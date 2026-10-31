@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Operations: weekly risk review and releases · kube-noob</title>
+<meta name="description" content="The risk review opens or updates one GitHub issue per ISO week titled Weekly risk review &lt;year&gt;-W&lt;week&gt; with the label risk-review , plus release-needed…">
+<link rel="canonical" href="https://kube-noob.com/docs/operations/">
+<meta property="og:title" content="Operations: weekly risk review and releases · kube-noob">
+<meta property="og:description" content="The risk review opens or updates one GitHub issue per ISO week titled Weekly risk review &lt;year&gt;-W&lt;week&gt; with the label risk-review , plus release-needed…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/operations/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/" aria-current="page">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="operations-weekly-risk-review-and-releases">Operations: weekly risk review and releases</h1>
+<h2 id="when-this-runs">When this runs</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>When (UTC)</th>
+<th>What</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sunday 05:17</td>
+<td>Corpus refresh (Git sources, release history, ROX Jira)</td>
+<td><code>corpus-refresh.yml</code></td>
+</tr>
+<tr>
+<td>Monday 04:23</td>
+<td>CodeQL</td>
+<td><code>codeql.yml</code></td>
+</tr>
+<tr>
+<td>Monday 06:41</td>
+<td>Risk review: dependency CVEs, released-image CVEs, upstream drift, SDK drift</td>
+<td><code>risk-review.yml</code></td>
+</tr>
+<tr>
+<td>Monday 04:37 US Central (09:37 or 10:37 UTC)</td>
+<td>Agent review: reads the issue and open Dependabot PRs, verifies facts, fixes, pushes a patch and hands back the tag command</td>
+<td>Claude scheduled task "kube-noob weekly risk review"</td>
+</tr>
+<tr>
+<td>Tuesday 03:41</td>
+<td>OpenSSF Scorecard</td>
+<td><code>scorecard.yml</code></td>
+</tr>
+<tr>
+<td>Weekly</td>
+<td>Dependabot PRs for pip, Actions and the base image</td>
+<td><code>dependabot.yml</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The risk review opens or updates one GitHub issue per ISO week titled <code>Weekly risk review &lt;year&gt;-W&lt;week&gt;</code> with the
+label <code>risk-review</code>, plus <code>release-needed</code> when a patch release is recommended.</p>
+<h2 id="risk-vectors-and-the-release-rule">Risk vectors and the release rule</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Vector</th>
+<th>Signal</th>
+<th>Release?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python dependency CVE with a fix</td>
+<td><code>pip-audit</code> on <code>requirements.lock</code></td>
+<td>yes, patch</td>
+</tr>
+<tr>
+<td>Fixable HIGH/CRITICAL CVE in the released image</td>
+<td>Trivy on <code>ghcr.io/aashishmahajan/kube-noob:&lt;latest&gt;</code></td>
+<td>yes, patch (rebuild)</td>
+</tr>
+<tr>
+<td>Upstream release newer than verified knowledge</td>
+<td>Kubernetes, OpenShift, Helm, StackRox vs <code>scripts/risk_baseline.json</code></td>
+<td>yes, after re-verifying facts</td>
+</tr>
+<tr>
+<td>New <code>mcp</code> or <code>anthropic</code> SDK</td>
+<td>PyPI vs lock pins</td>
+<td>review; release only if behaviour changes</td>
+</tr>
+<tr>
+<td>Unfixed CVE (no fix yet)</td>
+<td>pip-audit / Trivy</td>
+<td>review, document, no release</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="procedure">Procedure</h2>
+<ol>
+<li>Open the latest <code>risk-review</code> issue (or run <code>gh workflow run risk-review.yml</code>).</li>
+<li>For each reason, make the fix on <code>main</code>:
+   - dependency: <code>uv pip compile pyproject.toml --generate-hashes --python-version 3.12 --universal --upgrade-package &lt;pkg&gt; -o requirements.lock</code>
+   - image: no code change needed; the release rebuilds on the current UBI digest
+   - drift: re-verify the affected facts against the source, update knowledge, catalog and tests, then bump
+     <code>scripts/risk_baseline.json</code></li>
+<li>Verify locally: <code>scripts/check.sh</code> (plugin copy, lint, types, tests, self-test).</li>
+<li>Bump and changelog: <code>python scripts/bump_version.py &lt;next&gt; "&lt;one-line reason&gt;"</code>.</li>
+<li>Commit, push, and wait for CI to pass on <code>main</code>.</li>
+<li>Tag and push: <code>git tag v&lt;next&gt; &amp;&amp; git push origin v&lt;next&gt;</code>. The release workflow publishes to PyPI (trusted
+   publishing), pushes the signed multi-arch image and the signed OCI Helm chart to GHCR, publishes to the MCP
+   Registry and creates the GitHub release with the chart <code>.tgz</code> and demo GIFs.</li>
+<li>After PyPI shows the version: <code>python scripts/brew_formula.py &lt;next&gt; --write</code>, commit and push; the brew workflow
+   installs it on macOS and Linux.</li>
+<li>Close the weekly issue with the release link.</li>
+</ol>
+<p>Tags must be pushed by a person or the scheduled agent: tags pushed with the workflow <code>GITHUB_TOKEN</code> do not trigger
+other workflows.</p>
+<p>The Claude plugin directory reads the plugin (<code>.claude-plugin/marketplace.json</code> and <code>plugin/kube-noob/</code>) from <code>main</code>,
+and its review shows the commit it last checked. Work done on another branch reaches it only after that branch is
+merged to <code>main</code> and someone presses "Check for new commits" (or sets up push updates) in the plugin portal. A version
+that is bumped on <code>main</code> but never tagged never reaches PyPI, the image or the MCP Registry: 0.5.0 (073fe80) was
+bumped on <code>main</code> and not tagged, so PyPI stopped at 0.4.0.</p>
+<h2 id="rollback">Rollback</h2>
+<ul>
+<li>PyPI versions are immutable. Yank the bad version (<code>pypi.org/manage/project/kube-noob/releases/</code>), fix forward, and
+  release the next patch.</li>
+<li>GHCR: delete or retag the bad image version; users pinned by digest are unaffected.</li>
+<li>MCP Registry and the Claude plugin follow the next published version.</li>
+</ul>
+<h2 id="escalation">Escalation</h2>
+<ul>
+<li>Vulnerability reports arrive through GitHub private vulnerability reporting (see <code>SECURITY.md</code>); acknowledge within
+  3 business days.</li>
+<li>A failing release workflow blocks the release: fix and re-tag with the next patch version (never reuse a version).</li>
+</ul><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/operations.md">docs/operations.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# kube-noob.com: pages may be indexed; the in-browser runtime is not for crawlers; no AI training crawls.
+
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bytespider
+User-agent: Amazonbot
+User-agent: meta-externalagent
+User-agent: FacebookBot
+User-agent: cohere-ai
+User-agent: cohere-training-data-crawler
+User-agent: Diffbot
+User-agent: Omgilibot
+User-agent: ImagesiftBot
+User-agent: Timpibot
+User-agent: AI2Bot
+User-agent: PanguBot
+Disallow: /
+
+User-agent: *
+Disallow: /pyodide/
+Disallow: /py/
+Disallow: /404.html
+Allow: /
+
+Sitemap: https://kube-noob.com/sitemap.xml

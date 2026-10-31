@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Red-teaming a change, and ranking what comes out · kube-noob</title>
+<meta name="description" content="Written after the 0.7.0 incident described below, which the ordinary gate passed and an adversarial review caught. This is the procedure to run on a…">
+<link rel="canonical" href="https://kube-noob.com/docs/red-team-playbook/">
+<meta property="og:title" content="Red-teaming a change, and ranking what comes out · kube-noob">
+<meta property="og:description" content="Written after the 0.7.0 incident described below, which the ordinary gate passed and an adversarial review caught. This is the procedure to run on a…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/red-team-playbook/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/" aria-current="page">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="red-teaming-a-change-and-ranking-what-comes-out">Red-teaming a change, and ranking what comes out</h1>
+<p>Written after the 0.7.0 incident described below, which the ordinary gate passed and an adversarial review caught.
+This is the procedure to run on a change worth more than a typo, and the rubric for deciding what to do with what it
+finds.</p>
+<h2 id="why-this-exists-what-070-shipped">Why this exists: what 0.7.0 shipped</h2>
+<p><code>data/ceph_health.yaml</code> held 195 scalars of the form <code>src: [healthmon:885]</code>. A colon with no space after it inside a
+flow sequence is ambiguous YAML. PyYAML's own scanner reads it as the string <code>"healthmon:885"</code>; the stricter libyaml
+in the browser runtime refuses the document outright. <code>signals/ceph.py</code> prefers <code>CSafeLoader</code> when libyaml is
+present, and <code>signals.catalogue()</code> is on the path of both <code>diagnose</code> and <code>known_issues</code>, so those two tools raised a
+<code>ScannerError</code> for every visitor to kube-noob.com's playground and for any install whose libyaml is the strict one.</p>
+<p><code>scripts/check.sh</code> was green throughout. It had to be: it parses that file with the parser installed on the machine
+running it, which is the permissive one. Every test asked "does this work here?" and none asked "does this work
+where we ship it?"</p>
+<p><strong>The lesson is not that the tests were too few. It is that kube-noob ships to four runtimes and tests in one.</strong> A
+PyPI wheel on the user's Python, a plugin under <code>uv run</code> with locked dependencies, a UBI9 container, and a wheel
+compiled to WebAssembly in a browser. Anything that reads "whatever is installed" is a place those four can disagree.</p>
+<h2 id="the-three-passes">The three passes</h2>
+<p>Run them in parallel, on cheap models; they are independent. Each brief below is a shape, not a script: fill in the
+change under review. What makes them produce signal rather than prose is the last rule in each — a finding is not a
+finding until it names an input and an environment.</p>
+<p><strong>1. Environment divergence.</strong> Give the model the four runtimes explicitly and the incident above as the worked
+example, then ask it to find every other place behaviour depends on what happens to be installed: an optional C
+accelerator, <code>sys.platform</code>, <code>sys.version_info</code>, a <code>try: import</code> fallback, locale, timezone, default encoding,
+filesystem case sensitivity, line endings, and in the WebAssembly target the absence of threads, subprocesses and
+sockets. Demand, for each: file and line, what differs, and a concrete input that behaves differently in which
+runtime.</p>
+<p><strong>2. Adversarial review of the diff.</strong> Give the model the diff and what it was meant to achieve, and tell it its job
+is to find what is wrong with it. The axes that paid off: construct an input the new test misses (a false negative);
+construct a legitimate input it wrongly rejects (a false positive, which blocks future honest changes); verify
+independently that a data change did not alter meaning; and for anything touching CI, hunt shell quoting, a trigger
+that cannot fire, a schedule that does not mean what its comment says, and an injection path from attacker-influenced
+input. Ask what companion fix the author skipped — that question has a good hit rate.</p>
+<p><strong>3. Mechanical data sweep.</strong> A bounded, exhaustive task suits the cheapest model. Write the script, walk every
+bundled file, report every value whose type is not what the author plainly meant, then triage. YAML 1.1 coercion is
+the standing trap here: <code>yes</code>/<code>no</code>/<code>on</code>/<code>off</code> becoming booleans, <code>1:30</code> becoming 90, a leading zero becoming octal,
+and — the one that would really hurt a Kubernetes tool — <code>4.20</code> becoming the float <code>4.2</code>, a different release.</p>
+<p>Keep each pass read-only. Let it report; do the fixing yourself, where the judgement is.</p>
+<h2 id="what-it-actually-found-the-day-it-was-written">What it actually found, the day it was written</h2>
+<p>Pass 2, reviewing the fix for the incident above, found three real defects in that fix: a <code>release: published</code> trigger
+that can never fire, because GitHub starts no workflow for a release created with <code>GITHUB_TOKEN</code>; a drift alarm whose
+grace period was shorter than the fallback it was watching, so it would have gone red on about half of all releases
+by design; and three YAML shapes the new regression test did not catch (<code>[rule:]</code>, <code>[rule:1, x]</code>), because PyYAML
+turns those into a single-pair mapping and the test was only looking at scalars. It also found that the deploy
+request, as first written, would have fired before the release's videos were attached — reproducing the stale Videos
+page that prompted the work. All four are fixed.</p>
+<p>Pass 3 came back almost clean: three non-string values, all benign, no version floats, no tabs, no duplicate keys.
+A negative result from an exhaustive sweep is worth having and worth recording, so nobody pays for it twice.</p>
+<h2 id="ranking-what-comes-out">Ranking what comes out</h2>
+<p>In order. The first question decides most cases.</p>
+<ol>
+<li><strong>Does it give a wrong answer, silently?</strong> An audit or debugging tool that confidently names the wrong cause is
+   worse than one that crashes, because the crash gets reported and the wrong answer gets acted on. Fix first,
+   always, whatever it costs.</li>
+<li><strong>Does it break a shipped runtime?</strong> Weighted by how many users are in that runtime and whether they can tell it
+   is kube-noob's fault. The incident above scored high on both: two of the most-used tools, in the runtime a new
+   visitor meets first.</li>
+<li><strong>Is it on a deadline somebody else set?</strong> A removal upstream, an end-of-support date, a CVE. These do not get
+   more expensive gradually; they become urgent on a date.</li>
+<li><strong>Does it close a class, or an instance?</strong> A fix that makes the whole class impossible — a test reading the YAML
+   tokens, rather than 195 quoted scalars — outranks a fix of equal size that closes one case.</li>
+<li><strong>Everything else</strong>, by evidence of someone actually wanting it. Prefer a thing one real user hit over a thing
+   that would be nice.</li>
+</ol>
+<p>Two tie-breakers worth stating. A deterministic guard beats a sharper review: a model finds a bug once, a test keeps
+it fixed, so any finding that can become an assertion should become one in the same change. And prefer the fix that
+makes the gap visible over the fix that makes it smaller — the drift alarm in <code>site-sync.yml</code> does not stop a deploy
+failing, it stops a deploy failing unnoticed, which is what actually went wrong.</p>
+<h2 id="what-pass-1-found-once-it-stopped-guessing">What pass 1 found, once it stopped guessing</h2>
+<p>The environment-divergence pass was worth running because it refused to reason about the browser runtime and built
+it instead: Pyodide 314.0.7, the version in the site's <code>deploy.yml</code>, loaded with a freshly built wheel. That runtime
+is <strong>Python 3.14 with libyaml 0.1.7</strong>, against 3.13 and libyaml 0.2.5 on a development machine — two divergences in
+one runtime, and it found a second live bug on the first of them.</p>
+<p><code>json.loads</code> recurses, and what stops it is not the same everywhere. Up to CPython 3.13 it raises <code>RecursionError</code>
+at about a thousand levels, which every caller here catches. On 3.14 it relies on the C stack, so a deeply nested
+paste overflows the WebAssembly stack and surfaces as a raw JavaScript <code>RangeError</code> the runtime calls fatal. A 40 KB
+paste of nothing but brackets took out <code>diagnose</code> and <code>known_issues</code> in the browser — the same two tools as the YAML
+bug, in the same runtime, from an unrelated cause. The repository already had a test asserting such input is
+"refused cleanly"; it passed on 3.13 and failed on 3.14. The fix counts brackets before parsing
+(<code>sanitize.json_nesting_ok</code>), so the refusal no longer depends on the interpreter.</p>
+<p>The libyaml divergence showed up a second time too, on the operator's own evidence rather than ours: a must-gather
+file holding <code>{image: reg/app:v1}</code> was recorded as unparsed, one finding disappeared, and <code>--fail-on</code> still exited
+clean, because <code>failing()</code> does not look at <code>unparsed</code>. A file either parser can read is now read by whichever one
+can.</p>
+<p>Both are the same lesson as the first bug, which is why the pass is worth repeating rather than reading: <strong>the ways
+four runtimes can disagree are not guessable, so build the runtime and ask it.</strong></p>
+<h2 id="the-open-one">The open one</h2>
+<p>The product repository still never runs its own wheel in the runtime that broke. The site repository does, which is
+where the first bug was finally caught — after release. A CI job here that loads the built wheel into Pyodide and
+calls <code>diagnose</code> and <code>known_issues</code> would have held 0.7.0 back, and would have caught the JSON bug too. That is the
+highest-value guard not yet built, and it is ranked where rule 4 puts it: it closes the class for every tool at
+once, not one tool's data. Python 3.14 is now in the CI matrix as a step towards it, advisory until its first green
+run — half the divergence, without the browser.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/red-team-playbook.md">docs/red-team-playbook.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

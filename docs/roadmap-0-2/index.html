@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>kube-noob 0.2.0: scope and acceptance criteria · kube-noob</title>
+<meta name="description" content="Outcome: a newcomer gets value in 5 minutes without network or cluster access, and a platform team can prove the tool never leaves the boundary and never…">
+<link rel="canonical" href="https://kube-noob.com/docs/roadmap-0-2/">
+<meta property="og:title" content="kube-noob 0.2.0: scope and acceptance criteria · kube-noob">
+<meta property="og:description" content="Outcome: a newcomer gets value in 5 minutes without network or cluster access, and a platform team can prove the tool never leaves the boundary and never…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/roadmap-0-2/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/" aria-current="page">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="kube-noob-020-scope-and-acceptance-criteria">kube-noob 0.2.0: scope and acceptance criteria</h1>
+<p>Outcome: a newcomer gets value in 5 minutes without network or cluster access, and a platform team can prove the tool
+never leaves the boundary and never changes anything.</p>
+<p>Jobs to be done:
+- When I am handed a broken workload on a locked-down cluster, I want safe, read-only, guided diagnosis so I can fix it
+  without leaking data or changing anything by accident.
+- When I am learning Kubernetes objects, I want instant, platform-aware feedback on my YAML so I build production habits
+  before I touch a real cluster.</p>
+<h2 id="decisions">Decisions</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ask</th>
+<th>Decision</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Walkthrough videos</td>
+<td>Scripted demos (<code>kube-noob demo &lt;scenario&gt;</code>) plus VHS tapes rendered to GIFs in CI on every release</td>
+<td>hand-made videos go stale every release; scripted demos are always current and double as smoke tests</td>
+</tr>
+<tr>
+<td>Educating on use cases</td>
+<td><code>docs/use-cases.md</code> (one page, by role) and <code>examples/</code> with ready-to-run inputs</td>
+<td>one source of truth beats a separate help repo; split later only if community scenarios grow</td>
+</tr>
+<tr>
+<td>Help / instruction set</td>
+<td>in-product first: <code>kube-noob demo --list</code> and an MCP prompt <code>getting_started</code></td>
+<td>users ask the tool, not a wiki</td>
+</tr>
+<tr>
+<td>Training case</td>
+<td><code>docs/learning.md</code>: a flight simulator for Kubernetes objects (offline, graded, credited)</td>
+<td>the deterministic grader is the differentiator over reading docs</td>
+</tr>
+<tr>
+<td>No egress by default</td>
+<td>add an admin lock (<code>offline: true</code> / <code>KUBE_NOOB_OFFLINE=1</code>) that overrides <code>webEnabled</code>; web stays HTTPS GET-only, allowlisted, text content types only, size-capped, never written to disk, never executed; <code>kube-noob doctor</code> proves the posture</td>
+<td>"off by default" protects users; an enforced lock protects platform teams</td>
+</tr>
+<tr>
+<td>Diagnose before change</td>
+<td>every playbook splits read-only checks from changes; diagnose/debug output lists read-only next steps first and labels changes "requires approval"; <code>kube-noob bundle</code> collects a redacted read-only evidence bundle</td>
+<td>makes the safe path the default path, not a prompt instruction</td>
+</tr>
+<tr>
+<td>Learning from context</td>
+<td>local, upgrade-safe learning file in the data dir: profile (platform, versions, conventions), confirmed notes (symptom, cause, fix) and aggregate counters; never raw logs or manifests; notes are searchable and cited as <code>kn:local-...</code></td>
+<td>learning must not leak data or turn guesses into truth; explicit confirmation plus derived facts only</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="status">Status</h2>
+<p>Delivered in 0.2.0. Each criterion below is enforced by the tests listed in <a href="/docs/guidance/">guidance.md</a> (G02-G04,
+G06-G09, G16, G20-G21).</p>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<ol>
+<li>Offline lock
+   - With <code>KUBE_NOOB_OFFLINE=1</code>, <code>webEnabled: true</code> is ignored, <code>web_fetch</code> is not registered and <code>corpus --online</code>
+     exits non-zero.
+   - Web responses with non-text content types (archives, binaries) are rejected; nothing fetched is written to disk.
+   - <code>kube-noob doctor</code> reports network, cluster, model and data-dir posture and exits non-zero if the posture
+     contradicts the lock.</li>
+<li>Diagnose before change
+   - A test fails if any playbook lists a mutating command (<code>apply</code>, <code>create</code>, <code>delete</code>, <code>patch</code>, <code>edit</code>, <code>scale</code>,
+     <code>rollout restart</code>, <code>adm</code>) in its read-only checks.
+   - <code>diagnose</code> and <code>cluster_debug_workload</code> return <code>readOnlyNextSteps</code> before <code>proposedChanges</code>, and every proposed
+     change carries <code>requiresApproval: true</code>.
+   - <code>kube-noob bundle &lt;kind/name&gt; -n &lt;ns&gt;</code> writes a Markdown + JSON bundle using read-only calls only, with Secrets
+     refused and values redacted.</li>
+<li>Learning file
+   - Stored at <code>&lt;dataDir&gt;/learning.json</code> with <code>schemaVersion</code>; a file written by an older version loads after upgrade.
+   - Notes containing credential patterns are rejected; raw manifests and logs are never stored.
+   - Confirmed notes appear in <code>search_knowledge</code> as <code>origin: local</code> and are citable.</li>
+<li>Demos and education
+   - <code>kube-noob demo --list</code> shows at least 5 offline scenarios; each runs in under 10 seconds without network.
+   - The release workflow renders one GIF per scenario from VHS tapes and attaches them to the GitHub release.
+   - <code>docs/use-cases.md</code>, <code>docs/learning.md</code> and <code>examples/</code> exist; the README links them in one line each.</li>
+</ol>
+<h2 id="riskiest-assumptions-and-cheapest-tests">Riskiest assumptions and cheapest tests</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Assumption</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>People will try a demo before installing anything else</td>
+<td>put one GIF at the top of the README; watch PyPI installs and plugin installs in the launch week</td>
+</tr>
+<tr>
+<td>Auto-learned context helps more than it harms</td>
+<td>ship explicit, confirmed notes first; add automatic capture only of counters</td>
+</tr>
+<tr>
+<td>Platform teams need an enforced lock, not just defaults</td>
+<td>ask two OpenShift admins during launch; the lock is cheap to keep either way</td>
+</tr>
+</tbody>
+</table></div>
+<p>Set aside for later: a hosted demo environment, an operator/CRD, OAuth for remote MCP, embeddings.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/roadmap-0.2.md">docs/roadmap-0.2.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

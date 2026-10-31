@@ -1,0 +1,61 @@
+WEBVTT
+
+1
+00:00:00.450 --> 00:00:04.162
+Ask Claude to review a
+Deployment for OpenShift 4.22.
+
+2
+00:00:07.450 --> 00:00:10.248
+The kube-noob plugin runs on your machine.
+
+3
+00:00:10.248 --> 00:00:13.445
+Claude calls its tools:
+audit, fix and diagnose.
+
+4
+00:00:16.450 --> 00:00:19.807
+kube-noob checks the
+YAML against 77 rules and
+
+5
+00:00:19.807 --> 00:00:23.091
+returns findings with
+line numbers and fixes.
+
+6
+00:00:23.091 --> 00:00:24.770
+Same answer every time.
+
+7
+00:00:29.450 --> 00:00:31.703
+Each finding lands on its line.
+
+8
+00:00:31.703 --> 00:00:34.900
+The safe fixes take the
+score from 37 to 59,
+
+9
+00:00:34.900 --> 00:00:38.751
+and kube-noob lists the 4
+changes that need a person.
+
+10
+00:00:39.950 --> 00:00:44.174
+Claude explains the result in plain
+language and cites the rule ids.
+
+11
+00:00:48.950 --> 00:00:53.494
+There's no model inside kube-noob, and
+it makes no network calls of its own.
+
+12
+00:00:56.950 --> 00:00:59.385
+Add it to Claude Code with two commands.
+
+13
+00:00:59.385 --> 00:01:01.089
+Get it at kube-noob dot com.

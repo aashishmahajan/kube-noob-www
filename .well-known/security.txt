@@ -1,0 +1,6 @@
+Contact: https://kube-noob.com/docs/security/
+Contact: https://github.com/aashishmahajan/kube-noob/security/advisories/new
+Expires: 2027-10-31T00:00:00Z
+Policy: https://kube-noob.com/docs/security/
+Preferred-Languages: en
+Canonical: https://kube-noob.com/.well-known/security.txt

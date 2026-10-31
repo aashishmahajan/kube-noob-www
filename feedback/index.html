@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://script.google.com https://script.googleusercontent.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Feedback · kube-noob</title>
+<meta name="description" content="Send feedback about kube-noob.">
+<link rel="canonical" href="https://kube-noob.com/feedback/">
+<meta property="og:title" content="Feedback · kube-noob">
+<meta property="og:description" content="Send feedback about kube-noob.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/feedback/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+<script type="module" src="/assets/forms.js"></script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="prose form-page"><span class="eyebrow">Feedback</span><h1>Tell us what you think</h1>
+<p class="lead">What worked, what did not and what you would like next. Every message is read.</p><form class="kn-form" data-kn-form="feedback" data-endpoint="https://script.google.com/macros/s/AKfycbz_u-phseecVPC_fG3e3iBBBeGT2KWVNsSbN6bHf5RhGHcTOZUYziJh7b-3mGs2jKDF/exec" novalidate><div class="row2"><div><label for="f-area">What were you using?</label><select id="f-area" name="area">
+<option value="audit">Audit</option><option value="debug">Debug and diagnose</option><option value="learn">Learning</option><option value="playground">Playground</option><option value="ask">Bring your own AI</option><option value="docs">Docs and website</option><option value="other">Other</option></select></div><div><label for="f-rating">How useful was it?</label><select id="f-rating" name="rating">
+<option value="">(skip)</option><option value="5">5, very useful</option><option value="4">4</option>
+<option value="3">3</option><option value="2">2</option><option value="1">1, not at all</option></select></div></div>
+<label for="f-message">What worked, what did not, what should come next?</label>
+<textarea id="f-message" name="message" maxlength="5000" required></textarea>
+<label for="f-email">Email (optional, if you would like a reply)</label><input id="f-email" name="email" type="email"
+maxlength="254" autocomplete="email"><div class="hp" aria-hidden="true"><label for="feedback-website">Leave this empty</label><input id="feedback-website" name="website" type="text" tabindex="-1" autocomplete="off"></div><p><button class="btn primary" type="submit">Send</button></p><p class="form-status" role="status" aria-live="polite"></p></form>
+<p class="form-privacy">What you send goes to the kube-noob maintainer through a Google Apps Script web app and is kept in a private Google Sheet, only to reply to you or to keep your license. It is not sold or shared, and you can ask for it to be deleted through the <a href="/contact/">contact form</a>. More: <a href="/docs/privacy/">privacy</a>.</p></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

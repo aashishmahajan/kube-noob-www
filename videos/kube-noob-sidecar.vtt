@@ -1,0 +1,45 @@
+WEBVTT
+
+1
+00:00:00.450 --> 00:00:03.330
+Run kube-noob next to your
+own app, in the same pod.
+
+2
+00:00:07.450 --> 00:00:12.165
+It listens only on localhost, so only
+the containers in that pod can call it.
+
+3
+00:00:15.450 --> 00:00:20.181
+It makes no outbound calls, so its
+network policy allows DNS only.
+
+4
+00:00:20.181 --> 00:00:24.410
+kube-noob gets no Service, no
+Route and no token to manage.
+
+5
+00:00:25.617 --> 00:00:29.310
+On a test cluster that enforces
+Pod Security restricted,
+
+6
+00:00:29.310 --> 00:00:34.257
+the app asks it to audit a Deployment
+and diagnose a crash, over localhost.
+
+7
+00:00:37.617 --> 00:00:41.884
+In our test cluster it peaked at
+94 mebibytes, well under its limit.
+
+8
+00:00:44.617 --> 00:00:49.174
+One example manifest, audited
+for OpenShift 4.20 and later.
+
+9
+00:00:49.174 --> 00:00:51.337
+Get it at kube-noob dot com.

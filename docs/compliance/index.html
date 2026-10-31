@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Compliance: FedRAMP High and NIST SP 800-53 · kube-noob</title>
+<meta name="description" content="kube-noob is software that runs inside your system boundary; it is not a cloud service and holds no FedRAMP authorization of its own. FedRAMP authorizes…">
+<link rel="canonical" href="https://kube-noob.com/docs/compliance/">
+<meta property="og:title" content="Compliance: FedRAMP High and NIST SP 800-53 · kube-noob">
+<meta property="og:description" content="kube-noob is software that runs inside your system boundary; it is not a cloud service and holds no FedRAMP authorization of its own. FedRAMP authorizes…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/compliance/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/" aria-current="page">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="compliance-fedramp-high-and-nist-sp-800-53">Compliance: FedRAMP High and NIST SP 800-53</h1>
+<p>kube-noob is software that runs inside your system boundary; it is not a cloud service and holds no FedRAMP
+authorization of its own. FedRAMP authorizes cloud service offerings, so kube-noob counts as a component of the
+offering it runs in (for example an OpenShift or ROSA cluster in a FedRAMP High environment), and the controls below
+are met by how that offering deploys and operates it. This page says what kube-noob gives as evidence, how to deploy
+it inside a High boundary, and what is not covered yet. Researched 2026-10-27.</p>
+<p>FedRAMP is changing: the Consolidated Rules for 2026 apply to every authorization from 1 January 2027, and the
+Vulnerability Detection and Response rules from 7 December 2026 for obtaining and for maintaining a certification,
+with a grace period to 7 March 2027. 20x Class D (the high-impact class) is not in pilot yet: RFC-0033 proposes the
+Phase 4 pilot for FY27 Q1 and Q2, with the application window 1-4 December 2026 and a cap of ten participants, and
+applicants need a CR26-compliant Class C certification first (checked 2026-10-31).
+Both Rev5 baselines and the 20x Key Security Indicators are written against NIST SP 800-53 Rev. 5 controls, which is
+what kube-noob maps to.</p>
+<h2 id="evidence-kube-noob-produces">Evidence kube-noob produces</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Controls it supports</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every audit finding names the NIST SP 800-53 controls it is evidence about; each report has a <code>controlSummary</code></td>
+<td>CM-6, CM-7, AC-6, SC-7, SC-8, IA-5(7) and the rest in the table below</td>
+<td><code>kube-noob audit -f k8s/ --format json</code> (also over MCP)</td>
+</tr>
+<tr>
+<td>Changes are validated before they reach the cluster</td>
+<td>CM-3(2)</td>
+<td><code>kube-noob audit</code> in CI (exit 1 on high findings), <code>fix</code>, <code>protocol</code></td>
+</tr>
+<tr>
+<td>Posture: what the process can reach, and FIPS mode</td>
+<td>CM-7, SC-7, SC-13</td>
+<td><code>kube-noob doctor</code> (exit 1 on a contradiction); <code>config_status</code> over MCP</td>
+</tr>
+<tr>
+<td>Policy denials and NetworkPolicy reachability explained</td>
+<td>AC-4, SC-7, AC-3</td>
+<td><code>kube-noob policy explain</code>, <code>kube-noob policy reach</code></td>
+</tr>
+<tr>
+<td>Signed image and chart, build provenance, image SBOM, hash-pinned dependencies</td>
+<td>SI-7, SR-4, SR-11, SA-10</td>
+<td>Release workflow; verification commands in <a href="/docs/security/">SECURITY.md</a></td>
+</tr>
+<tr>
+<td>Dependency and code scanning, weekly risk review</td>
+<td>RA-5, SI-2, SA-11</td>
+<td>Dependabot, <code>pip-audit</code>, CodeQL, OpenSSF Scorecard, <code>risk-review</code> workflow</td>
+</tr>
+<tr>
+<td>Each requirement traced to a test</td>
+<td>SA-11, CA-2 (input)</td>
+<td><a href="/docs/guidance/">guidance.md</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="deploying-inside-a-fedramp-high-boundary">Deploying inside a FedRAMP High boundary</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CM-7, SC-7</td>
+<td>Chart <code>config.offline=true</code> (no web, no corpus downloads, local models only); keep the chart's NetworkPolicy (DNS-only egress) and add the EgressFirewall on OVN-Kubernetes</td>
+</tr>
+<tr>
+<td>SC-13</td>
+<td>Install OpenShift in FIPS mode and use the UBI-based image: kube-noob uses only SHA-256 and the system OpenSSL, so its crypto runs in the validated module. <code>kube-noob doctor</code> must show <code>FIPS mode on</code></td>
+</tr>
+<tr>
+<td>AC-3, AC-6</td>
+<td>Live cluster access stays off unless needed; when on it is read-only, namespace-scoped, never reads Secrets and redacts values</td>
+</tr>
+<tr>
+<td>IA-2, IA-5, AC-2</td>
+<td>Put the HTTP service behind the OpenShift OAuth proxy backed by your PIV/CAC identity provider instead of relying only on the shared bearer token</td>
+</tr>
+<tr>
+<td>AU-2, AU-3, AU-12</td>
+<td>Ship the container's stdout to cluster logging and your SIEM: each tool call logs the tool, argument sizes, outcome and duration, never content</td>
+</tr>
+<tr>
+<td>SI-7, SR-11</td>
+<td>Deploy by digest from your mirror and verify the cosign signature and provenance before admission (RHACS or a Sigstore admission policy)</td>
+</tr>
+<tr>
+<td>RA-5, SI-2</td>
+<td>Scan the image in your registry (RHACS, Quay, Clair) and fix within the Vulnerability Detection and Response timeframes; take patch releases from the weekly risk review</td>
+</tr>
+<tr>
+<td>SC-28</td>
+<td>Keep the data directory on an encrypted storage class, or set <code>learningEnabled: false</code>; kube-noob stores nothing else</td>
+</tr>
+<tr>
+<td>CM-2, CM-6</td>
+<td>Keep <code>kube-noob.yaml</code> in Git as a ConfigMap; run <code>kube-noob doctor</code> in the pipeline</td>
+</tr>
+</tbody>
+</table></div>
+<p>Using kube-noob with an AI client in a High boundary: kube-noob never calls a model. The client's model must itself
+be authorized at High, for example Claude through Amazon Bedrock in AWS GovCloud (US), Claude for Government, or
+Claude on Google Vertex AI with Assured Workloads, or a model you host inside the boundary (<code>kube-noob ask</code> with
+<code>openai-compatible</code> and a <code>*.svc</code> endpoint).</p>
+<h2 id="not-covered-yet">Not covered yet</h2>
+<ul>
+<li>Per-user identity in the service: authorization is one shared token unless you add the OAuth proxy, and audit
+  records do not carry the caller's identity yet.</li>
+<li>Machine-readable output for assessors (OSCAL assessment results) and the FedRAMP 20x Key Security Indicator
+  mapping.</li>
+<li>FIPS mode is checked by <code>doctor</code> but not exercised in CI (no FIPS-mode runner).</li>
+<li>No 3PAO assessment, Iron Bank listing, DISA STIG review of the image, or CISA secure software development
+  attestation has been done.</li>
+</ul>
+<h2 id="the-77-audit-rules-and-their-controls">The 77 audit rules and their controls</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>What it checks</th>
+<th>NIST SP 800-53 Rev. 5 controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KN-C001</td>
+<td>No readiness probe</td>
+<td>CP-10</td>
+</tr>
+<tr>
+<td>KN-C002</td>
+<td>No liveness probe</td>
+<td>CP-10</td>
+</tr>
+<tr>
+<td>KN-C003</td>
+<td>Liveness probe is aggressive</td>
+<td>CP-10, SC-5</td>
+</tr>
+<tr>
+<td>KN-C004</td>
+<td>Missing CPU/memory requests</td>
+<td>SC-6</td>
+</tr>
+<tr>
+<td>KN-C005</td>
+<td>Missing memory limit</td>
+<td>SC-5, SC-6</td>
+</tr>
+<tr>
+<td>KN-C006</td>
+<td>Request exceeds limit</td>
+<td>CM-6</td>
+</tr>
+<tr>
+<td>KN-C007</td>
+<td>Single replica</td>
+<td>CP-10, SC-36</td>
+</tr>
+<tr>
+<td>KN-C008</td>
+<td>No PodDisruptionBudget</td>
+<td>CP-10</td>
+</tr>
+<tr>
+<td>KN-C009</td>
+<td>PodDisruptionBudget blocks all voluntary evictions</td>
+<td>SI-2, CP-10</td>
+</tr>
+<tr>
+<td>KN-C010</td>
+<td>Replicas not spread across zones/nodes</td>
+<td>SC-36</td>
+</tr>
+<tr>
+<td>KN-C011</td>
+<td>terminationGracePeriodSeconds is 0</td>
+<td>CP-10</td>
+</tr>
+<tr>
+<td>KN-C012</td>
+<td>HPA cannot compute CPU utilization</td>
+<td>SC-6</td>
+</tr>
+<tr>
+<td>KN-C013</td>
+<td>Pull secret exists only in another namespace</td>
+<td>CM-6</td>
+</tr>
+<tr>
+<td>KN-C014</td>
+<td>Workload scaled by an HPA also sets spec.replicas</td>
+<td>CM-6, SC-6</td>
+</tr>
+<tr>
+<td>KN-N001</td>
+<td>Namespace has workloads but no NetworkPolicy</td>
+<td>SC-7, SC-7(5), AC-4</td>
+</tr>
+<tr>
+<td>KN-N002</td>
+<td>Route without TLS</td>
+<td>SC-8, SC-8(1)</td>
+</tr>
+<tr>
+<td>KN-N003</td>
+<td>Ingress without TLS</td>
+<td>SC-8, SC-8(1)</td>
+</tr>
+<tr>
+<td>KN-N004</td>
+<td>LoadBalancer Service open to the internet</td>
+<td>SC-7, AC-4</td>
+</tr>
+<tr>
+<td>KN-N005</td>
+<td>NodePort Service</td>
+<td>SC-7, CM-7</td>
+</tr>
+<tr>
+<td>KN-N006</td>
+<td>EgressFirewall rule is shadowed</td>
+<td>SC-7, SC-7(5), AC-4</td>
+</tr>
+<tr>
+<td>KN-N007</td>
+<td>NetworkPolicy allows all ingress</td>
+<td>SC-7, SC-7(5), AC-4</td>
+</tr>
+<tr>
+<td>KN-N008</td>
+<td>Service uses externalIPs</td>
+<td>SC-7, SC-8, AC-4</td>
+</tr>
+<tr>
+<td>KN-N009</td>
+<td>Ingress uses a risky ingress-nginx annotation</td>
+<td>CM-7, SI-2, SC-7</td>
+</tr>
+<tr>
+<td>KN-N010</td>
+<td>ingress-nginx ConfigMap widens what an Ingress may ask of the controller</td>
+<td>CM-6, CM-7, SI-2</td>
+</tr>
+<tr>
+<td>KN-N011</td>
+<td>Ingress path type ImplementationSpecific on ingress-nginx</td>
+<td>SI-2, SI-10, CM-7</td>
+</tr>
+<tr>
+<td>KN-N012</td>
+<td>NetworkPolicy selects no pod in this bundle</td>
+<td>SC-7, SC-7(5), AC-4</td>
+</tr>
+<tr>
+<td>KN-S001</td>
+<td>Privileged container</td>
+<td>AC-6, CM-7, SC-39</td>
+</tr>
+<tr>
+<td>KN-S002</td>
+<td>Privilege escalation not disabled</td>
+<td>AC-6, AC-6(10), CM-7</td>
+</tr>
+<tr>
+<td>KN-S003</td>
+<td>Container may run as root</td>
+<td>AC-6, CM-6</td>
+</tr>
+<tr>
+<td>KN-S004</td>
+<td>Fixed UID/fsGroup conflicts with OpenShift restricted-v2 SCC</td>
+<td>CM-6, AC-6</td>
+</tr>
+<tr>
+<td>KN-S005</td>
+<td>Dangerous Linux capabilities added</td>
+<td>AC-6, CM-7</td>
+</tr>
+<tr>
+<td>KN-S006</td>
+<td>Capabilities not dropped</td>
+<td>AC-6, CM-7</td>
+</tr>
+<tr>
+<td>KN-S007</td>
+<td>Writable root filesystem</td>
+<td>CM-7, SI-7</td>
+</tr>
+<tr>
+<td>KN-S008</td>
+<td>Seccomp profile not set to RuntimeDefault</td>
+<td>CM-6, CM-7, SC-39</td>
+</tr>
+<tr>
+<td>KN-S009</td>
+<td>Host namespaces shared</td>
+<td>SC-39, AC-6</td>
+</tr>
+<tr>
+<td>KN-S010</td>
+<td>hostPath volume</td>
+<td>AC-6, SC-39</td>
+</tr>
+<tr>
+<td>KN-S011</td>
+<td>hostPort used</td>
+<td>SC-7, CM-7</td>
+</tr>
+<tr>
+<td>KN-S012</td>
+<td>Mutable image reference</td>
+<td>CM-2, SI-7</td>
+</tr>
+<tr>
+<td>KN-S013</td>
+<td>Secret value hard-coded in environment</td>
+<td>IA-5(7), SC-28</td>
+</tr>
+<tr>
+<td>KN-S014</td>
+<td>ServiceAccount token automounted</td>
+<td>AC-6, IA-5, CM-7</td>
+</tr>
+<tr>
+<td>KN-S015</td>
+<td>RBAC wildcard grants</td>
+<td>AC-3, AC-6</td>
+</tr>
+<tr>
+<td>KN-S016</td>
+<td>Binding to cluster-admin</td>
+<td>AC-6, AC-6(5)</td>
+</tr>
+<tr>
+<td>KN-S017</td>
+<td>RBAC privilege-escalation paths</td>
+<td>AC-3, AC-5, AC-6</td>
+</tr>
+<tr>
+<td>KN-S018</td>
+<td>Secret material committed in manifests</td>
+<td>IA-5(7), SC-28</td>
+</tr>
+<tr>
+<td>KN-S019</td>
+<td>Permissive SecurityContextConstraints</td>
+<td>AC-6, CM-7, SC-39</td>
+</tr>
+<tr>
+<td>KN-S020</td>
+<td>Unmasked /proc</td>
+<td>SC-39, CM-7</td>
+</tr>
+<tr>
+<td>KN-S021</td>
+<td>gitRepo volume</td>
+<td>SI-2, CM-7, SC-39</td>
+</tr>
+<tr>
+<td>KN-S022</td>
+<td>Pod sysctl name or value contains '+' or '='</td>
+<td>SI-2, SC-39, CM-7</td>
+</tr>
+<tr>
+<td>KN-S023</td>
+<td>Container workingDir under /proc</td>
+<td>SI-2, SC-39</td>
+</tr>
+<tr>
+<td>KN-S024</td>
+<td>ingress-nginx controller image below the fixed releases</td>
+<td>SI-2, SA-22</td>
+</tr>
+<tr>
+<td>KN-S025</td>
+<td>volumeMount subPath carries shell or PowerShell characters</td>
+<td>SI-2, SI-10, SC-39</td>
+</tr>
+<tr>
+<td>KN-S026</td>
+<td>Credential stored in a ConfigMap</td>
+<td>IA-5(7), SC-28</td>
+</tr>
+<tr>
+<td>KN-S027</td>
+<td>Legacy ServiceAccount token Secret</td>
+<td>IA-5, AC-6</td>
+</tr>
+<tr>
+<td>KN-S028</td>
+<td>RBAC binding grants a role to everyone</td>
+<td>AC-14, AC-3, AC-6</td>
+</tr>
+<tr>
+<td>KN-ST001</td>
+<td>ReadWriteMany requested from a ReadWriteOnce-only StorageClass</td>
+<td>CM-6</td>
+</tr>
+<tr>
+<td>KN-ST002</td>
+<td>ReadWriteOnce volume shared by a rolling Deployment</td>
+<td>CM-6, CP-10</td>
+</tr>
+<tr>
+<td>KN-ST003</td>
+<td>Zonal storage with Immediate volume binding</td>
+<td>SC-36, CM-6</td>
+</tr>
+<tr>
+<td>KN-ST004</td>
+<td>EFS StorageClass is missing required parameters</td>
+<td>CM-6</td>
+</tr>
+<tr>
+<td>KN-ST005</td>
+<td>PVC has no storage request</td>
+<td>CM-6, SC-6</td>
+</tr>
+<tr>
+<td>KN-ST006</td>
+<td>PersistentVolume path carries command or traversal characters</td>
+<td>SI-2, SI-10, AC-6</td>
+</tr>
+<tr>
+<td>KN-V001</td>
+<td>Object is missing apiVersion, kind or metadata.name</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V002</td>
+<td>apiVersion does not serve this kind</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V003</td>
+<td>OpenShift-only API used on a non-OpenShift target</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V004</td>
+<td>API requires an add-on on this platform</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V005</td>
+<td>API removed in the target Kubernetes version</td>
+<td>CM-3(2), SA-22</td>
+</tr>
+<tr>
+<td>KN-V006</td>
+<td>Deprecated API in the target Kubernetes version</td>
+<td>SA-22</td>
+</tr>
+<tr>
+<td>KN-V008</td>
+<td>DeploymentConfig is deprecated</td>
+<td>SA-22</td>
+</tr>
+<tr>
+<td>KN-V009</td>
+<td>metadata.name is not a valid DNS-1123 name</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V010</td>
+<td>Workload selector does not match its pod template labels</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V011</td>
+<td>Service selects no pods in this bundle</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V012</td>
+<td>Service targetPort name is not declared by the selected containers</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V014</td>
+<td>Duplicate object in bundle</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V015</td>
+<td>EgressFirewall must be named 'default'</td>
+<td>SC-7, CM-6</td>
+</tr>
+<tr>
+<td>KN-V016</td>
+<td>Route TLS configuration is invalid</td>
+<td>SC-8, CM-6</td>
+</tr>
+<tr>
+<td>KN-V017</td>
+<td>MachineConfig is not a customer lever on ROSA</td>
+<td>CM-6</td>
+</tr>
+<tr>
+<td>KN-V018</td>
+<td>Duplicate key in a YAML mapping</td>
+<td>CM-3(2), CM-6</td>
+</tr>
+<tr>
+<td>KN-V019</td>
+<td>Ingress targets the retired ingress-nginx</td>
+<td>SA-22</td>
+</tr>
+</tbody>
+</table></div>
+<p>Control titles (<a href="https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final">NIST SP 800-53 Rev. 5</a>):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Title</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AC-3</td>
+<td>Access Enforcement</td>
+</tr>
+<tr>
+<td>AC-4</td>
+<td>Information Flow Enforcement</td>
+</tr>
+<tr>
+<td>AC-5</td>
+<td>Separation of Duties</td>
+</tr>
+<tr>
+<td>AC-6</td>
+<td>Least Privilege</td>
+</tr>
+<tr>
+<td>AC-6(5)</td>
+<td>Least Privilege</td>
+</tr>
+<tr>
+<td>AC-6(10)</td>
+<td>Least Privilege</td>
+</tr>
+<tr>
+<td>AC-14</td>
+<td>Permitted Actions Without Identification or Authentication</td>
+</tr>
+<tr>
+<td>CM-2</td>
+<td>Baseline Configuration</td>
+</tr>
+<tr>
+<td>CM-3(2)</td>
+<td>Configuration Change Control</td>
+</tr>
+<tr>
+<td>CM-6</td>
+<td>Configuration Settings</td>
+</tr>
+<tr>
+<td>CM-7</td>
+<td>Least Functionality</td>
+</tr>
+<tr>
+<td>CP-10</td>
+<td>System Recovery and Reconstitution</td>
+</tr>
+<tr>
+<td>IA-5</td>
+<td>Authenticator Management</td>
+</tr>
+<tr>
+<td>IA-5(7)</td>
+<td>Authenticator Management</td>
+</tr>
+<tr>
+<td>SA-22</td>
+<td>Unsupported System Components</td>
+</tr>
+<tr>
+<td>SC-5</td>
+<td>Denial-of-service Protection</td>
+</tr>
+<tr>
+<td>SC-6</td>
+<td>Resource Availability</td>
+</tr>
+<tr>
+<td>SC-7</td>
+<td>Boundary Protection</td>
+</tr>
+<tr>
+<td>SC-7(5)</td>
+<td>Boundary Protection</td>
+</tr>
+<tr>
+<td>SC-8</td>
+<td>Transmission Confidentiality and Integrity</td>
+</tr>
+<tr>
+<td>SC-8(1)</td>
+<td>Transmission Confidentiality and Integrity</td>
+</tr>
+<tr>
+<td>SC-28</td>
+<td>Protection of Information at Rest</td>
+</tr>
+<tr>
+<td>SC-36</td>
+<td>Distributed Processing and Storage</td>
+</tr>
+<tr>
+<td>SC-39</td>
+<td>Process Isolation</td>
+</tr>
+<tr>
+<td>SI-2</td>
+<td>Flaw Remediation</td>
+</tr>
+<tr>
+<td>SI-7</td>
+<td>Software, Firmware, and Information Integrity</td>
+</tr>
+<tr>
+<td>SI-10</td>
+<td>Information Input Validation</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-fedramp-20x-consolidated-rules-transition/">FedRAMP Consolidated Rules transition (Cloud Security Alliance research note)</a></li>
+<li><a href="https://fedramp.gov/2026/providers/20x/rules/vulnerability-detection-and-response/">FedRAMP Vulnerability Detection and Response</a></li>
+<li><a href="https://www.fedramp.gov/20x/standards/20x-ksi">FedRAMP 20x Key Security Indicators</a></li>
+<li><a href="https://www.fedramp.gov/rfcs/0033/">RFC-0033: 20x Phase 4 development tracks for Class D</a></li>
+<li><a href="https://support.claude.com/en/articles/13756069-public-sector-faqs">Claude public sector FAQ (FedRAMP High availability)</a></li>
+</ul><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/compliance.md">docs/compliance.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Release readiness: kube-noob 0.1.0 · kube-noob</title>
+<meta name="description" content="Assessed 2026-10-27. Every row is backed by a command that was run, a CI job, or a cited source.">
+<link rel="canonical" href="https://kube-noob.com/docs/release-readiness/">
+<meta property="og:title" content="Release readiness: kube-noob 0.1.0 · kube-noob">
+<meta property="og:description" content="Assessed 2026-10-27. Every row is backed by a command that was run, a CI job, or a cited source.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/release-readiness/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/" aria-current="page">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="release-readiness-kube-noob-010">Release readiness: kube-noob 0.1.0</h1>
+<p>Assessed 2026-10-27. Every row is backed by a command that was run, a CI job, or a cited source.</p>
+<h2 id="1-end-to-end-evidence">1. End-to-end evidence</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Verified by</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tests</td>
+<td>CI on Python 3.11-3.13, 80 % coverage gate</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Package</td>
+<td>wheel + sdist, <code>twine check</code>, clean venv from the hash-pinned lock, <code>pip check</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>CLI</td>
+<td>26 commands against the installed wheel</td>
+<td>pass (<code>helm-audit</code> needs <code>helm</code>; CI covers it)</td>
+</tr>
+<tr>
+<td>MCP stdio</td>
+<td>SDK client spawning <code>kube-noob mcp</code>: 22 tools, prompts, resources; misspelled arguments rejected</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>MCP HTTP</td>
+<td>bearer auth, Host/Origin checks, 8 MB body limit, audit log, read-only cluster tools, Secrets refused</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>CI <code>e2e-kind</code>: server-side dry runs, legacy API migration, Helm install, <code>helm test</code>, live crash-loop diagnosis</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Air-gapped</td>
+<td>full workflow in a network namespace with no route, including a local model on loopback</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Web opt-in</td>
+<td>allowlisted live fetch; other hosts blocked; tool absent when disabled</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td>22,913-chunk corpus: index 1.9 s, 210 MB RSS, search p50 22 ms</td>
+<td>fits chart limits</td>
+</tr>
+<tr>
+<td>Release</td>
+<td>dry run of wheel + amd64/arm64 UBI image</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Supply chain</td>
+<td><code>pip-audit</code>, CodeQL, Scorecard, SHA-pinned actions</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>Not verified here: a live OpenShift / ROSA HCP cluster (run the smoke test in section 6) and a real Anthropic model call.</p>
+<h2 id="2-residual-risks">2. Residual risks</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Severity</th>
+<th>Mitigation / next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One shared bearer token for the HTTP service</td>
+<td>Medium</td>
+<td>kube-rbac-proxy or OAuth proxy; per-tool authorization; MCP OAuth for remote use</td>
+</tr>
+<tr>
+<td>Prompt injection via untrusted text (Jira, web, cluster logs)</td>
+<td>Medium</td>
+<td>read-only server limits impact; next: untrusted-content envelopes</td>
+</tr>
+<tr>
+<td>Built-in facts age</td>
+<td>Medium</td>
+<td>weekly risk review flags upstream drift (docs/operations.md)</td>
+</tr>
+<tr>
+<td>Reward is a proxy over 16 held-out tasks</td>
+<td>Medium (training)</td>
+<td>grow the benchmark; judge spot checks</td>
+</tr>
+<tr>
+<td>Not run on real OpenShift / ROSA HCP</td>
+<td>High for release claims</td>
+<td>smoke test before announcing ROSA support</td>
+</tr>
+<tr>
+<td>Lexical retrieval; in-memory index</td>
+<td>Low</td>
+<td>optional embeddings; SQLite FTS5 for large corpora</td>
+</tr>
+</tbody>
+</table></div>
+<p>Fixed during this assessment: all red-team findings (2 high, 8 medium, 12 low); strict tool arguments; request size limit;
+tool audit log; clean model-endpoint errors; arm64 image build (QEMU); dead code removed.</p>
+<h2 id="3-rosa-hcp-gaps-from-openshift-docs-modules">3. ROSA HCP gaps (from openshift-docs <code>modules/</code>)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gap</th>
+<th>Add</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cluster-level config</td>
+<td>audit <code>rosa create cluster</code> / Terraform <code>rhcs</code>: machine CIDR, PrivateLink, egress lockdown, KMS, FIPS, shared VPC, external auth + break-glass, no-CNI</td>
+</tr>
+<tr>
+<td>Machine pools</td>
+<td>spot + termination queue, Capacity Reservations, Windows LI, disk size, Local Zones, tuning configs, kubeletconfig, n-2 skew</td>
+</tr>
+<tr>
+<td>AutoNode (Karpenter)</td>
+<td><code>EC2NodeClass</code> / <code>NodePool</code> validation and readiness playbook</td>
+</tr>
+<tr>
+<td>Workload AWS identity</td>
+<td><code>rosa create iamserviceaccount</code>, role-arn annotations, Secrets Store CSI</td>
+</tr>
+<tr>
+<td>Live ROSA data</td>
+<td>read-only <code>rosa</code>/OCM backend (cluster, machine pools, upgrades, ingress, log forwarders)</td>
+</tr>
+<tr>
+<td>Upgrade readiness</td>
+<td>one report: removed APIs for the target, PDB blockers, pool skew</td>
+</tr>
+<tr>
+<td>Red team</td>
+<td>spot interruption, reservation exhaustion, IdP outage, KMS key disabled, egress dependency blocked</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="4-free-sources-licenses-checked-2026-10-27">4. Free sources (licenses checked 2026-10-27)</h2>
+<p>Redistributable: openshift/runbooks, kubernetes-mixin, prometheus-operator/runbooks, kyverno/policies,
+gatekeeper-library, kube-linter, Polaris, kubescape regolibrary, falcosecurity/rules, kubernetes/enhancements,
+openshift/enhancements, kubernetes/kubernetes, Argo CD, cert-manager, kustomize, operator-sdk, oc-mirror, bitnami/charts
+(Apache-2.0); trivy-checks (MIT); Red Hat Security Data CSAF/VEX/OSV/SBOM and GitHub Advisory Database (CC BY 4.0).</p>
+<p>Retrieval only: EKS best practices and OWASP Kubernetes Top Ten (CC BY-SA 4.0), public Jira, Microsoft Threat Matrix (no
+LICENSE). Never ingest CIS Benchmark text; reference control ids only.</p>
+<h2 id="5-distribution">5. Distribution</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Path</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PyPI</td>
+<td>trusted publishing from <code>release.yml</code> (environment <code>pypi</code>)</td>
+<td>pending publisher configured</td>
+</tr>
+<tr>
+<td>MCP Registry</td>
+<td><code>server.json</code> + <code>mcp-name</code> marker in the README; <code>release.yml</code> publishes with GitHub OIDC after PyPI</td>
+<td>automated</td>
+</tr>
+<tr>
+<td>Claude Code (own marketplace)</td>
+<td><code>/plugin marketplace add aashishmahajan/kube-noob</code></td>
+<td>live</td>
+</tr>
+<tr>
+<td>Claude directory (plugins)</td>
+<td>submit at claude.ai/directory/manage, "Plugin bundle"; needs a paid plan, public repo, LICENSE + README in the plugin folder; the plugin runs bundled source with a <code>uv.lock</code> (no <code>uvx</code> download, which is held for policy review) and links PRIVACY.md</td>
+<td>submitted</td>
+</tr>
+<tr>
+<td>OpenShift Helm charts (community)</td>
+<td>fork openshift-helm-charts/charts, PR the OWNERS file, then the release <code>.tgz</code> (<a href="/docs/openshift-catalog/">openshift-catalog.md</a>); check first with <code>podman run --rm -v "$PWD/deploy/helm":/charts:z quay.io/redhat-certification/chart-verifier verify --set profile.vendorType=community /charts/kube-noob</code></td>
+<td>chart ready</td>
+</tr>
+<tr>
+<td>Homebrew</td>
+<td><code>brew tap aashishmahajan/kube-noob https://github.com/aashishmahajan/kube-noob</code>, <code>brew trust --formula aashishmahajan/kube-noob/kube-noob</code>, then <code>brew install kube-noob</code>; the release workflow writes <code>Formula/kube-noob.rb</code> once PyPI has the version (<code>python scripts/brew_formula.py &lt;version&gt; --write</code>) and CI installs it that way</td>
+<td>live for 0.2.2</td>
+</tr>
+<tr>
+<td>Claude Desktop <code>.mcpb</code></td>
+<td>the directory no longer accepts MCPB; optional release asset</td>
+<td>not planned</td>
+</tr>
+<tr>
+<td>claude.ai Connectors (remote)</td>
+<td>needs one hosted HTTPS server with OAuth; poor fit for in-cluster use</td>
+<td>not planned</td>
+</tr>
+<tr>
+<td>OpenShift Developer Catalog</td>
+<td>community Helm chart via <code>openshift-helm-charts/charts</code> (OWNERS PR first); partner listing needs Partner Connect and a certified image</td>
+<td>next</td>
+</tr>
+<tr>
+<td>Red Hat container certification</td>
+<td><code>preflight</code> checks UBI base, non-root, <code>/licenses</code>, required labels, unique tag</td>
+<td>labels and <code>/licenses</code> added</td>
+</tr>
+<tr>
+<td>OperatorHub</td>
+<td>needs an operator bundle and a CRD</td>
+<td>later</td>
+</tr>
+<tr>
+<td>OpenShift Lightspeed</td>
+<td>external MCP servers via <code>OLSConfig</code> feature gate <code>MCPServer</code>; check <code>oc explain olsconfig.spec.mcpServers</code></td>
+<td>document after 0.1.0</td>
+</tr>
+</tbody>
+</table></div>
+<p>Sources: code.claude.com/docs/en/plugins, claude.com/docs/plugins/submit, claude.com/docs/connectors,
+modelcontextprotocol.io/registry, github.com/modelcontextprotocol/mcpb, github.com/redhat-openshift-ecosystem/openshift-preflight,
+github.com/openshift-helm-charts/charts, docs.redhat.com (OpenShift Lightspeed 1.0 OLSConfig API).</p>
+<p>Positioning: Red Hat's OpenShift MCP server (Technology Preview, based on containers/kubernetes-mcp-server) operates
+clusters; kube-noob teaches, audits and diagnoses offline and can sit next to it.</p>
+<h2 id="6-release-gates">6. Release gates</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CI green on <code>main</code>; release dry run</td>
+<td>done</td>
+</tr>
+<tr>
+<td>PyPI pending publisher</td>
+<td>done</td>
+</tr>
+<tr>
+<td>Private vulnerability reporting enabled</td>
+<td>maintainer</td>
+</tr>
+<tr>
+<td>ROSA HCP smoke test on a real cluster</td>
+<td>maintainer, before announcing ROSA support</td>
+</tr>
+<tr>
+<td>Tag <code>v0.1.1</code> (v0.1.0 never reached PyPI: publish action bundled twine 6.1.0, which rejects Metadata-Version 2.5; fixed and gated by <code>scripts/check_publishable.sh</code>)</td>
+<td>ready</td>
+</tr>
+</tbody>
+</table></div>
+<p>ROSA HCP smoke test (logged in with <code>oc login</code>; read-only):</p>
+<pre><code class="language-bash">uvx --from git+https://github.com/aashishmahajan/kube-noob kube-noob debug deployment/console -n openshift-console --platform rosa-hcp --cluster-enabled
+oc get deploy,svc,route,pvc,networkpolicy -n openshift-console -o yaml | uvx --from git+https://github.com/aashishmahajan/kube-noob kube-noob audit -f - --platform rosa-hcp --version 4.22
+</code></pre><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/release-readiness.md">docs/release-readiness.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

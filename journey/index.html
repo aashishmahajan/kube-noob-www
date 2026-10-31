@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Product journey · kube-noob</title>
+<meta name="description" content="What kube-noob does, step by step, with real output.">
+<link rel="canonical" href="https://kube-noob.com/journey/">
+<meta property="og:title" content="Product journey · kube-noob">
+<meta property="og:description" content="What kube-noob does, step by step, with real output.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/journey/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/" aria-current="page">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="prose" style="max-width:900px"><span class="eyebrow">Product journey</span><h1>From a broken pod to a cited, read-only fix</h1><p class="lead">kube-noob is the rulebook, not the chatbot. Below is what it does, step by step, with the real output of <code>kube-noob demo</code> from this build: offline, in under a second, never touching a cluster.</p></div><section class="band"><h2>The 7-step protocol</h2><p class="sub">Every design request runs these steps, in this order.</p><ol class="steps"><li><b>Clarify</b><span>platform/version inference (blueprint &gt; explicit &gt; request text &gt; manifest API groups), blocking questions vs stated assumptions.</span></li><li><b>Validate</b><span>strict JSON schema (Kubernetes 1.35 + CRDs), apiVersion/kind catalog, removed APIs per target version, selector/port wiring.</span></li><li><b>Research</b><span>BM25 over local knowledge; results carry chunk ids, source URLs and licenses.</span></li><li><b>Audit</b><span>security, RBAC, network exposure, storage access modes vs provisioner capabilities.</span></li><li><b>Calibrate</b><span>probes, resources, replicas, PDBs, topology spread, HPA prerequisites.</span></li><li><b>Generate</b><span>deterministic generator (blueprints) or mechanical fixer (existing YAML) with a change log.</span></li><li><b>Red Team</b><span>nine adversarial scenarios evaluated on the final output; remaining HIGH/CRITICAL findings mark the result <code>blocked</code>.</span></li></ol></section><section class="band"><h2>What it does, in real output</h2><div class="chapter" id="audit"><div><h3>Audit and auto-fix a Deployment for OpenShift</h3><p><b>For:</b> developers, platform engineers</p><p>Paste a Deployment and get findings with the line, the fix, the RHACS policy and the NIST controls; <code>fix</code> applies the safe mechanical changes and audits the result again.</p><p><code>kube-noob demo audit</code></p></div><pre>== kube-noob demo: Audit and auto-fix a Deployment for OpenShift ==
+
+# Audit a Deployment that works on a laptop but not on OpenShift
+$ kube-noob audit -f examples/insecure-deployment.yaml --platform openshift --version 4.22
+score 37.0/100 | high=3 medium=7 low=5
+[HIGH    ] KN-S013 line 23: Container &#x27;api&#x27; sets DB_PASSWORD as a literal value.
+    fix: Move the value to a Secret and reference it with valueFrom.secretKeyRef (or an external
+      secret store).
+[HIGH    ] KN-S004 line 25: Container &#x27;api&#x27; sets runAsUser: 1000; restricted-v2 will reject IDs outside the namespace range.
+    fix: Remove runAsUser/fsGroup and let OpenShift assign IDs from the namespace range; keep
+      runAsNonRoot: true. If a fixed UID is truly required, bind the ServiceAccount to the
+      nonroot-v2 SCC. (runAsGroup is not governed by SCCs and is left alone.)
+[HIGH    ] KN-S002 line 26: Container &#x27;api&#x27; explicitly allows privilege escalation.
+    fix: Set securityContext.allowPrivilegeEscalation: false on every container.
+
+# Apply the safe mechanical fixes and re-audit
+$ kube-noob fix -f examples/insecure-deployment.yaml --platform openshift -o fixed.yaml
+5 changes applied; score 37.0 -&gt; 59.0
+  + spec.template.spec.securityContext.seccompProfile: Pod Security restricted requires RuntimeDefault seccomp.
+  + spec.template.spec.securityContext.runAsNonRoot: Refuse to start as root.
+  + spec.template.spec.containers[0].securityContext.runAsUser: restricted-v2 assigns IDs from the namespace range.
+  + spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation: restricted-v2 rejects allowPrivilegeEscalation: true, so the pod could not start anyway.
+Left for a human (needs app knowledge):
+  - Deployment/shop/orders-api: runAsNonRoot: true was added. Images whose USER is root will now
+    fail with CreateContainerConfigError (&#x27;container has runAsNonRoot and image will run as root&#x27;);
+    use an unprivileged image variant or set a numeric non-root USER in the Dockerfile.
+  - Deployment/shop/orders-api container &#x27;api&#x27;: consider readOnlyRootFilesystem: true with emptyDir
+    mounts for writable paths (needs app knowledge).</pre></div><div class="chapter" id="diagnose"><div><h3>Diagnose SCC and CrashLoop/OOM failures, read-only first</h3><p><b>For:</b> SREs, on-call</p><p>Paste events or logs and get the likely cause, then read-only steps first. Commands that run inside a container or change the cluster come last, marked as needing approval.</p><p><code>kube-noob demo diagnose</code></p></div><pre>== kube-noob demo: Diagnose SCC and CrashLoop/OOM failures, read-only first ==
+
+# Pods are never created: paste the events
+$ kube-noob diagnose -f examples/events-scc.txt
+DBG-SCC: Pod rejected by SecurityContextConstraints (confidence 1.0)
+  1. read-only first:
+     oc get events -n shop --field-selector reason=FailedCreate
+     oc describe rs -n shop -l &lt;app-label&gt;
+       why: FailedCreate message lists every SCC tried
+     oc get ns shop -o jsonpath=&#x27;{.metadata.annotations.openshift\.io/sa\.scc\.uid-range}&#x27;
+  2. change, only after the evidence (asks before running):
+     Remove runAsUser/runAsGroup/fsGroup and keep runAsNonRoot: true (preferred).
+
+# A pod keeps restarting: paste `oc describe pod`
+$ kube-noob diagnose -f examples/events-crashloop.txt
+DBG-OOM: Container killed for exceeding memory (OOMKilled / exit 137) (confidence 1.0)
+  1. read-only first:
+     kubectl describe pod orders-api-7c4b9d6f5-x2lqp -n shop
+       why: Last State: Terminated, Reason: OOMKilled
+     kubectl top pod orders-api-7c4b9d6f5-x2lqp -n shop --containers
+     kubectl get events -A --field-selector reason=OOMKilling
+  2. change, only after the evidence (asks before running):
+     Set limits from observed p99 usage plus headroom; keep requests ~= steady-state usage.</pre></div><div class="chapter" id="protocol"><div><h3>Blueprint to audited ROSA HCP manifests (7-step protocol)</h3><p><b>For:</b> platform engineers</p><p>A design request runs Clarify, Validate, Research, Audit, Calibrate, Generate and Red Team. Remaining HIGH or CRITICAL findings mark the result blocked.</p><p><code>kube-noob demo protocol</code></p></div><pre>== kube-noob demo: Blueprint to audited ROSA HCP manifests (7-step protocol) ==
+
+# Describe the app; get audited, platform-correct manifests
+$ kube-noob protocol &quot;Deploy orders-api on ROSA HCP&quot; --blueprint examples/blueprint.yaml
+status: ready | rosa-hcp 4.22 (Kubernetes 1.35) | score 100.0/100
+generated: ServiceAccount, Deployment, Service, Route, PodDisruptionBudget, HorizontalPodAutoscaler, NetworkPolicy x3
+prerequisite: Secrets referenced by secretEnv must exist: orders-db
+validate before applying:
+  kube-noob audit -f manifest.yaml --platform rosa-hcp
+  oc apply --dry-run=server -f manifest.yaml</pre></div><div class="chapter" id="learn"><div><h3>Lesson plus a graded exercise</h3><p><b>For:</b> learners, trainers</p><p>Lessons with objectives and citations, then exercises graded by the same rules as a production review.</p><p><code>kube-noob demo learn</code></p></div><pre>== kube-noob demo: Lesson plus a graded exercise ==
+
+# Open the first lesson
+$ kube-noob learn lesson k8s-101-objects
+Core objects and how they fit together
+  - Deployments for stateless replicas, StatefulSets for stable identity and per-replica volumes.
+  - A Service only routes to Ready pods whose labels match its selector.
+
+# Submit a first attempt at the exercise; it is graded offline
+$ kube-noob learn submit k8s-ex-hardened-deployment -f examples/exercise-answer.yaml
+passed: False | score 0.4 | points 6
+  - KN-S002: Container &#x27;web&#x27; does not set allowPrivilegeEscalation: false. fix: Set
+    securityContext.allowPrivilegeEscalation: false on every container.
+  - KN-S003: Container &#x27;web&#x27; does not enforce runAsNonRoot: true. fix: Set runAsNonRoot: true (pod
+    or container securityContext) and build images with a non-root USER.
+  - KN-N001: No NetworkPolicy for namespace demo in this bundle. fix: Add a default-deny ingress
+    NetworkPolicy plus explicit allows (router/ingress controller, monitoring, same-app traffic).</pre></div><div class="chapter" id="search"><div><h3>Cited answers from local knowledge</h3><p><b>For:</b> everyone</p><p>Answers cite local knowledge as [kn:&lt;doc&gt;#&lt;n&gt;], with the source URL and license of every chunk.</p><p><code>kube-noob demo search</code></p></div><pre>== kube-noob demo: Cited answers from local knowledge ==
+
+# Ask the local knowledge base; every answer carries a citation
+$ kube-noob search &quot;restricted-v2 SCC runAsUser range&quot;
+[kn:ocp-scc#1] SecurityContextConstraints (SCC) on OpenShift &gt; restricted-v2 (default for authenticated users on new 4.11+ clusters)
+[kn:openshift#4] OpenShift Container Platform - what it adds on top of Kubernetes &gt; Security defaults
+[kn:ocp-scc#5] SecurityContextConstraints (SCC) on OpenShift &gt; Privileged workloads: grant an SCC to the ServiceAccount, never edit the default SCCs</pre></div><div class="chapter" id="learning"><div><h3>Remember a confirmed team fix and find it later</h3><p><b>For:</b> teams</p><p>A fix the team confirmed is remembered locally and found the next time the symptom appears.</p><p><code>kube-noob demo learning</code></p></div><pre>== kube-noob demo: Remember a confirmed team fix and find it later ==
+
+# Remember a fix your team confirmed (summaries only; secrets and logs are rejected)
+$ kube-noob learning note --symptom &quot;orders-api pods rejected by SCC: runAsUser 1000 outside the namespace range&quot; --cause &quot;the Helm chart hard-codes runAsUser for vanilla Kubernetes&quot; --fix &quot;drop runAsUser on OpenShift and let restricted-v2 assign the UID&quot;
+saved [kn:local-1#0] to learning.json (local only, survives upgrades)
+
+# Next time, the same search finds your team&#x27;s note next to the docs
+$ kube-noob search &quot;orders-api SCC runAsUser helm&quot;
+[kn:local-1#0] Team note (saved by a user, unverified): orders-api pods rejected by SCC: runAsUser 1000 outside the namespace range
+[kn:ocp-scc#1] SecurityContextConstraints (SCC) on OpenShift &gt; restricted-v2 (default for authenticated users on new 4.11+ clusters)
+[kn:ocp-scc#2] SecurityContextConstraints (SCC) on OpenShift &gt; Practical rules</pre></div><div class="chapter" id="memory"><div><h3>Fixes as code: a team memory repo, its guard and a match</h3><p><b>For:</b> teams, SREs</p><p></p><p><code>kube-noob demo memory</code></p></div><pre>== kube-noob demo: Fixes as code: a team memory repo, its guard and a match ==
+
+# Keep your team&#x27;s fixes as code, in your own repository
+$ kube-noob memory init team-memory
+created README.md
+created entry.schema.json
+created entries/.gitkeep
+created .github/workflows/kube-noob-memory.yml
+created scripts/validate-memory.sh
+seeded MEM-1 (approved fix, 3 outcomes), a negative entry, and MEM-3 (proposed)
+
+# CI runs the poisoning guard on every pull request
+$ kube-noob memory validate team-memory
+ERROR MEM-3 verifier: patch: audit KN-S016 (critical) ClusterRoleBinding grants cluster-admin to [&#x27;ServiceAccount/default&#x27;]; record riskAccepted to keep it
+ERROR MEM-3 verifier: patch: red team RT-PRIVESC (critical) If an attacker gets code execution in this pod, can they escalate to the node or the cluster?; record 
+exit 1: MEM-3 cannot be approved until the fix is safe or the risk is accepted
+
+# An alert fires: what did your team learn last time?
+$ kube-noob memory match -f examples/alertmanager-etcd.json --dir team-memory
+[mem:MEM-1] fix: etcd leader changes every few minutes after the 4.21.0 update; API requests time out
+  matched 3 times, resolved 2; seen on 3 of your clusters, fixed on 2
+[mem:MEM-2] tried, did not work: etcd leader elections keep happening; we restarted the etcd pods one by one
+  matched 1 time, resolved 0; seen on 1 of your clusters, fixed on 0
+  Tried before and did not work: do not repeat it without a new reason.
+version 4.21.0 from the alert&#x27;s label openshift_version</pre></div><div class="chapter" id="must-gather"><div><h3>Must-gather pre-flight: what is wrong, the matching bugs, a case draft</h3><p><b>For:</b> support engineers, SREs</p><p></p><p><code>kube-noob demo must-gather</code></p></div><pre>== kube-noob demo: Must-gather pre-flight: what is wrong, the matching bugs, a case draft ==
+
+# A must-gather arrives: open it safely (nothing extracted or run, Secrets never read)
+$ kube-noob must-gather analyze must-gather.tar.gz
+31 files read as a stream; skipped: 2 Secret data (never read), 1 nested archive (not opened)
+OpenShift 4.20.3; updating to 4.20.4; platform AWS; 1/2 nodes Ready; 2/3 cluster operators Available, 1 Degraded
+findings: 2 critical, 8 high, 10 medium, 2 low, 2 info
+  CRITICAL the cluster version operator reports Failing
+  CRITICAL cluster operator image-registry is not Available
+  HIGH     cluster operator authentication is Degraded
+  HIGH     machine config pool worker reports Degraded
+  HIGH     machine config pool worker reports NodeDegraded
+  HIGH     worker node worker-1 is NotReady
+  ... 18 more, each with its file, signals and read-only next steps
+
+# Match every finding to known bugs for the version it runs, and draft the support case
+$ kube-noob must-gather analyze must-gather.tar.gz --report report --case-draft
+OCPBUGS-73876 (findings 14): Reported and fixed in OpenShift 4.20.13. You run 4.20.3: updating to 4.20.13 or later fixes it.
+wrote report.md, report.json, case-draft.md: every [FILL IN] in the case draft is yours to answer</pre></div><div class="chapter" id="posture"><div><h3>Show and lock the security posture</h3><p><b>For:</b> security, platform admins</p><p><code>doctor</code> proves what kube-noob can reach (nothing, by default), and the offline lock keeps it that way.</p><p><code>kube-noob demo posture</code></p></div><pre>== kube-noob demo: Show and lock the security posture ==
+
+# Prove what kube-noob can reach (nothing, by default)
+$ kube-noob doctor
+kube-noob 0.7.1 posture: OK
+  offline lock   ON
+  web            locked-off
+  corpus         blocked
+  cluster        none
+  agent model    none (local)
+  tier R         off read-only cluster (cluster.enabled)
+  tier P         off probe (probe.enabled)
+  tier D         off server-side dry-run (dryRun.enabled)
+  tier W         off external writes (itsm.writeEnabled or notify.enabled)
+  tier G         off gate forwarding (gate.enabled)
+  tier A         off admission enforcement (admission.enforce)
+  data dir       /tmp/kube-noob-demo-glszl7o0
+  memory         none (memory.paths)
+  telemetry      none
+  FIPS mode      off (OpenSSL 3.0.13 30 Jan 2024)
+  config file    none (defaults + environment)
+
+# Platform teams can lock it: no web, no downloads, local models only
+$ KUBE_NOOB_OFFLINE=1 kube-noob doctor
+kube-noob 0.7.1 posture: OK
+  offline lock   ON
+  web            locked-off
+  corpus         blocked
+  cluster        none
+  agent model    none (local)
+  tier R         off read-only cluster (cluster.enabled)
+  tier P         off probe (probe.enabled)
+  tier D         off server-side dry-run (dryRun.enabled)
+  tier W         off external writes (itsm.writeEnabled or notify.enabled)
+  tier G         off gate forwarding (gate.enabled)
+  tier A         off admission enforcement (admission.enforce)
+  data dir       /tmp/kube-noob-demo-glszl7o0
+  memory         none (memory.paths)
+  telemetry      none
+  FIPS mode      off (OpenSSL 3.0.13 30 Jan 2024)
+  config file    none (defaults + environment)</pre></div></section><section class="band"><h2>How it got here</h2><p class="sub">Every release, newest first, from the changelog.</p><div class="timeline"><div class="rel"><h3>0.7.1</h3><div class="date">2026-10-31</div><p>**Two holes in the Jira corpus scrubber let person-shaped text reach stored tickets**, which is what the `corpus-refresh` privacy gate has been refusing since 2026-10-28 with 123 findings. `_ACCOUNT` required the id to start within one punctuation character of `accountId`, so the JSON spelling `{&quot;accountId&quot;: &quot;5b10...&quot;}` -- quote, colon, space -- kept a real Atlassian account id. And `scrub()` ran before `unname()`, so a display name it could not recognise as a person (a non-ASCII one is neither email- nor handle-shaped) survived the scrub and was only then swapped for its label, leaving text like &quot;ping Commenter A at quay.io&quot; that reads as a spelled-out email. `anonymise()` now runs the chain in an order that holds -- scrub, unname, handles, scrub again -- and the widened `_ACCOUNT` accepts any mix of quote, colon, equals and space before the id. The audit that gates the corpus is deliberately not loosened: it may still over-flag a bare 24-character hex string that is not an account id, and telling those apart needs the real tickets.</p></div><div class="rel"><h3>0.7.0</h3><div class="date">2026-10-30</div><p>Plugin and catalog readiness (independent review against the directory&#x27;s and the OpenShift Helm charts repository&#x27;s requirements): the Claude plugin no longer ships the HTTP client, the REST routes or Helm rendering (`kube_noob.generate.helm_render`, the only `subprocess` call), so nothing in it can open a connection or start a program; `web_fetch` is offered only where the network module ships. The Agent Skill drops `httpx` from what it needs. `plugin.json` carries the directory listing links (documentation, support, privacy policy) and says the plugin makes no network calls of its own while uv installs its pinned dependencies once; `claude plugin validate` passes with nothing to report.</p></div><div class="rel"><h3>0.6.0</h3><div class="date">2026-10-29</div><p>New documents for the weakest technologies in the owner&#x27;s by-technology file, written from each project&#x27;s own docs by writers that never saw the test half, every claim checked against the cited lines: Helm template functions (`range`, `toYaml` and `nindent`, `default` and `required`, `tpl`, `.Files`, `lookup`, subchart values), Gatekeeper usage (Rego in ConstraintTemplates, audit results, `spec.match`, ExpansionTemplate for workloads, install on OpenShift) and kubectl output and scripting (jsonpath, custom-columns, `--sort-by`, `--field-selector`, logs, `wait`, `exec`, `diff`). Four more drafts are held back because blinded graders on real posts found them worse more often than better: Rook-Ceph operations, Rook-Ceph troubleshooting, Jobs/CronJobs and kustomize, and Kyverno usage. In a long pasted post (over 300 characters), the words that name a document&#x27;s subject (&quot;gatekeeper&quot;, &quot;rego&quot;, &quot;helm&quot;, &quot;chart&quot;) no longer count toward the words the document must share with the post, because every post about that subject shares them. A typed question or a short post still counts every word. Measured on the owner&#x27;s two answered files with two blinded graders per row: - the subject rule on the train half: 69 and 61 answers better, 25 and 25 worse; - the shipped change against the previous answers on the test half, every changed row not used for a decision (122): 54 and 53 better, 31 and 27 worse. The 132 test rows that decided which drafts ship are retired. - Reported-issue answers fell from 523 to 515, because the new documents explain words that had looked rare. - Golden: unchanged in scope (89 of 96); out of scope 22 of 23 (rosa-019 now abstains).</p></div><div class="rel"><h3>0.5.0</h3><div class="date">2026-10-28</div><p>Has Red Hat seen this error before? A local copy of Red Hat&#x27;s public Jira, and what became of each ticket.</p></div><div class="rel"><h3>0.4.0</h3><div class="date">2026-10-27</div><p>An incident watch that remembers: always on, read-only, no model.</p></div><div class="rel"><h3>0.3.1</h3><div class="date">2026-10-27</div><p>Why was this denied, and can pod A reach pod B? Policy debugging, offline and read-only.</p></div><div class="rel"><h3>0.3.0</h3><div class="date">2026-10-27</div><p>Is this a known bug? kube-noob now answers from the OpenShift release notes, and says how current its knowledge is.</p></div><div class="rel"><h3>0.2.3</h3><div class="date">2026-10-27</div><p>Install fixes: the Homebrew formula is kept in step by the release and tested the way users install it; a short `noob` command; an install guide with the fix for each common error.</p></div><div class="rel"><h3>0.2.2</h3><div class="date">2026-10-27</div><p>The Claude plugin passes the plugin directory&#x27;s checks; releases finish even when the chart push fails; three animated videos rendered without a video model.</p></div><div class="rel"><h3>0.2.1</h3><div class="date">2026-10-27</div><p>No AI inside, said and enforced; safer to run for a whole team; easier to install.</p></div><div class="rel"><h3>0.2.0</h3><div class="date">2026-10-27</div><p>Enterprise self-help release: safe by construction, provable in your environment, and grounded in your own runbooks.</p></div><div class="rel"><h3>0.1.1</h3><div class="date">2026-10-27</div><p>First PyPI release. 0.1.0 was tagged but never reached PyPI: the pinned pypa/gh-action-pypi-publish v1.13.0 bundles twine 6.1.0, which rejects Metadata-Version 2.5 from current hatchling. Publish action bumped to v1.14.3 (twine 7.0.0) and scorecard-action to v2.5.0; CI and release now check dists with the exact twine the pinned publish action uses (scripts/check_publishable.sh).</p></div><div class="rel"><h3>0.1.0</h3><div class="date">2026-10-27</div><p>First release. - MCP server (stdio + authenticated streamable HTTP), CLI, Claude plugin with 7 skills, Helm chart and sidecar example. - 7-step protocol (Clarify, Validate, Research, Audit, Calibrate, Generate, Red Team). - 60 deterministic audit rules plus strict schema validation (Kubernetes 1.35, Route, SCC, EgressFirewall, Gateway API, StackRox CRDs), 9 red-team scenarios, safe auto-fix, RHACS policy mapping. - Generator for kubernetes / openshift / rosa-classic / rosa-hcp manifests and Helm charts. - 33 debugging playbooks and read-only live cluster evidence (kubectl/oc or in-cluster ServiceAccount). - 28 fact-checked knowledge docs (OCP 4.22 = Kubernetes 1.35, Helm 4, RHACS 4.11 -&gt; 5.0, ROSA HCP architecture). - Learning tracks with graded exercises, quizzes and credits. - Corpus builder (Git docs with license provenance, release history, jittered Jira pulls), deterministic reward with TRL adapter, held-out benchmark, SFT/GRPO export. - Hardened before release after an independent red-team review: assertion-gated, negation-aware reward with citation relevance; config never read implicitly from the working directory; LLM key/endpoint restrictions; redaction of credentials in every cluster string; duplicate-key and nesting-depth checks; fixer output that the API server accepts (privileged containers, root containers, null securityContexts, duplicate EgressFirewalls).</p></div></div></section>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Privacy · kube-noob</title>
+<meta name="description" content="kube-noob is open-source software that you run yourself: on your computer, in your CI, or in your cluster. The maintainers run no service for it and…">
+<link rel="canonical" href="https://kube-noob.com/docs/privacy/">
+<meta property="og:title" content="Privacy · kube-noob">
+<meta property="og:description" content="kube-noob is open-source software that you run yourself: on your computer, in your CI, or in your cluster. The maintainers run no service for it and…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/privacy/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/" aria-current="page">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="privacy">Privacy</h1>
+<p>kube-noob is open-source software that you run yourself: on your computer, in your CI, or in your cluster. The
+maintainers run no service for it and receive nothing from it. There are no accounts, no telemetry and no analytics.
+The website's contact and license forms are the one place the maintainer receives data: see
+<a href="#the-website-kube-noobcom">The website</a>.</p>
+<p>There is no AI inside kube-noob. When you use it from Claude, OpenShift Lightspeed or another MCP client, that client
+and its model do the talking and call kube-noob's tools. What you share in that conversation is handled by that
+product under its own terms and privacy policy. kube-noob adds no network traffic of its own.</p>
+<h2 id="what-it-reads">What it reads</h2>
+<ul>
+<li>Text you give it: manifests, events, logs, error messages and questions. It processes them in memory to answer;
+  names it finds there (a pod, a Service, a label selector, a namespace) go only into the steps it prints.</li>
+<li>Its bundled knowledge, and documents you index yourself with <code>kube-noob corpus add-docs</code>.</li>
+<li>Only if you turn on cluster access: read-only requests to the Kubernetes or OpenShift API of your current
+  kubeconfig context. It never reads Secrets and redacts values that look like credentials.</li>
+</ul>
+<h2 id="what-it-stores-on-your-machine-only">What it stores, on your machine only</h2>
+<p>Everything lives in the data directory: <code>~/.local/share/kube-noob</code> by default, or <code>KUBE_NOOB_DATA_DIR</code>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Contents</th>
+<th>How to remove it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>progress/&lt;learner&gt;.json</code></td>
+<td>Lessons read, exercise and quiz results, points. The learner id is a label you choose (default <code>local</code>); use a nickname, not an email address. A shared server (service or sidecar, meant for several learners through one deployment) refuses the default and requires each caller's own id, so one person's progress is never silently mixed into another's</td>
+<td>Delete the file</td>
+</tr>
+<tr>
+<td><code>learning.json</code></td>
+<td>Your profile (platform, versions, team conventions) and fixes you confirmed (symptom, cause, fix). Notes that contain credentials, logs or manifests are rejected. Counters record rule and playbook ids only, never your text</td>
+<td><code>kube-noob learning forget &lt;id&gt;</code>, delete the file, or set <code>learningEnabled: false</code></td>
+</tr>
+<tr>
+<td><code>corpus/</code></td>
+<td>Documents you indexed with <code>corpus add-docs</code> (credentials masked), and public corpus data you built or imported</td>
+<td>Delete the directory</td>
+</tr>
+<tr>
+<td><code>corpus/jira-*.jsonl</code>, <code>jira/</code></td>
+<td>Only after <code>kube-noob corpus jira</code>, <code>jira.sync.enabled</code> or importing a snapshot: the public Red Hat Jira tickets of the chosen projects (title, status, versions, the full description and every comment; comment authors appear only as per-ticket pseudonyms such as Commenter A, their names in the text and their @mentions are replaced by the same pseudonym, other mentions become @user, and emails, phone numbers, account ids and profile links are removed; reporter, assignee and author identities are never stored), the sync state, a search index and <code>jira/changes.jsonl</code> (each ticket's status, resolution and fix-version changes seen by a sync: key, project, type, when, before and after; no text). Public data, not redistributable: kube-noob never publishes it</td>
+<td>Delete the files</td>
+</tr>
+<tr>
+<td><code>corpus/DB_SEED.json</code>, <code>known_issues/</code></td>
+<td>Only after importing the public <code>kube-noob-db</code> bundle (<code>corpus import</code>, chart <code>db.enabled</code>): when the bundle was built and the release-note known issues it carried. The bundle itself holds public documentation and release facts only, never Jira data or anything about you; kube-noob downloads nothing for it: your cluster pulls the image you pinned</td>
+<td>Delete the files</td>
+</tr>
+<tr>
+<td>A sealed snapshot (<code>kube-noob corpus seal</code>, <code>&lt;dataDir&gt;/seed/*.tgz.enc</code>, the <code>kube-noob-db-jira</code> image)</td>
+<td>Only when you make one: a Jira snapshot encrypted with your key (AES-256-GCM). The key lives in your Secret store (chart <code>jira.seed.keySecret</code>, workflow secret <code>JIRA_SEED_KEY</code>) and never in the image, the chart values or kube-noob's files; the plaintext exists only in a temporary folder next to the data while it is imported. The <code>jira-db-image</code> workflow pushes it only to a repository that refuses anonymous access</td>
+<td>Delete the image or file; rotate the key</td>
+</tr>
+<tr>
+<td>A Jira snapshot (<code>kube-noob corpus jira-snapshot -o &lt;file&gt;</code>, <code>&lt;dataDir&gt;/seed/*.tgz</code>)</td>
+<td>Only when you make one: the files above in one owner-only archive, for your other installs to import. It holds Red Hat ticket text: keep it inside your organisation (a private image, bucket or volume). The <code>corpus-refresh</code> workflow uploads it only encrypted with your <code>CORPUS_PASSPHRASE</code></td>
+<td>Delete the file</td>
+</tr>
+<tr>
+<td>Your team memory repository (<code>memory.paths</code>, chart <code>memory.source</code>)</td>
+<td>Entries your team wrote and reviewed (<code>entries/MEM-&lt;n&gt;.yaml</code>). kube-noob reads it where it runs and writes only on <code>kube-noob memory init</code>, <code>add</code>, <code>outcome</code>, <code>import</code> and <code>migrate-learning</code>; it never uploads, bundles, publishes or exports it. <code>memory import</code> reads a ticket export on your machine and keeps no people: assignee, caller and reporter fields are not read, and emails, account ids, @mentions, phone numbers and named people are removed from the text</td>
+<td>It is your repository: remove entries in Git</td>
+</tr>
+<tr>
+<td><code>incidents.json</code></td>
+<td>Only when the incident watch runs (<code>kube-noob watch</code>, <code>watch.enabled</code>): per incident the namespace, workload, signal, redacted event and status lines, the diagnosis ids and steps, rollout changes (image names, environment variable names, resource values), when it opened and resolved, and fixes a person confirmed. Never log lines, object specs or Secret values. Resolved incidents are dropped after <code>watch.retentionDays</code> (30) unless a fix was confirmed</td>
+<td>Delete the file</td>
+</tr>
+<tr>
+<td><code>posture/snapshot-*.json</code>, <code>posture/report-*</code></td>
+<td>Only when you run <code>kube-noob posture report</code> or <code>serve</code> with <code>posture.reportEnabled</code>: per watched object its kind, namespace, name, owner label, a hash of its desired state and a 12-character hash per field; the audit findings (rule, object, severity, owner). Never field values, ConfigMap data or Secrets. The newest <code>posture.keep</code> (14) are kept, owner-only (0600)</td>
+<td>Delete the folder</td>
+</tr>
+</tbody>
+</table></div>
+<p>Nothing from a request is kept after it is answered. What is listed above stays until you delete it; the maintainers
+never receive it.</p>
+<p><code>kube-noob must-gather analyze --report DIR</code> writes <code>report.md</code>, <code>report.json</code> and, with <code>--case-draft</code>, <code>case-draft.md</code> to the folder you name; they hold redacted findings from the must-gather, never its Secrets, and nothing is sent anywhere. <code>kube-noob bundle</code> writes a redacted evidence pack to the folder you name (default <code>./kube-noob-bundle</code>). The MCP
+server's log line records each tool name, argument sizes and duration, never argument contents.</p>
+<h2 id="what-it-sends-and-where">What it sends, and where</h2>
+<p>By default, nothing. Each destination below is off until you turn it on.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Turned on by</th>
+<th>What is sent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Your cluster's API server</td>
+<td><code>cluster.enabled: true</code> or <code>--cluster-enabled</code></td>
+<td>Read-only get, list and logs requests</td>
+</tr>
+<tr>
+<td>Allowlisted documentation sites (listed below)</td>
+<td><code>webEnabled: true</code>; refused under the offline lock</td>
+<td>HTTPS GET of the page address; nothing is downloaded to disk or run</td>
+</tr>
+<tr>
+<td>The model you configure</td>
+<td>Only <code>kube-noob ask</code>, <code>kube-noob train bench</code> and the eval judge</td>
+<td>Your question and the tool results; under the offline lock, local models only</td>
+</tr>
+<tr>
+<td>The GitHub Actions API (<code>ci.githubApiUrl</code>, default api.github.com)</td>
+<td><code>ci.githubEnabled: true</code>; only <code>kube-noob build history</code>; under the offline lock only an in-cluster <code>*.svc</code> host</td>
+<td>HTTPS GET of the repository's workflow runs, their attempts and jobs, with your token; the runs are written to the folder you name</td>
+</tr>
+<tr>
+<td>Nowhere: the admission webhook (<code>kube-noob admission serve</code>, chart <code>admission.enabled</code>)</td>
+<td>Running it</td>
+<td>It receives the objects your API server sends it (never Secrets or ConfigMaps), answers with warnings or a denial, keeps only request counts and latencies, and sends nothing; <code>admission.lookups</code> adds read-only lists of five kinds from your API server, as in the row above</td>
+</tr>
+<tr>
+<td>Your RHACS Central (<code>rhacs.endpoint</code>)</td>
+<td><code>rhacs.enabled: true</code> (chart <code>rhacs.enabled</code>); only <code>kube-noob rhacs compare --live</code>, the <code>rhacs_compare_live</code> tool and <code>kube-noob vuln report --rhacs-image</code>; under the offline lock only an in-cluster <code>*.svc</code> Central</td>
+<td>HTTPS GET of <code>/v1/policies</code> and <code>/v1/policies/&lt;id&gt;</code>, and of <code>/v1/images/&lt;digest&gt;</code> for the images you name, with your API token; policies and image scans are read in memory and not stored</td>
+</tr>
+<tr>
+<td>Your git host (the chart's <code>memory.git.url</code>)</td>
+<td><code>memory.source: git</code> in the chart; under <code>config.offline</code> only an in-cluster <code>*.svc</code> host</td>
+<td>A shallow <code>git clone</code> of your memory repository by the pod's init container at start, through egress opened to <code>memory.git.egressCIDRs</code> only; kube-noob itself sends nothing</td>
+</tr>
+<tr>
+<td>Red Hat's security data (security.access.redhat.com)</td>
+<td>Only <code>kube-noob corpus advisories --online</code>; refused under the offline lock (<code>--from-archive</code> reads a downloaded file instead)</td>
+<td>HTTPS GET of <code>changes.csv</code> and the VEX document of each CVE, one request a second plus jitter, within <code>--max-requests</code>; nothing about you</td>
+</tr>
+<tr>
+<td>Public GitHub repositories and the public Red Hat Jira</td>
+<td>Only <code>kube-noob corpus build</code>, <code>jira</code>, <code>jira-projects</code>, <code>history</code> and <code>known-issues</code>, and <code>jira.sync.enabled</code> in the service; refused under the offline lock</td>
+<td>Requests for public data: Jira search queries (project key, an "updated in the last N minutes" or "key below N" filter) through its REST API, at most one per second</td>
+</tr>
+</tbody>
+</table></div>
+<p>The default web allowlist is kubernetes.io, helm.sh, docs.redhat.com, docs.openshift.com, access.redhat.com,
+cloud.redhat.com, developers.redhat.com, redhat.atlassian.net, docs.aws.amazon.com, github.com,
+raw.githubusercontent.com, stackrox.io, www.stackrox.io, gateway-api.sigs.k8s.io and kind.sigs.k8s.io, with their
+subdomains. You can shorten or replace it with <code>web.allowedDomains</code>.</p>
+<p><code>kube-noob doctor</code> prints what the running process can reach. Administrators can set <code>offline: true</code> (or
+<code>KUBE_NOOB_OFFLINE=1</code>) to block web access and downloads and to allow only local models; nothing later in the
+configuration can lift it.</p>
+<h2 id="the-claude-plugin">The Claude plugin</h2>
+<p>The plugin starts the bundled server on your computer over stdio, with web access, cluster access and model calls
+off. Its Python dependencies are installed from PyPI at the versions and hashes in the plugin's <code>uv.lock</code>, into a
+throwaway environment in uv's cache (and uv's managed CPython once, if no Python 3.11 or later is installed). The
+plugin ships only the modules of the stdio server: no CLI, model agent, HTTP service, web client or cluster access,
+so it reads no credentials and makes no network calls of its own. Personal data is never requested. If text you paste contains some, it is processed in memory
+and not stored, except words you choose to put in a confirmed note or a learner id.</p>
+<h2 id="the-agent-skill">The Agent Skill</h2>
+<p>The skill runs where Claude runs code: your computer in Claude Code, a sandbox for chat on claude.ai. It reads only
+the files named in a call, makes no network connections (web, cluster and model are forced off) and sends nothing to
+the maintainer. Like the server, it keeps learning progress and notes you confirm in kube-noob's data folder
+(<code>KUBE_NOOB_DATA_DIR</code>, else <code>~/.local/share/kube-noob</code>) inside that environment; a claude.ai sandbox discards them
+when it ends.</p>
+<h2 id="the-website-kube-noobcom">The website (kube-noob.com)</h2>
+<p>A static site on GitHub Pages, built from this repository's releases. It sets no cookies, runs no analytics and loads
+its pages, scripts and fonts from its own host only. GitHub Pages, which serves it, keeps its own access logs under
+GitHub's privacy statement. Data leaves your browser in three cases, and only when you act:</p>
+<ul>
+<li><strong>Contact, feedback and student-license forms.</strong> When you submit one, what you typed goes to a Google Apps Script
+  web app the maintainer runs, which stores it in the maintainer's private Google Sheet and emails the maintainer a
+  copy. A message keeps its time, topic or area, rating, your name, email address, text and the page it was sent
+  from. A student license keeps its id, your name, email address and school, and that you said you are a student; the
+  license id is emailed to you. The data is used only to reply to you or to keep your student record, is not sold or
+  shared, and is deleted on request through the contact form.</li>
+<li><strong>Bring your own AI.</strong> That page sends your Anthropic API key and your messages from your browser straight to
+  <code>api.anthropic.com</code>, under Anthropic's terms for your key; the site never receives them. The key is kept in memory,
+  or in the tab's session storage only if you tick the box.</li>
+<li><strong>Playground.</strong> It runs kube-noob's tools in your browser: what you paste stays on your device.</li>
+</ul>
+<h2 id="children">Children</h2>
+<p>kube-noob is not directed at children under 18.</p>
+<h2 id="contact">Contact</h2>
+<p>Security reports: <a href="/docs/security/">SECURITY.md</a>. Anything else:
+<a href="https://github.com/aashishmahajan/kube-noob/issues">GitHub issues</a>.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/PRIVACY.md">PRIVACY.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

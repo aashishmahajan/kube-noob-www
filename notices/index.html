@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Website notices · kube-noob</title>
+<meta name="description" content="kube-noob: the Kubernetes, OpenShift, ROSA HCP, Helm and RHACS rulebook your AI calls as tools.">
+<link rel="canonical" href="https://kube-noob.com/notices/">
+<meta property="og:title" content="Website notices · kube-noob">
+<meta property="og:description" content="kube-noob: the Kubernetes, OpenShift, ROSA HCP, Helm and RHACS rulebook your AI calls as tools.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/notices/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<article class="prose"><h1 id="website-notices">Website notices</h1>
+<p>kube-noob.com serves unmodified copies of the software below, so the site loads nothing from other hosts. Licenses
+were read from each package's metadata on 2026-10-29. Source for every MPL-2.0 file: the upstream project linked here.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Upstream</th>
+<th>License</th>
+<th>Where on the site</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pyodide 314.0.7 runtime (CPython 3.14 built for WebAssembly)</td>
+<td><a href="https://github.com/pyodide/pyodide">pyodide/pyodide</a></td>
+<td>MPL-2.0 (Pyodide), PSF-2.0 (CPython)</td>
+<td><code>/pyodide/</code></td>
+</tr>
+<tr>
+<td>Pyodide builds of pydantic, pydantic-core, annotated-types, typing-inspection, PyYAML, jsonschema, jsonschema-specifications, referencing, rpds-py, attrs, pyrsistent, six, anyio, h11, sniffio</td>
+<td>the Pyodide 314.0.7 distribution</td>
+<td>MIT (sniffio: MIT or Apache-2.0)</td>
+<td><code>/pyodide/</code></td>
+</tr>
+<tr>
+<td>httpx, httpcore, idna</td>
+<td>the Pyodide 314.0.7 distribution</td>
+<td>BSD-3-Clause</td>
+<td><code>/pyodide/</code></td>
+</tr>
+<tr>
+<td>certifi</td>
+<td>the Pyodide 314.0.7 distribution</td>
+<td>MPL-2.0</td>
+<td><code>/pyodide/</code></td>
+</tr>
+<tr>
+<td>typing-extensions</td>
+<td>the Pyodide 314.0.7 distribution</td>
+<td>PSF-2.0</td>
+<td><code>/pyodide/</code></td>
+</tr>
+<tr>
+<td>kube-noob wheel</td>
+<td><a href="https://github.com/aashishmahajan/kube-noob">aashishmahajan/kube-noob</a></td>
+<td>Apache-2.0</td>
+<td><code>/py/</code></td>
+</tr>
+<tr>
+<td>Anthropic TypeScript SDK 0.134.0 (bundled into <code>agent.js</code>)</td>
+<td><a href="https://github.com/anthropics/anthropic-sdk-typescript">anthropics/anthropic-sdk-typescript</a></td>
+<td>MIT</td>
+<td><code>/assets/agent.js</code></td>
+</tr>
+<tr>
+<td>Inter 4.1 (InterVariable.woff2)</td>
+<td><a href="https://github.com/rsms/inter">rsms/inter</a></td>
+<td>OFL-1.1 (<code>/assets/fonts/Inter-LICENSE.txt</code>)</td>
+<td><code>/assets/fonts/</code></td>
+</tr>
+<tr>
+<td>JetBrains Mono 2.304 (Regular, Medium)</td>
+<td><a href="https://github.com/JetBrains/JetBrainsMono">JetBrains/JetBrainsMono</a></td>
+<td>OFL-1.1 (<code>/assets/fonts/JetBrainsMono-OFL.txt</code>)</td>
+<td><code>/assets/fonts/</code></td>
+</tr>
+<tr>
+<td>mermaid 12.2.0</td>
+<td><a href="https://github.com/mermaid-js/mermaid">mermaid-js/mermaid</a></td>
+<td>MIT</td>
+<td><code>/assets/mermaid.min.js</code></td>
+</tr>
+<tr>
+<td>Kokoro-82M voice (in the videos)</td>
+<td>hexgrad/Kokoro-82M, packaged by thewh1teagle/kokoro-onnx</td>
+<td>Apache-2.0</td>
+<td><code>/videos/</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Build and test only (not served): esbuild 0.28.2 (MIT), Python-Markdown (BSD-3-Clause), Playwright 1.63.0
+(Apache-2.0).</p>
+<p>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS are
+trademarks of their respective owners; kube-noob is independent and not endorsed by them.</p><p>The product's own notices: <a href="/docs/third-party-notices/">third-party notices</a>.</p></article>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

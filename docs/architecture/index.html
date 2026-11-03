@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Architecture · kube-noob</title>
+<meta name="description" content="kube-noob has no model inside. The server, the CLI and the plugin run deterministic code: rules, schemas, playbooks, a BM25 index and graders. A model…">
+<link rel="canonical" href="https://kube-noob.com/docs/architecture/">
+<meta property="og:title" content="Architecture · kube-noob">
+<meta property="og:description" content="kube-noob has no model inside. The server, the CLI and the plugin run deterministic code: rules, schemas, playbooks, a BM25 index and graders. A model…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/architecture/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/" aria-current="page">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="architecture">Architecture</h1>
+<p>kube-noob has no model inside. The server, the CLI and the plugin run deterministic code: rules, schemas, playbooks,
+a BM25 index and graders. A model appears only on the client side (Claude, Lightspeed, any MCP client) or in the
+optional <code>kube-noob ask</code> agent, which calls the same toolkit.</p>
+<pre class="mermaid">flowchart LR
+  subgraph Clients
+    A[Claude / Cursor / VS Code&lt;br/&gt;MCP client]
+    B[kube-noob CLI]
+    C[Optional agent: kube-noob ask&lt;br/&gt;a model you configure]
+    D[Sidecar app in the same pod]
+    SK[Agent Skill: scripts/kn.py&lt;br/&gt;one tool per command, offline]
+  end
+  subgraph Server[&quot;kube-noob (stdio or streamable HTTP)&quot;]
+    T[Toolkit&lt;br/&gt;one tool surface]
+    P[7-step protocol]
+    E[Audit engine&lt;br/&gt;rules + schemas + red team]
+    F[Fixer / Generator / Helm]
+    G[Debug playbooks]
+    K[Knowledge store BM25&lt;br/&gt;built-in docs + corpus]
+    L[Learning: tracks, exercises, quizzes, credits]
+    R[Reward / grader&lt;br/&gt;enforcer + credit system]
+  end
+  subgraph Optional[&quot;Opt-in, guarded&quot;]
+    W[web_fetch&lt;br/&gt;webEnabled + domain allowlist]
+    X[Read-only cluster&lt;br/&gt;kubectl / oc / in-cluster SA&lt;br/&gt;no Secrets, redaction]
+  end
+  subgraph Offline[&quot;Maintainer / CI (corpus-refresh)&quot;]
+    S1[Git docs with license provenance]
+    S2[Release history from tags]
+    S3[Red Hat Jira copy via REST API&lt;br/&gt;1 req/s, PII scrubbed, local only]
+  end
+  A &amp; B &amp; C &amp; D &amp; SK --&gt; T
+  T --&gt; P --&gt; E &amp; F &amp; K
+  T --&gt; G &amp; L &amp; R
+  T -.-&gt; W &amp; X
+  S1 &amp; S2 &amp; S3 --&gt; K
+  R --&gt; DS[(SFT / GRPO datasets)]
+</pre>
+<h2 id="request-flow-run_protocol">Request flow (run_protocol)</h2>
+<ol>
+<li><strong>Clarify</strong> - platform/version inference (blueprint &gt; explicit &gt; request text &gt; manifest API groups), blocking
+   questions vs stated assumptions.</li>
+<li><strong>Validate</strong> - strict JSON schema (Kubernetes 1.35 + CRDs), apiVersion/kind catalog, removed APIs per target version,
+   selector/port wiring.</li>
+<li><strong>Research</strong> - BM25 over local knowledge; results carry chunk ids, source URLs and licenses.</li>
+<li><strong>Audit</strong> - security, RBAC, network exposure, storage access modes vs provisioner capabilities.</li>
+<li><strong>Calibrate</strong> - probes, resources, replicas, PDBs, topology spread, HPA prerequisites.</li>
+<li><strong>Generate</strong> - deterministic generator (blueprints) or mechanical fixer (existing YAML) with a change log.</li>
+<li><strong>Red Team</strong> - nine adversarial scenarios evaluated on the final output; remaining HIGH/CRITICAL findings mark the
+   result <code>blocked</code>.</li>
+</ol>
+<h2 id="trust-boundaries">Trust boundaries</h2>
+<ul>
+<li>MCP clients and model output are untrusted input: every tool validates with Pydantic, YAML is size/alias bounded.
+  Text that came from outside is untrusted on the way out too: <code>kube_noob.sanitize</code> cleans every MCP result (invisible
+  characters, role and tool-call markers, instruction phrases, exfiltrating Markdown) and flags it <code>untrusted</code>.
+  Pasted payloads are data too: an Alertmanager payload is read as JSON only (2 MB, 500 alerts, 64 labels, 2,000
+  characters per value, control characters dropped), and only an OpenShift release label sets the version.</li>
+<li>The Agent Skill (<code>skill/kube-noob/scripts/kn.py</code>) is a fourth surface over the same toolkit: it calls
+  <code>kube_noob.tool_runner.call</code> (the code path <code>mcp_app.run_tool</code> uses), loads only the bundled copy of the server
+  source next to it, and forces <code>offline: true</code>, web and cluster off and no model, whatever the config file or
+  <code>KUBE_NOOB_*</code> variables say. Its trust boundary is the model that runs it: arguments are validated by the tool's
+  model, input is capped at 5 MiB, and results are cleaned and flagged like MCP results.</li>
+<li>The HTTP transport authenticates with a bearer token (constant time) unless bound to loopback (sidecar).</li>
+<li>REST routes (<code>kube_noob.server.rest</code>, <code>/v1/...</code>) sit beside MCP on the same app and run the same toolkit call
+  (<code>mcp_app.run_tool</code>: validation, sanitising, <code>knowledgeAsOf</code>, the content-free audit line, now with <code>via=rest</code>).
+  Trust boundary: the caller holding the token. They pass the bearer check and body limit first, then the MCP
+  transport's Host and Origin checks; a POST must be <code>application/json</code>, so a cross-site form cannot reach a tool.
+  Only the tools the shared server offers have routes. <code>docs/api/openapi.json</code> is generated from the tools' models
+  (<code>scripts/gen_openapi.py</code>) and a test keeps it equal to the code.</li>
+<li>Outbound HTTP only through <code>kube_noob.net</code>: web purpose requires <code>webEnabled</code> and allowlisted HTTPS hosts on every
+  hop, GET only; <code>web_fetch</code> refuses non-text content types before reading the body. LLM and in-cluster API clients
+  are separate, explicit purposes.</li>
+<li>The admin lock (<code>offline: true</code>) is applied at config load and only tightens: it disables web, refuses corpus
+  downloads and allows only loopback or <code>*.svc</code> model endpoints. <code>kube-noob doctor</code> reports the result.</li>
+<li>Cluster access is read-only, allowlisted per resource, never Secrets, and redacts values before they reach a model.
+  Diagnoses list read-only steps first; commands that execute or change state are labelled as needing approval.
+  A structured playbook ties each root cause to the patterns that point at it, its own read-only steps and fixes
+  (<code>debug.playbooks.Cause</code>, <code>debug.diagnose.likely_cause</code>); with no pattern matching, the first cause is shown.
+  Names in steps come only from command-shaped input (<code>pod/&lt;name&gt;</code>, <code>kubectl get svc &lt;name&gt;</code>, <code>Selector:</code> lines) and
+  are pasted into a command only when made of characters a shell leaves alone there, so a copied step only ever reads.</li>
+<li>Anything beyond reading is a capability tier (<code>kube_noob.tiers</code>: probe, dry-run, external writes, gate forwarding),
+  off by default. Code that changes something is a <code>Writer</code> that cannot be built while its tier is off, and each
+  action needs a person's <code>Approval</code> for that action, unexpired and used once. The read-only backends have no write
+  method; tier RBAC renders only when the tier is on.</li>
+<li>A memory repository (<code>kube_noob.memory</code>) is the team's own Git content: kube-noob reads it locally, writes only on
+  <code>memory init</code>, <code>add</code>, <code>outcome</code> and <code>migrate-learning</code> (new files created exclusively, rewrites atomic), never runs
+  git, and never bundles, publishes or exports it. Entries are untrusted input until <code>memory validate</code> passes:
+  bounded YAML, content rules, and the verifier on every fix (validate, audit and red team on patches; privileged
+  SCC, cluster-admin, hostPath and wildcard RBAC grants fail without a recorded risk acceptance). In the chart the
+  repository is mounted read-only; the git source is cloned by an init container (no credentials in the URL, a
+  deploy key from a Secret, strict host keys), with egress only to the git host's CIDRs and, under the offline
+  lock, only from an in-cluster host.</li>
+<li>The Red Hat Jira copy is local data that is not redistributable. Each sync appends status, resolution and
+  fix-version changes to <code>jira/changes.jsonl</code> (owner-only, atomic, capped); reconciliation reads it and the ticket
+  index offline. A snapshot (<code>corpus jira-snapshot</code>) is owner-only; <code>corpus import</code> validates its file names,
+  sizes, checksums and that it comes from the same Jira before copying anything. <code>serve</code> imports a seed from
+  <code>&lt;dataDir&gt;/seed/</code> only when there is no copy, and the chart mounts the seed read-only (an init container copies it
+  from a pinned image, or a read-only claim). The scheduled main copy leaves the runner only encrypted.</li>
+<li>A sealed Jira seed is opened in the server container only, with the key file from a Secret; the init container
+  that copies it never sees the key. The plaintext is written to a temporary folder next to the data, imported
+  through the same validation as any snapshot, and removed; a wrong key leaves the data folder untouched.</li>
+<li>The public <code>kube-noob-db</code> bundle is the only data kube-noob publishes. It is built from redistributable sources
+  only, checked by <code>corpus db-check</code> (allow-listed licenses, no Jira data, every file listed and checksummed), and
+  shipped in an image the chart pins by digest. The init container copies the archive into a scratch volume that the
+  server mounts read-only; <code>serve</code> validates the whole archive and imports it only when it is newer than the copy
+  it has. Trust boundary: the image registry and its signature, checked by the operator with <code>cosign verify</code>.</li>
+<li>The attack-path scan (<code>posture scan</code>, tools <code>posture_scan</code> and <code>cluster_posture_scan</code>) reads RBAC objects (who may do what, no credentials) and the objects that expose and run pods; Secret objects in a bundle are dropped before analysis, and the live allowlist refuses Secrets. It reports paths and fixes and changes nothing.</li>
+<li>Build analytics (<code>kube_noob.build.analytics</code>) reads run folders on disk; JUnit XML with a DOCTYPE or entities is refused before parsing, and every file is size-bounded. <code>kube_noob.build.github_history</code> is the only code that reads the GitHub token: through <code>net.Purpose.CI</code> (on only with <code>ci.githubEnabled</code>, GET only, https to the configured API host and port only, no redirects), with a random pause between requests; the Claude plugin does not ship it.</li>
+<li>The CI gate (<code>kube_noob.gate</code>) is offline: it reads the files it is given (and runs <code>helm template</code> for <code>--chart</code>, with a throwaway Helm home), audits them together so rules that need other objects still work, maps each finding back to its file and line (or chart template), and writes SARIF, Markdown and code quality JSON. The GitHub Action installs kube-noob from its own source with hash-pinned dependencies and a hash-pinned build backend and passes every input through the environment; the Tekton Task mounts the source read-only and passes params through the environment.</li>
+<li>Build insight (<code>kube_noob.build</code>) reads text and files the user gives it and runs nothing: logs are split into steps by each CI system's own markers and classified by bounded patterns; the Containerfile audit parses without running a shell; the OCI layout reader opens blobs only by validated digest, refuses symlinks, checks every blob's sha256, reads layers as tar streams in memory with byte, file and layer budgets, and reports credentials by kind and location only (never their value). Trust boundary: the files on disk.</li>
+<li>Vulnerability assessment (<code>kube_noob.vuln</code>) reads scanner reports, SBOMs, CSAF VEX and the KEV catalog the user gives it, as bounded JSON, and runs and fetches nothing; VEX statements come from the local <code>redhat-vex</code> corpus shard or files on disk, RHACS image scans only through the Central reader (<code>rhacs.enabled</code>, GET <code>/v1/images/&lt;digest&gt;</code> with the same guards as policies). The threat model reads manifests through the attack-path inventory, so Secret objects are dropped unread. The Claude plugin ships the parsers and the CSAF reader (<code>kube_noob.vuln.csaf</code>), not the VEX fetcher or archive reader. Trust boundary: the scanner, SBOM and VEX producers. kube-noob trusts Red Hat's VEX statements for Red Hat builds and cites them; it does not let a report clear its own findings (CycloneDX analysis needs <code>--trust-report-vex</code>), escapes report text before it reaches the job summary, and flattens control characters in every name it reads.</li>
+<li>The admission webhook (<code>kube_noob.admission</code>, <code>kube-noob admission serve</code>, chart <code>admission.enabled</code>) receives the AdmissionReview requests the API server sends it over TLS (its rules never match Secrets or ConfigMaps), evaluates the object with the audit engine in memory and answers with warnings, or a denial for a rule in <code>admission.enforce</code>. It never mutates, keeps only request counters and latency buckets (<code>/metrics</code>), and connects to nothing; with <code>admission.lookups</code> a background thread lists PodDisruptionBudgets, NetworkPolicies, PersistentVolumeClaims, HorizontalPodAutoscalers and StorageClasses read-only, with jittered pauses, and a request never waits for it. Any error admits the object with a warning (fail open, like its <code>failurePolicy: Ignore</code>). Trust boundary: the API server is the only intended caller; port 8443 is open to every source by default because the API server is rarely a pod a NetworkPolicy can name, which is safe because a caller learns only the findings of an object it sends (with lookups, also whether its namespace has a matching budget or policy); <code>admission.networkPolicy.from</code> narrows it.</li>
+<li>Must-gather ingest (<code>kube_noob.mustgather.ingest</code>) reads a directory with <code>os.walk</code> (no links followed, files opened with <code>O_NOFOLLOW</code>, only regular files) or a tar archive as a stream (<code>tarfile</code> mode <code>r|*</code>, never <code>extract</code>), in memory, under caps on file count, bytes processed, file size, memory kept and depth. Trust boundary: the must-gather is untrusted; a traversal member refuses the archive, Secrets-named files are never opened, and member names with control characters are skipped.</li>
+<li>Must-gather analysers (<code>kube_noob.mustgather.analyse</code>) read only what ingest kept. Resource YAML is parsed with
+  libyaml after an event pre-scan (libyaml's event parser keeps an explicit stack; its composer recurses and crashes
+  the process on very deep input) that refuses aliases, more than 10 documents and nesting deeper than 64, under a
+  768 MiB parse budget. Trust boundary: everything in the must-gather is untrusted; shown strings are flattened and
+  redacted, names reach next-step commands only when they are valid Kubernetes names, and the output is bounded
+  (150 findings per analyser, 500 in all, 25 event reasons).</li>
+<li>Must-gather report (<code>kube_noob.mustgather.report</code>) matches the 20 most severe findings against the bundled known
+  issues (and the local Jira cache) for the detected version and against approved team memory, offline. It writes
+  <code>report.md</code>, <code>report.json</code> and <code>case-draft.md</code> into the directory given (never through a symbolic link). Trust
+  boundary: as for the analysers; the report adds only indexed facts, the draft leaves every human fact as a
+  placeholder, and the must-gather's own path is reduced to its file name.</li>
+<li>MCP <code>analyze_must_gather</code> (toolkit) reads a path the caller names. Trust boundary: the caller. The local stdio
+  server runs as the user and reads any absolute path; a shared (HTTP) server offers the tool only with
+  <code>mustGather.allowedDir</code> and refuses a path whose resolved form (links followed) leaves it. The modules are guarded
+  out of the Claude plugin.</li>
+<li>Code findings (<code>kube_noob.code</code>) read SARIF, Containerfiles, manifests, scanner reports and dependency files as bounded text and run nothing: no analysis engine, no package resolution, no network. The CLI reads the Containerfiles, <code>.dockerignore</code> and dependency files under <code>--repo</code> (no symlinks followed, at most 500 dependency files of 5 MB); the MCP tool takes everything inline and reads no files. Trust boundary: the SAST tools and scanners; kube-noob trusts their findings, never their paths (a path outside the source root, or one that decodes to control characters, is reported as unresolved, not opened, and its shipping counts as unknown, which gates like shipped code). Containerfile and context paths resolve inside <code>--repo</code> (the gate: the working directory) and become repository-relative; stage traversal is memoised and SARIF merging is indexed, so input inside the bounds costs linear work; dependency patterns never run on lines over 4 KB.</li>
+<li>The RHACS comparison (<code>kube_noob.rhacs</code>) reads a policy export as data and changes nothing. Reading Central goes through <code>net.Purpose.RHACS</code>: on only with <code>rhacs.enabled</code>, GET only, https to the configured host and port only, no redirects, the token from <code>$ROX_API_TOKEN</code> (or the KUBE_NOOB_* variable <code>rhacs.tokenEnv</code> names) in the Authorization header and never in an error; <code>kube_noob.rhacs_central</code> is the only code that reads it, and the Claude plugin does not ship it, Central's CA from <code>rhacs.caFile</code>; under the offline lock only a loopback or <code>*.svc</code> Central with no proxy from the environment. Trust boundary: Central and the token's role.</li>
+<li>Drift snapshots and reports (<code>kube_noob.drift</code>) are local files, owner-only, with hashes and names only: a snapshot cannot be turned back into configuration. The daily job reads through the same read-only allowlist.</li>
+<li><code>policy generate</code> (CLI and the read-only <code>policy_generate</code> tool) only writes YAML: it applies nothing, reads no
+  cluster and fetches nothing. What the policies do is decided by the person who applies them; enforce mode refuses
+  requests, so the default is audit. The CEL reads only the admitted object and the requester's name, never other
+  objects, and exempts platform namespaces and operators so a cluster upgrade is never blocked by a generated policy.</li>
+<li><code>policy migrate-check</code> (CLI and the read-only <code>policy_migrate_check</code> tool; <code>kube_noob.kyverno_migrate</code>) reads legacy
+  Kyverno policies as bounded YAML (the <code>yamlio</code> caps, Secret documents skipped unread) and rewrites, applies and
+  fetches nothing. Its verdicts come from mapping tables pinned to kyverno/website and kyverno/kyverno commits; a draft
+  CEL policy is text labelled as a draft, and the <code>kyverno test</code> skeleton beside it is how equivalence gets proven.
+  With <code>-o</code> the CLI writes only new files under the given directory, from sanitised names, and refuses to overwrite.</li>
+<li><code>&lt;dataDir&gt;/learning.json</code> holds user-confirmed summaries, the user's profile and id counters only. Notes are indexed
+  as <code>origin: local</code>, are never redistributable and never exported as training data.</li>
+<li>Evaluation (maintainer tools, not shipped in the package or plugin): <code>scripts/eval_questions.py</code> reads a question
+  CSV that is third-party text (forum posts, accepted answers, Jira resolutions) from outside the repository, runs
+  each row through <code>insight</code> offline and writes ids, answer kinds, finding ids and scores only: no question or answer
+  text. Only ids, verdicts, retired ids and aggregates are committed (<code>docs/evals/</code>). <code>scripts/eval_golden.py</code>
+  reads <code>tests/fixtures/golden/</code>, original questions written from the official docs with their source pinned to a
+  commit, and fails CI when a passing item regresses. Trust boundary: the CSV is untrusted input, read with a bounded
+  field size; nothing from it is executed.</li>
+</ul><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/architecture.md">docs/architecture.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

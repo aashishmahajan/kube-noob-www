@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Demo recordings · kube-noob</title>
+<meta name="description" content="Each tape records one kube-noob demo scenario with VHS . The release workflow renders every tape from the released wheel and attaches the GIFs to the…">
+<link rel="canonical" href="https://kube-noob.com/docs/demos/">
+<meta property="og:title" content="Demo recordings · kube-noob">
+<meta property="og:description" content="Each tape records one kube-noob demo scenario with VHS . The release workflow renders every tape from the released wheel and attaches the GIFs to the…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/demos/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/" aria-current="page">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="demo-recordings">Demo recordings</h1>
+<p>Each tape records one <code>kube-noob demo</code> scenario with <a href="https://github.com/charmbracelet/vhs">VHS</a>. The release
+workflow renders every tape from the released wheel and attaches the GIFs to the GitHub release, so recordings always
+match the shipped version. The demos are offline and use a throwaway data directory.</p>
+<pre><code class="language-bash">vhs demos/diagnose.tape
+</code></pre>
+<h2 id="videos">Videos</h2>
+<p>All three are rendered in 4K from real output, with the kube-noob brand music; the walkthrough is also narrated
+(needs Node with Playwright and Chromium, ffmpeg, and python3 with <code>numpy</code> and <code>kokoro-onnx</code>):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Video</th>
+<th>Command</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2-minute walkthrough + YouTube thumbnail</td>
+<td><code>demos/video/render.sh &lt;out-dir&gt;</code></td>
+<td><code>kube-noob demo</code> and <code>selftest</code></td>
+</tr>
+<tr>
+<td>kube-noob as tools for Claude (MCP), 70 s</td>
+<td><code>demos/video/render.sh &lt;out-dir&gt; mcp &lt;session.jsonl&gt;</code></td>
+<td>a <code>claude -p --plugin-dir plugin/kube-noob --output-format stream-json --verbose</code> session, with its prompt in <code>&lt;session&gt;.prompt.txt</code></td>
+</tr>
+<tr>
+<td>kube-noob as a sidecar on a cluster</td>
+<td><code>demos/video/render.sh &lt;out-dir&gt; sidecar &lt;transcript.txt&gt;</code></td>
+<td>the transcript <code>scripts/demo_sidecar_kind.sh</code> records in CI (job <code>e2e-kind</code>, OpenShift 4.22 leg)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The voice-over, title options and chapters are in <a href="https://github.com/aashishmahajan/kube-noob/blob/main/demos/youtube-walkthrough.md">youtube-walkthrough.md</a>. Prompts for an
+AI-generated teaser, sidecar and MCP explainer are in <a href="https://github.com/aashishmahajan/kube-noob/blob/main/demos/ai-video-prompts.md">ai-video-prompts.md</a>.</p>
+<h3 id="animated-videos-no-video-model">Animated videos, no video model</h3>
+<p>The same three scripts, rendered locally in the look of the Grok teaser (navy server room, glass terminal, rocket
+mascot) with a Kokoro voice-over and the kube-noob brand music. Every terminal line in them is copied from a real run:
+the 0.2.2 CLI, the CI sidecar transcript and the recorded Claude session.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Video</th>
+<th>Length</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Teaser: no AI inside</td>
+<td>30 s</td>
+<td><code>demos/video/stage/build.sh &lt;out-dir&gt; teaser</code></td>
+</tr>
+<tr>
+<td>kube-noob as a sidecar</td>
+<td>56 s</td>
+<td><code>demos/video/stage/build.sh &lt;out-dir&gt; sidecar</code></td>
+</tr>
+<tr>
+<td>kube-noob as tools for Claude (MCP)</td>
+<td>57 s</td>
+<td><code>demos/video/stage/build.sh &lt;out-dir&gt; mcp</code></td>
+</tr>
+<tr>
+<td>Compliance regimes: FedRAMP, EU AI Act, GDPR</td>
+<td>71 s</td>
+<td><code>python3 demos/video/stage/compliance.py &lt;out-dir&gt;</code> then <code>node demos/video/stage/capture.js &lt;out-dir&gt;</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Needs python3 with <code>numpy</code> and <code>kokoro-onnx</code> (<code>pip install kokoro-onnx numpy</code>), Node with Playwright and Chromium,
+and ffmpeg. Scenes, captions and voice-over lines are in <a href="https://github.com/aashishmahajan/kube-noob/blob/main/demos/video/stage/videos.json">video/stage/videos.json</a>.</p>
+<p>The compliance video's script is in its own file, <a href="https://github.com/aashishmahajan/kube-noob/blob/main/demos/video/stage/compliance.json">video/stage/compliance.json</a>, because
+every claim in it names a NIST SP 800-53 control id and <code>videos.json</code> may type no digits. It runs through the same
+schema, voice, music, caption and loudness path; <code>compliance.py</code> is the <code>voiceover.py</code> step for it. Each claim traces
+to a file in the repository: FedRAMP wording and the control ids to <a href="/docs/compliance/">docs/compliance.md</a>,
+read-only and never-reads-Secrets to <a href="/docs/safety-contract/">docs/safety-contract.md</a>, the DNS-only chart
+NetworkPolicy to <a href="/docs/security/">SECURITY.md</a>, and no accounts / no telemetry / on your machine only to
+<a href="/docs/privacy/">PRIVACY.md</a>. The scene before the end card carries the disclaimer; <code>compliance.py</code> refuses a script
+without it.</p>
+<h3 id="voice-and-music">Voice and music</h3>
+<ul>
+<li><strong>Voice:</strong> <a href="https://github.com/thewh1teagle/kokoro-onnx">Kokoro-82M</a> (Apache-2.0), voice <code>af_heart</code>, run locally.
+  The first run downloads the model from GitHub and checks its sha256. Pick another voice with <code>--voice</code> (<code>af_bella</code>,
+  <code>am_michael</code>, <code>bm_george</code>, ...) or <code>KN_VOICE</code> for <code>render.sh</code>; <code>--engine piper</code> brings back the earlier Piper voice.</li>
+<li><strong>Music:</strong> generated by <a href="https://github.com/aashishmahajan/kube-noob/blob/main/demos/video/audio_kit.py">video/audio_kit.py</a>: an upbeat business groove in C major at 104 bpm
+  built on the kube-noob motif (C, G, high C), which also plays on every end card. No samples, no licences.</li>
+<li><strong>Music level:</strong> <code>--music-db</code> (or <code>KN_MUSIC_DB</code> for <code>render.sh</code>) sets the music against the voice: <code>-12</code> by
+  default, <code>-18</code> quieter, <code>-6</code> louder, <code>off</code> for none. Every render keeps <code>voice.wav</code> and <code>music.wav</code>, so the level
+  can change later without rendering the picture again:</li>
+</ul>
+<pre><code class="language-bash">python3 demos/video/audio_kit.py remix &lt;out-dir&gt;/teaser --music-db -18 --video &lt;out-dir&gt;/teaser/kube-noob-teaser.mp4
+</code></pre><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/demos/README.md">demos/README.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

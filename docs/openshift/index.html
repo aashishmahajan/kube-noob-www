@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Run kube-noob on OpenShift and ROSA · kube-noob</title>
+<meta name="description" content="There are three ways to run kube-noob in a cluster. All three serve the same MCP tools, and all three start offline and read-only.">
+<link rel="canonical" href="https://kube-noob.com/docs/openshift/">
+<meta property="og:title" content="Run kube-noob on OpenShift and ROSA · kube-noob">
+<meta property="og:description" content="There are three ways to run kube-noob in a cluster. All three serve the same MCP tools, and all three start offline and read-only.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/openshift/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/" aria-current="page">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="run-kube-noob-on-openshift-and-rosa">Run kube-noob on OpenShift and ROSA</h1>
+<p>There are three ways to run kube-noob in a cluster. All three serve the same MCP tools, and all three start offline
+and read-only.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Who calls it</th>
+<th>Network exposure</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Service (Helm chart)</td>
+<td>MCP clients and OpenShift Lightspeed, over HTTP with a bearer token</td>
+<td>ClusterIP; optional Route</td>
+<td>One shared instance for a team or the whole cluster</td>
+</tr>
+<tr>
+<td>Sidecar</td>
+<td>Only containers in the same pod, on <code>127.0.0.1</code></td>
+<td>none</td>
+<td>Your own bot or agent that needs Kubernetes expertise</td>
+</tr>
+<tr>
+<td>OpenShift Lightspeed tool</td>
+<td>Lightspeed's chat in the console calls the Service</td>
+<td>in-cluster only</td>
+<td>Developers ask in the console; kube-noob supplies audits, diagnoses and cited answers</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="1-service-mode">1. Service mode</h2>
+<pre><code class="language-bash">oc new-project kube-noob
+oc create secret generic kube-noob-token --from-literal=token=&quot;$(openssl rand -hex 32)&quot;
+helm install kube-noob deploy/helm/kube-noob -n kube-noob --set auth.existingSecret=kube-noob-token --set config.offline=true --set config.defaultPlatform=rosa-hcp
+oc rollout status deployment/kube-noob -n kube-noob
+helm test kube-noob -n kube-noob
+</code></pre>
+<ul>
+<li><code>config.offline=true</code> is the admin lock: no web, no corpus downloads, local models only.</li>
+<li>The pod runs under <code>restricted-v2</code>. NetworkPolicies allow only the same namespace and the router by default. Egress
+  allows DNS only.</li>
+<li>Read-only cluster evidence (<code>cluster_get</code>, <code>cluster_debug_workload</code>) is opt-in. Set
+  <code>--set config.clusterEnabled=true --set "rbac.namespaces={shop,payments}"</code> and list the API server CIDRs in
+  <code>networkPolicy.egress.apiServerCIDRs</code>. The ServiceAccount gets read verbs only, never Secrets, and by default only
+  in its own namespace plus <code>rbac.namespaces</code>; <code>rbac.scope=cluster</code> widens that. Every holder of the token reads
+  through this ServiceAccount, so grant only the namespaces its users may see.</li>
+<li>Over HTTP, tools that write the learning file are not offered, because callers share one file. Add team notes with
+  <code>oc exec deploy/kube-noob -- kube-noob learning note ...</code> (with <code>persistence.enabled=true</code> and <code>replicaCount=1</code>).</li>
+<li>Persist notes, corpus and progress with <code>--set persistence.enabled=true --set replicaCount=1</code> (a ReadWriteOnce
+  volume attaches to one node, so the chart uses one replica and the Recreate strategy with it).</li>
+<li>Your own runbooks: <code>kube-noob corpus add-docs &lt;folder&gt; --source platform-runbooks</code> indexes them wherever the CLI
+  or plugin runs. Loading runbooks into the in-cluster service (an init container that reads a Git repo or a
+  ConfigMap) is on the roadmap.</li>
+</ul>
+<p>Clients connect to <code>http://kube-noob.kube-noob.svc:8080/mcp</code> with <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+<p>Callers that do not speak MCP (CI jobs, scripts, a chat bot) use the REST routes beside it, with the same token and
+the same tools: <code>POST /v1/insight</code>, <code>/v1/diagnose</code>, <code>/v1/audit</code>, <code>/v1/known-issues</code>, <code>/v1/policy/reach</code>,
+<code>/v1/memory/match</code> (with <code>memory.source</code>), <code>/v1/must-gather</code> (with <code>mustGather.pvc.claimName</code>), and <code>GET</code> or <code>POST
+/v1/reports</code>. <code>GET /v1/openapi.json</code> describes them (<a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/api/openapi.json">docs/api/openapi.json</a>); <code>GET /v1</code> lists the
+routes this install offers. Bodies are JSON objects with the tool's arguments; a POST must be <code>application/json</code>.</p>
+<pre><code class="language-bash">curl -s -H &quot;Authorization: Bearer $TOKEN&quot; -H 'Content-Type: application/json' \
+  -d '{&quot;text&quot;: &quot;0/3 nodes are available: 3 Insufficient memory.&quot;}' http://kube-noob.kube-noob.svc:8080/v1/diagnose
+</code></pre>
+<h2 id="2-sidecar-mode">2. Sidecar mode</h2>
+<p><a href="https://github.com/aashishmahajan/kube-noob/blob/main/deploy/sidecar/app-with-kube-noob-sidecar.yaml">deploy/sidecar/app-with-kube-noob-sidecar.yaml</a> is a complete
+example. kube-noob listens on <code>127.0.0.1:8080</code> inside your pod, so no Service, Route or token is needed. Your
+container calls <code>http://127.0.0.1:8080/mcp</code>. Audit the example with:</p>
+<pre><code class="language-bash">kube-noob audit -f deploy/sidecar/app-with-kube-noob-sidecar.yaml --platform openshift --fail-on medium
+</code></pre>
+<h2 id="3-openshift-lightspeed-integration">3. OpenShift Lightspeed integration</h2>
+<p>OpenShift Lightspeed can call external MCP servers when the <code>MCPServer</code> feature gate is on. Lightspeed's own model
+does the talking; kube-noob answers its tool calls with audits, diagnoses and cited docs, and calls no model itself. The field names below
+come from the <code>OLSConfig</code> API in the lightspeed-operator. Run <code>oc explain olsconfig.spec.mcpServers</code> to confirm the
+schema of your installed version.</p>
+<ol>
+<li>Install kube-noob in service mode (section 1), then let the Lightspeed namespace reach it:</li>
+</ol>
+<pre><code class="language-bash">helm upgrade kube-noob deploy/helm/kube-noob -n kube-noob --reuse-values --set networkPolicy.allowIngressNamespace=openshift-lightspeed
+</code></pre>
+<ol start="2">
+<li>Give Lightspeed the bearer token. The operator reads the header value from the key <code>header</code> of a Secret in its
+   own namespace:</li>
+</ol>
+<pre><code class="language-bash">oc create secret generic kube-noob-mcp-auth -n openshift-lightspeed --from-literal=header=&quot;Bearer $(oc get secret kube-noob-token -n kube-noob -o jsonpath='{.data.token}' | base64 -d)&quot;
+</code></pre>
+<ol start="3">
+<li>Register the server and turn on the gate:</li>
+</ol>
+<pre><code class="language-yaml">apiVersion: ols.openshift.io/v1alpha1
+kind: OLSConfig
+metadata:
+  name: cluster
+spec:
+  featureGates:
+    - MCPServer
+  mcpServers:
+    - name: kube-noob
+      url: http://kube-noob.kube-noob.svc:8080/mcp
+      timeout: 30
+      headers:
+        - name: Authorization
+          valueFrom:
+            type: secret
+            secretRef:
+              name: kube-noob-mcp-auth
+</code></pre>
+<p>Merge this into your existing <code>OLSConfig</code> with <code>oc edit olsconfig cluster</code>. Applying it as a new object replaces the
+LLM provider settings.</p>
+<ol start="4">
+<li>Check: ask Lightspeed "audit this Deployment for OpenShift 4.22" with a manifest pasted in. The kube-noob audit log
+   (<code>oc logs deploy/kube-noob -n kube-noob</code>) shows a <code>tool=kubenoob_...</code> line for each call.</li>
+</ol>
+<h2 id="compatibility">Compatibility</h2>
+<p>OpenShift 4.20 and later (Kubernetes 1.33 and later), including ROSA Classic and ROSA HCP. Every change runs the chart
+install, a Helm test, the sidecar example under Pod Security <code>restricted</code>, and an MCP end-to-end check on Kubernetes
+1.33, 1.34, 1.35 and the newest release (CI job <code>e2e-kind</code>). The chart and the sidecar example are audited for
+OpenShift 4.20, 4.21 and 4.22. Pods run under <code>restricted-v2</code> with an arbitrary UID, no capabilities, <code>RuntimeDefault</code>
+seccomp and a read-only root filesystem. The only APIs used are stable <code>v1</code> ones (<code>apps</code>, <code>networking.k8s.io</code>,
+<code>policy</code>, <code>route.openshift.io</code>, <code>rbac.authorization.k8s.io</code>) plus the optional <code>k8s.ovn.org/v1</code> EgressFirewall.</p>
+<h2 id="sizing">Sizing</h2>
+<p>Measured with <code>scripts/measure_footprint.py</code> (Python 3.13): about 80 MiB resident at start and 85 MiB peak after
+search, audit, diagnose and a full protocol run, the same for stdio and HTTP. Each MB of indexed text (team runbooks,
+a corpus) adds about 25 MiB; 3,000 issue-sized documents (11 MB) peaked at 340 MiB. On a cluster, the sidecar
+container's cgroup reported 66 MiB current and 68 MiB peak after audit, diagnose and search calls (CI job <code>e2e-kind</code>,
+Kubernetes 1.35, image built from the <code>Containerfile</code> on UBI 9 Python 3.12). The two sets of figures differ in Python
+version and in what is counted (process resident memory versus the container's cgroup).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Request</th>
+<th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sidecar, built-in knowledge</td>
+<td>128Mi</td>
+<td>256Mi</td>
+</tr>
+<tr>
+<td>Service (chart default), up to about 15 MB of indexed text</td>
+<td>256Mi</td>
+<td>512Mi</td>
+</tr>
+<tr>
+<td>Larger corpus</td>
+<td>85 MiB plus 25 MiB per MB of text</td>
+<td>request plus 50%</td>
+</tr>
+</tbody>
+</table></div>
+<p>CPU is idle between calls; a call takes 2 to 70 ms.</p>
+<h2 id="traffic-out-of-the-cluster">Traffic out of the cluster</h2>
+<p>kube-noob calls no model and, by default, opens no outbound connection. The chart's NetworkPolicy allows egress to
+DNS only. <code>config.clusterEnabled</code> adds the API server CIDRs you list; <code>config.webEnabled</code> adds TCP 443 to public
+addresses only (private, carrier-grade NAT and link-local ranges are excepted, so nothing in the cluster), or to your
+egress proxy (<code>networkPolicy.egress.webProxy</code>), and the application allowlist limits that to documentation domains. To enforce domains at the network layer too, set
+<code>egressFirewall.enabled=true</code> (OVN-Kubernetes). It allows only the API server (when cluster access is on) and HTTPS
+to the allowlisted domains (when web access is on), then denies everything else leaving the cluster. It applies to the
+whole namespace, so keep kube-noob in its own. In sidecar mode kube-noob needs no egress; the example's NetworkPolicy
+allows DNS only, and you add your app's own destinations.</p>
+<h2 id="regulated-environments">Regulated environments</h2>
+<p>For FedRAMP High and other NIST SP 800-53 based programs (FIPS mode, identity, audit logs, image verification):
+<a href="/docs/compliance/">compliance.md</a>.</p>
+<h2 id="data-retention">Data retention</h2>
+<p>kube-noob processes requests in memory and keeps nothing from them. It stores only what a user saves on purpose:
+learning progress, confirmed notes and indexed documents, in <code>/var/lib/kube-noob</code>. With <code>persistence.enabled=false</code>
+(the default) that is an <code>emptyDir</code> and is gone when the pod is deleted; with persistence it stays on the PVC until you
+delete it. Each request writes one log line to stdout (tool name, argument sizes, outcome, duration; never argument
+contents); your cluster's logging decides how long that is kept. Details: <a href="/docs/privacy/">PRIVACY.md</a>.</p>
+<h2 id="status-of-the-public-listings">Status of the public listings</h2>
+<ul>
+<li>PyPI: <code>kube-noob</code> is published with Trusted Publishing and provenance on every tag.</li>
+<li>MCP Registry: <code>io.github.aashishmahajan/kube-noob</code> is published by the release workflow.</li>
+<li>Homebrew: <code>brew tap aashishmahajan/kube-noob https://github.com/aashishmahajan/kube-noob</code>, then
+  <code>brew trust --formula aashishmahajan/kube-noob/kube-noob</code> and <code>brew install kube-noob</code>. The release workflow writes the formula once PyPI has the version, and CI installs it
+  that way on macOS and Linux after every release and every week. Other ways and fixes: <a href="/docs/install/">install.md</a>.</li>
+<li>Container image: <code>ghcr.io/aashishmahajan/kube-noob:&lt;version&gt;</code> is multi-arch and signed with cosign. Verify it
+  with the commands in <a href="/docs/security/">SECURITY.md</a>.</li>
+<li>Claude plugin: <code>/plugin marketplace add aashishmahajan/kube-noob</code>. It runs the bundled server source with
+  dependencies pinned by hash in <code>uv.lock</code>. The Claude plugin directory listing is a manual submission (see
+  <a href="/docs/release-readiness/">release readiness</a>).</li>
+<li>OpenShift Helm chart catalog: ready to submit to the community tier; steps in <a href="/docs/openshift-catalog/">openshift-catalog.md</a>.
+  OperatorHub (Software Catalog) needs an operator bundle and is on the roadmap.</li>
+</ul><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/openshift.md">docs/openshift.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

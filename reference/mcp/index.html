@@ -1,0 +1,2947 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>MCP tools · kube-noob</title>
+<meta name="description" content="Every kube-noob MCP tool with its arguments and JSON schema.">
+<link rel="canonical" href="https://kube-noob.com/reference/mcp/">
+<meta property="og:title" content="MCP tools · kube-noob">
+<meta property="og:description" content="Every kube-noob MCP tool with its arguments and JSON schema.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/reference/mcp/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/" aria-current="page">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/" aria-current="page">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose" style="max-width:none"><h1>MCP tools</h1><p>The tool surface every MCP client sees (Claude, OpenShift Lightspeed, Cursor, VS Code). Generated from the same ToolSpecs the server registers, so the schemas here are the schemas it validates. 47 tools are on by default; cluster and web tools appear only when enabled. Prompts: <code>getting_started</code>, <code>master_controller</code>, <code>debug_session</code>, <code>tutor</code>. Resources: <code>kubenoob://rules</code>, <code>kubenoob://curriculum</code>, <code>kubenoob://knowledge/{doc_id}</code>.</p><div class="table-wrap"><table><thead><tr><th>Tool</th><th>Title</th><th>Effect</th><th>Available</th></tr></thead><tbody><tr><td><a href="#kubenoob_run_protocol"><code>kubenoob_run_protocol</code></a></td><td>Run the 7-step engineering protocol</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_validate_manifests"><code>kubenoob_validate_manifests</code></a></td><td>Validate manifests</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_audit_manifests"><code>kubenoob_audit_manifests</code></a></td><td>Audit manifests</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_red_team"><code>kubenoob_red_team</code></a></td><td>Red-team manifests</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_fix_manifests"><code>kubenoob_fix_manifests</code></a></td><td>Apply safe mechanical fixes</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_clarify_requirements"><code>kubenoob_clarify_requirements</code></a></td><td>Clarify requirements</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_generate_manifests"><code>kubenoob_generate_manifests</code></a></td><td>Generate production manifests</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_generate_helm_chart"><code>kubenoob_generate_helm_chart</code></a></td><td>Generate a Helm chart</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_search_knowledge"><code>kubenoob_search_knowledge</code></a></td><td>Search local knowledge</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_get_knowledge"><code>kubenoob_get_knowledge</code></a></td><td>Read a knowledge chunk or document</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_api_history"><code>kubenoob_api_history</code></a></td><td>API removal history and version map</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_explain_rule"><code>kubenoob_explain_rule</code></a></td><td>Explain an audit rule</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_list_rules"><code>kubenoob_list_rules</code></a></td><td>List audit rules</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_diagnose"><code>kubenoob_diagnose</code></a></td><td>Diagnose symptoms offline</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_extract_signals"><code>kubenoob_extract_signals</code></a></td><td>Extract signals</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_insight"><code>kubenoob_insight</code></a></td><td>What is this, and what does it say?</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_ticket_changes"><code>kubenoob_ticket_changes</code></a></td><td>What changed in Red Hat Jira</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_known_issues"><code>kubenoob_known_issues</code></a></td><td>Is this a reported issue?</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_upgrade_risks"><code>kubenoob_upgrade_risks</code></a></td><td>Known risks for an OpenShift update</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_ticket"><code>kubenoob_ticket</code></a></td><td>Look up a Red Hat Jira ticket</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_explain_denial"><code>kubenoob_explain_denial</code></a></td><td>Why was this denied?</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_policy_generate"><code>kubenoob_policy_generate</code></a></td><td>Turn audit rules into admission policies</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_policy_migrate_check"><code>kubenoob_policy_migrate_check</code></a></td><td>Check legacy Kyverno policies for their CEL form</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_posture_scan"><code>kubenoob_posture_scan</code></a></td><td>Attack paths in manifests</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_build_diagnose"><code>kubenoob_build_diagnose</code></a></td><td>Diagnose a failed build log</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_rhacs_compare"><code>kubenoob_rhacs_compare</code></a></td><td>Compare RHACS policies with kube-noob&#x27;s rules</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_vuln_report"><code>kubenoob_vuln_report</code></a></td><td>Assess scanner output: VEX, exploitation, reachability</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_threat_model"><code>kubenoob_threat_model</code></a></td><td>STRIDE threat model of an application</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_posture_report"><code>kubenoob_posture_report</code></a></td><td>Latest drift and policy report</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_check_network_policy"><code>kubenoob_check_network_policy</code></a></td><td>Would this traffic be allowed?</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_incidents"><code>kubenoob_incidents</code></a></td><td>Incidents the watch has seen</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_incident"><code>kubenoob_incident</code></a></td><td>One incident in full</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_incident_confirm"><code>kubenoob_incident_confirm</code></a></td><td>Remember the fix for an incident</td><td>writes local learning file</td><td>always</td></tr><tr><td><a href="#kubenoob_learn_tracks"><code>kubenoob_learn_tracks</code></a></td><td>List learning tracks</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_learn_lesson"><code>kubenoob_learn_lesson</code></a></td><td>Open a lesson</td><td>writes local learning file</td><td>always</td></tr><tr><td><a href="#kubenoob_learn_exercise"><code>kubenoob_learn_exercise</code></a></td><td>Get an exercise</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_learn_submit"><code>kubenoob_learn_submit</code></a></td><td>Submit an exercise answer</td><td>writes local learning file</td><td>always</td></tr><tr><td><a href="#kubenoob_learn_quiz"><code>kubenoob_learn_quiz</code></a></td><td>Quiz</td><td>writes local learning file</td><td>always</td></tr><tr><td><a href="#kubenoob_learn_progress"><code>kubenoob_learn_progress</code></a></td><td>Learner progress</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_grade_answer"><code>kubenoob_grade_answer</code></a></td><td>Grade a model answer (enforcer + credit system)</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_learning_summary"><code>kubenoob_learning_summary</code></a></td><td>Show what kube-noob has learned locally</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_learning_note_add"><code>kubenoob_learning_note_add</code></a></td><td>Remember a confirmed fix</td><td>writes local learning file</td><td>always</td></tr><tr><td><a href="#kubenoob_learning_profile_set"><code>kubenoob_learning_profile_set</code></a></td><td>Remember the user&#x27;s environment</td><td>writes local learning file</td><td>always</td></tr><tr><td><a href="#kubenoob_config_status"><code>kubenoob_config_status</code></a></td><td>Show configuration</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_cluster_get"><code>kubenoob_cluster_get</code></a></td><td>Read cluster objects (read-only)</td><td>read-only</td><td>webEnabled</td></tr><tr><td><a href="#kubenoob_cluster_debug_workload"><code>kubenoob_cluster_debug_workload</code></a></td><td>Debug a live workload (read-only)</td><td>read-only</td><td>webEnabled</td></tr><tr><td><a href="#kubenoob_cluster_check_traffic"><code>kubenoob_cluster_check_traffic</code></a></td><td>Would this traffic be allowed? (live, read-only)</td><td>read-only</td><td>webEnabled</td></tr><tr><td><a href="#kubenoob_cluster_posture_scan"><code>kubenoob_cluster_posture_scan</code></a></td><td>Attack paths in the cluster (live, read-only)</td><td>read-only</td><td>webEnabled</td></tr><tr><td><a href="#kubenoob_cluster_check_namespace"><code>kubenoob_cluster_check_namespace</code></a></td><td>Check a namespace now (live, read-only)</td><td>read-only</td><td>webEnabled</td></tr><tr><td><a href="#kubenoob_cluster_version"><code>kubenoob_cluster_version</code></a></td><td>Cluster version</td><td>read-only</td><td>webEnabled</td></tr><tr><td><a href="#kubenoob_code_report"><code>kubenoob_code_report</code></a></td><td>Assess SAST findings: where the code ships and who runs it</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_containerfile_audit"><code>kubenoob_containerfile_audit</code></a></td><td>Audit a Containerfile</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_analyze_must_gather"><code>kubenoob_analyze_must_gather</code></a></td><td>Analyse a must-gather</td><td>read-only</td><td>always</td></tr><tr><td><a href="#kubenoob_web_fetch"><code>kubenoob_web_fetch</code></a></td><td>Fetch an allowlisted web page</td><td>read-only</td><td>webEnabled</td></tr></tbody></table></div><h2 id="kubenoob_run_protocol">Run the 7-step engineering protocol</h2><p><code>kubenoob_run_protocol</code> · available: always</p><p>Clarify -&gt; Validate -&gt; Research -&gt; Audit -&gt; Calibrate -&gt; Generate -&gt; Red Team for a request with existing manifests or a generator blueprint. Returns the Audit &amp; Validation Brief, the production manifest, and Red Team findings with safeguards. Use this first for any design/review request.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>request</code> (required)</td><td><code>string</code></td><td></td><td>What the user wants, in their words.</td></tr><tr><td><code>manifests</code></td><td><code>string | null</code></td><td>null</td><td>Existing manifests to review.</td></tr><tr><td><code>blueprint</code></td><td><code>object | null</code></td><td>null</td><td>Generator blueprint (see generate_manifests).</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td></td></tr><tr><td><code>apply_fixes</code></td><td><code>boolean</code></td><td>true</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;request&quot;: {
+      &quot;description&quot;: &quot;What the user wants, in their words.&quot;,
+      &quot;maxLength&quot;: 8000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Request&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;manifests&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 1000000,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Existing manifests to review.&quot;,
+      &quot;title&quot;: &quot;Manifests&quot;
+    },
+    &quot;blueprint&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;additionalProperties&quot;: true,
+          &quot;type&quot;: &quot;object&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Generator blueprint (see generate_manifests).&quot;,
+      &quot;title&quot;: &quot;Blueprint&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 16,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Version&quot;
+    },
+    &quot;apply_fixes&quot;: {
+      &quot;default&quot;: true,
+      &quot;title&quot;: &quot;Apply Fixes&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;request&quot;
+  ],
+  &quot;title&quot;: &quot;ProtocolIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_validate_manifests">Validate manifests</h2><p><code>kubenoob_validate_manifests</code> · available: always</p><p>Strict schema validation (Kubernetes 1.35 + OpenShift/OVN-K/StackRox/Gateway API CRDs), apiVersion vs kind, OpenShift-only APIs on vanilla Kubernetes, removed/deprecated APIs, selector wiring.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>manifests</code> (required)</td><td><code>string</code></td><td></td><td>One or more YAML documents (Kubernetes/OpenShift objects).</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot;</code></td><td>&quot;kubernetes&quot;</td><td>Target platform.</td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;manifests&quot;: {
+      &quot;description&quot;: &quot;One or more YAML documents (Kubernetes/OpenShift objects).&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Manifests&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;default&quot;: &quot;kubernetes&quot;,
+      &quot;description&quot;: &quot;Target platform.&quot;,
+      &quot;enum&quot;: [
+        &quot;kubernetes&quot;,
+        &quot;openshift&quot;,
+        &quot;rosa-classic&quot;,
+        &quot;rosa-hcp&quot;
+      ],
+      &quot;title&quot;: &quot;Platform&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 16,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;manifests&quot;
+  ],
+  &quot;title&quot;: &quot;ManifestsIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_audit_manifests">Audit manifests</h2><p><code>kubenoob_audit_manifests</code> · available: always</p><p>Full deterministic audit: security, network exposure, storage access modes, reliability and red-team scenarios. Findings carry rule ids, line numbers, fixes, citations and matching RHACS policy names.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>manifests</code> (required)</td><td><code>string</code></td><td></td><td>One or more YAML documents (Kubernetes/OpenShift objects).</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot;</code></td><td>&quot;kubernetes&quot;</td><td>Target platform.</td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.</td></tr><tr><td><code>exceptions</code></td><td><code>string | null</code></td><td>null</td><td>An exception list (YAML, apiVersion kube-noob.io/v1, kind ExceptionList): each entry names a rule, a scope, an owner, a reason and an expiry date. Active entries hide the findings they cover; expired and refused entries are reported and fail the gate.</td></tr><tr><td><code>min_severity</code></td><td><code>&quot;info&quot; | &quot;low&quot; | &quot;medium&quot; | &quot;high&quot; | &quot;critical&quot;</code></td><td>&quot;low&quot;</td><td>Hide findings below this severity.</td></tr><tr><td><code>stages</code></td><td><code>array of &quot;validate&quot; | &quot;audit&quot; | &quot;calibrate&quot; | &quot;red-team&quot;</code></td><td></td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;manifests&quot;: {
+      &quot;description&quot;: &quot;One or more YAML documents (Kubernetes/OpenShift objects).&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Manifests&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;default&quot;: &quot;kubernetes&quot;,
+      &quot;description&quot;: &quot;Target platform.&quot;,
+      &quot;enum&quot;: [
+        &quot;kubernetes&quot;,
+        &quot;openshift&quot;,
+        &quot;rosa-classic&quot;,
+        &quot;rosa-hcp&quot;
+      ],
+      &quot;title&quot;: &quot;Platform&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 16,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    },
+    &quot;exceptions&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 1000000,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;An exception list (YAML, apiVersion kube-noob.io/v1, kind ExceptionList): each entry names a rule, a scope, an owner, a reason and an expiry date. Active entries hide the findings they cover; expired and refused entries are reported and fail the gate.&quot;,
+      &quot;title&quot;: &quot;Exceptions&quot;
+    },
+    &quot;min_severity&quot;: {
+      &quot;default&quot;: &quot;low&quot;,
+      &quot;description&quot;: &quot;Hide findings below this severity.&quot;,
+      &quot;enum&quot;: [
+        &quot;info&quot;,
+        &quot;low&quot;,
+        &quot;medium&quot;,
+        &quot;high&quot;,
+        &quot;critical&quot;
+      ],
+      &quot;title&quot;: &quot;Min Severity&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;stages&quot;: {
+      &quot;items&quot;: {
+        &quot;enum&quot;: [
+          &quot;validate&quot;,
+          &quot;audit&quot;,
+          &quot;calibrate&quot;,
+          &quot;red-team&quot;
+        ],
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;title&quot;: &quot;Stages&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;manifests&quot;
+  ],
+  &quot;title&quot;: &quot;AuditIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_red_team">Red-team manifests</h2><p><code>kubenoob_red_team</code> · available: always</p><p>Hostile-auditor scenarios: node crash, zone outage, RWX split-brain, exposure, privilege escalation, upgrade blocking, secret leaks, resource starvation, supply chain.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>manifests</code> (required)</td><td><code>string</code></td><td></td><td>One or more YAML documents (Kubernetes/OpenShift objects).</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot;</code></td><td>&quot;kubernetes&quot;</td><td>Target platform.</td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;manifests&quot;: {
+      &quot;description&quot;: &quot;One or more YAML documents (Kubernetes/OpenShift objects).&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Manifests&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;default&quot;: &quot;kubernetes&quot;,
+      &quot;description&quot;: &quot;Target platform.&quot;,
+      &quot;enum&quot;: [
+        &quot;kubernetes&quot;,
+        &quot;openshift&quot;,
+        &quot;rosa-classic&quot;,
+        &quot;rosa-hcp&quot;
+      ],
+      &quot;title&quot;: &quot;Platform&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 16,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;manifests&quot;
+  ],
+  &quot;title&quot;: &quot;ManifestsIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_fix_manifests">Apply safe mechanical fixes</h2><p><code>kubenoob_fix_manifests</code> · available: always</p><p>Migrates removed APIs, fixes wrong API groups, hardens securityContext, adds Route TLS, unblocks PDBs, reorders EgressFirewall rules, swaps RWO-only classes for RWX claims. Returns the diff log and manual follow-ups. Does not touch any cluster.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>manifests</code> (required)</td><td><code>string</code></td><td></td><td>One or more YAML documents (Kubernetes/OpenShift objects).</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot;</code></td><td>&quot;kubernetes&quot;</td><td>Target platform.</td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.</td></tr><tr><td><code>harden</code></td><td><code>boolean</code></td><td>true</td><td>Apply securityContext hardening (restricted profile).</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;manifests&quot;: {
+      &quot;description&quot;: &quot;One or more YAML documents (Kubernetes/OpenShift objects).&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Manifests&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;default&quot;: &quot;kubernetes&quot;,
+      &quot;description&quot;: &quot;Target platform.&quot;,
+      &quot;enum&quot;: [
+        &quot;kubernetes&quot;,
+        &quot;openshift&quot;,
+        &quot;rosa-classic&quot;,
+        &quot;rosa-hcp&quot;
+      ],
+      &quot;title&quot;: &quot;Platform&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 16,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Platform version, e.g. &#x27;4.22&#x27; (OCP) or &#x27;1.35&#x27;.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    },
+    &quot;harden&quot;: {
+      &quot;default&quot;: true,
+      &quot;description&quot;: &quot;Apply securityContext hardening (restricted profile).&quot;,
+      &quot;title&quot;: &quot;Harden&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;manifests&quot;
+  ],
+  &quot;title&quot;: &quot;FixIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_clarify_requirements">Clarify requirements</h2><p><code>kubenoob_clarify_requirements</code> · available: always</p><p>Check a (partial) generator blueprint and return blocking questions and stated assumptions.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>blueprint</code> (required)</td><td><code>object</code></td><td></td><td>Partial blueprint; missing/invalid fields become questions.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;blueprint&quot;: {
+      &quot;additionalProperties&quot;: true,
+      &quot;description&quot;: &quot;Partial blueprint; missing/invalid fields become questions.&quot;,
+      &quot;title&quot;: &quot;Blueprint&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;blueprint&quot;
+  ],
+  &quot;title&quot;: &quot;ClarifyIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_generate_manifests">Generate production manifests</h2><p><code>kubenoob_generate_manifests</code> · available: always</p><p>Deterministic, audited manifests for kubernetes / openshift / rosa-classic / rosa-hcp from a blueprint (name, namespace, image, replicas, port, probes, storage, exposure, egress).</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>blueprint</code> (required)</td><td><code>Blueprint</code></td><td></td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;$defs&quot;: {
+    &quot;Blueprint&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;name&quot;: {
+          &quot;description&quot;: &quot;DNS-1123 label, e.g. &#x27;orders-api&#x27;&quot;,
+          &quot;title&quot;: &quot;Name&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;namespace&quot;: {
+          &quot;description&quot;: &quot;Target namespace / OpenShift project&quot;,
+          &quot;title&quot;: &quot;Namespace&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;image&quot;: {
+          &quot;description&quot;: &quot;Container image, ideally pinned by digest&quot;,
+          &quot;title&quot;: &quot;Image&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;platform&quot;: {
+          &quot;default&quot;: &quot;kubernetes&quot;,
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;title&quot;: &quot;Platform&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;platformVersion&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Platformversion&quot;
+        },
+        &quot;workload&quot;: {
+          &quot;default&quot;: &quot;deployment&quot;,
+          &quot;enum&quot;: [
+            &quot;deployment&quot;,
+            &quot;statefulset&quot;
+          ],
+          &quot;title&quot;: &quot;Workload&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;replicas&quot;: {
+          &quot;default&quot;: 3,
+          &quot;maximum&quot;: 100,
+          &quot;minimum&quot;: 1,
+          &quot;title&quot;: &quot;Replicas&quot;,
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        &quot;port&quot;: {
+          &quot;default&quot;: 8080,
+          &quot;maximum&quot;: 65535,
+          &quot;minimum&quot;: 1,
+          &quot;title&quot;: &quot;Port&quot;,
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        &quot;portName&quot;: {
+          &quot;default&quot;: &quot;http&quot;,
+          &quot;title&quot;: &quot;Portname&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;probe&quot;: {
+          &quot;default&quot;: &quot;http&quot;,
+          &quot;enum&quot;: [
+            &quot;http&quot;,
+            &quot;tcp&quot;,
+            &quot;none&quot;
+          ],
+          &quot;title&quot;: &quot;Probe&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;livenessPath&quot;: {
+          &quot;default&quot;: &quot;/healthz&quot;,
+          &quot;title&quot;: &quot;Livenesspath&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;readinessPath&quot;: {
+          &quot;default&quot;: &quot;/readyz&quot;,
+          &quot;title&quot;: &quot;Readinesspath&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;startupSeconds&quot;: {
+          &quot;default&quot;: 0,
+          &quot;description&quot;: &quot;Add a startupProbe allowing this many seconds&quot;,
+          &quot;maximum&quot;: 600,
+          &quot;minimum&quot;: 0,
+          &quot;title&quot;: &quot;Startupseconds&quot;,
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        &quot;resources&quot;: {
+          &quot;$ref&quot;: &quot;#/$defs/Resources&quot;
+        },
+        &quot;storage&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;$ref&quot;: &quot;#/$defs/Storage&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null
+        },
+        &quot;exposure&quot;: {
+          &quot;$ref&quot;: &quot;#/$defs/Exposure&quot;
+        },
+        &quot;env&quot;: {
+          &quot;additionalProperties&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Env&quot;,
+          &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;secretEnv&quot;: {
+          &quot;additionalProperties&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;description&quot;: &quot;ENV_NAME -&gt; &#x27;secretName/key&#x27; references (values never inlined)&quot;,
+          &quot;title&quot;: &quot;Secretenv&quot;,
+          &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;egress&quot;: {
+          &quot;default&quot;: &quot;open&quot;,
+          &quot;enum&quot;: [
+            &quot;open&quot;,
+            &quot;dns-only&quot;,
+            &quot;cidrs&quot;
+          ],
+          &quot;title&quot;: &quot;Egress&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;egressCidrs&quot;: {
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Egresscidrs&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;egressDnsNames&quot;: {
+          &quot;description&quot;: &quot;OpenShift EgressFirewall allow list&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Egressdnsnames&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;hpaMaxReplicas&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;maximum&quot;: 1000,
+              &quot;minimum&quot;: 2,
+              &quot;type&quot;: &quot;integer&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Hpamaxreplicas&quot;
+        },
+        &quot;readOnlyRootFs&quot;: {
+          &quot;default&quot;: true,
+          &quot;title&quot;: &quot;Readonlyrootfs&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;writablePaths&quot;: {
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Writablepaths&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;runAsUser&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;minimum&quot;: 1,
+              &quot;type&quot;: &quot;integer&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;Fixed UID (vanilla Kubernetes only)&quot;,
+          &quot;title&quot;: &quot;Runasuser&quot;
+        },
+        &quot;allowMonitoring&quot;: {
+          &quot;default&quot;: true,
+          &quot;title&quot;: &quot;Allowmonitoring&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;createNamespace&quot;: {
+          &quot;default&quot;: false,
+          &quot;title&quot;: &quot;Createnamespace&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        }
+      },
+      &quot;required&quot;: [
+        &quot;name&quot;,
+        &quot;namespace&quot;,
+        &quot;image&quot;
+      ],
+      &quot;title&quot;: &quot;Blueprint&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;Exposure&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;type&quot;: {
+          &quot;default&quot;: &quot;none&quot;,
+          &quot;enum&quot;: [
+            &quot;none&quot;,
+            &quot;route&quot;,
+            &quot;ingress&quot;,
+            &quot;gateway&quot;,
+            &quot;loadbalancer&quot;
+          ],
+          &quot;title&quot;: &quot;Type&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;host&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Host&quot;
+        },
+        &quot;path&quot;: {
+          &quot;default&quot;: &quot;/&quot;,
+          &quot;title&quot;: &quot;Path&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;tls&quot;: {
+          &quot;default&quot;: &quot;edge&quot;,
+          &quot;enum&quot;: [
+            &quot;edge&quot;,
+            &quot;reencrypt&quot;,
+            &quot;passthrough&quot;
+          ],
+          &quot;title&quot;: &quot;Tls&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;ingressClass&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Ingressclass&quot;
+        },
+        &quot;tlsSecret&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;Ingress TLS secret name (cert-manager can create it)&quot;,
+          &quot;title&quot;: &quot;Tlssecret&quot;
+        },
+        &quot;gatewayName&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Gatewayname&quot;
+        },
+        &quot;gatewayNamespace&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Gatewaynamespace&quot;
+        },
+        &quot;lbSourceRanges&quot;: {
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Lbsourceranges&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;internalLb&quot;: {
+          &quot;default&quot;: true,
+          &quot;title&quot;: &quot;Internallb&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        }
+      },
+      &quot;title&quot;: &quot;Exposure&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;Resources&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;cpuRequest&quot;: {
+          &quot;default&quot;: &quot;100m&quot;,
+          &quot;title&quot;: &quot;Cpurequest&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;memoryRequest&quot;: {
+          &quot;default&quot;: &quot;128Mi&quot;,
+          &quot;title&quot;: &quot;Memoryrequest&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;cpuLimit&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Cpulimit&quot;
+        },
+        &quot;memoryLimit&quot;: {
+          &quot;default&quot;: &quot;256Mi&quot;,
+          &quot;title&quot;: &quot;Memorylimit&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        }
+      },
+      &quot;title&quot;: &quot;Resources&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;Storage&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;size&quot;: {
+          &quot;default&quot;: &quot;10Gi&quot;,
+          &quot;description&quot;: &quot;PVC size, e.g. 10Gi&quot;,
+          &quot;title&quot;: &quot;Size&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;accessMode&quot;: {
+          &quot;default&quot;: &quot;ReadWriteOnce&quot;,
+          &quot;enum&quot;: [
+            &quot;ReadWriteOnce&quot;,
+            &quot;ReadWriteMany&quot;,
+            &quot;ReadWriteOncePod&quot;
+          ],
+          &quot;title&quot;: &quot;Accessmode&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;storageClass&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;StorageClass name; platform default chosen when omitted&quot;,
+          &quot;title&quot;: &quot;Storageclass&quot;
+        },
+        &quot;mountPath&quot;: {
+          &quot;default&quot;: &quot;/data&quot;,
+          &quot;title&quot;: &quot;Mountpath&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        }
+      },
+      &quot;title&quot;: &quot;Storage&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    }
+  },
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;blueprint&quot;: {
+      &quot;$ref&quot;: &quot;#/$defs/Blueprint&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;blueprint&quot;
+  ],
+  &quot;title&quot;: &quot;BlueprintIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_generate_helm_chart">Generate a Helm chart</h2><p><code>kubenoob_generate_helm_chart</code> · available: always</p><p>Same as generate_manifests but packaged as a Helm chart (Chart.yaml v2, values.yaml, values.schema.json, templates). Returns file contents.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>blueprint</code> (required)</td><td><code>Blueprint</code></td><td></td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;$defs&quot;: {
+    &quot;Blueprint&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;name&quot;: {
+          &quot;description&quot;: &quot;DNS-1123 label, e.g. &#x27;orders-api&#x27;&quot;,
+          &quot;title&quot;: &quot;Name&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;namespace&quot;: {
+          &quot;description&quot;: &quot;Target namespace / OpenShift project&quot;,
+          &quot;title&quot;: &quot;Namespace&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;image&quot;: {
+          &quot;description&quot;: &quot;Container image, ideally pinned by digest&quot;,
+          &quot;title&quot;: &quot;Image&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;platform&quot;: {
+          &quot;default&quot;: &quot;kubernetes&quot;,
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;title&quot;: &quot;Platform&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;platformVersion&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Platformversion&quot;
+        },
+        &quot;workload&quot;: {
+          &quot;default&quot;: &quot;deployment&quot;,
+          &quot;enum&quot;: [
+            &quot;deployment&quot;,
+            &quot;statefulset&quot;
+          ],
+          &quot;title&quot;: &quot;Workload&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;replicas&quot;: {
+          &quot;default&quot;: 3,
+          &quot;maximum&quot;: 100,
+          &quot;minimum&quot;: 1,
+          &quot;title&quot;: &quot;Replicas&quot;,
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        &quot;port&quot;: {
+          &quot;default&quot;: 8080,
+          &quot;maximum&quot;: 65535,
+          &quot;minimum&quot;: 1,
+          &quot;title&quot;: &quot;Port&quot;,
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        &quot;portName&quot;: {
+          &quot;default&quot;: &quot;http&quot;,
+          &quot;title&quot;: &quot;Portname&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;probe&quot;: {
+          &quot;default&quot;: &quot;http&quot;,
+          &quot;enum&quot;: [
+            &quot;http&quot;,
+            &quot;tcp&quot;,
+            &quot;none&quot;
+          ],
+          &quot;title&quot;: &quot;Probe&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;livenessPath&quot;: {
+          &quot;default&quot;: &quot;/healthz&quot;,
+          &quot;title&quot;: &quot;Livenesspath&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;readinessPath&quot;: {
+          &quot;default&quot;: &quot;/readyz&quot;,
+          &quot;title&quot;: &quot;Readinesspath&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;startupSeconds&quot;: {
+          &quot;default&quot;: 0,
+          &quot;description&quot;: &quot;Add a startupProbe allowing this many seconds&quot;,
+          &quot;maximum&quot;: 600,
+          &quot;minimum&quot;: 0,
+          &quot;title&quot;: &quot;Startupseconds&quot;,
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        &quot;resources&quot;: {
+          &quot;$ref&quot;: &quot;#/$defs/Resources&quot;
+        },
+        &quot;storage&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;$ref&quot;: &quot;#/$defs/Storage&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null
+        },
+        &quot;exposure&quot;: {
+          &quot;$ref&quot;: &quot;#/$defs/Exposure&quot;
+        },
+        &quot;env&quot;: {
+          &quot;additionalProperties&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Env&quot;,
+          &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;secretEnv&quot;: {
+          &quot;additionalProperties&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;description&quot;: &quot;ENV_NAME -&gt; &#x27;secretName/key&#x27; references (values never inlined)&quot;,
+          &quot;title&quot;: &quot;Secretenv&quot;,
+          &quot;type&quot;: &quot;object&quot;
+        },
+        &quot;egress&quot;: {
+          &quot;default&quot;: &quot;open&quot;,
+          &quot;enum&quot;: [
+            &quot;open&quot;,
+            &quot;dns-only&quot;,
+            &quot;cidrs&quot;
+          ],
+          &quot;title&quot;: &quot;Egress&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;egressCidrs&quot;: {
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Egresscidrs&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;egressDnsNames&quot;: {
+          &quot;description&quot;: &quot;OpenShift EgressFirewall allow list&quot;,
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Egressdnsnames&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;hpaMaxReplicas&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;maximum&quot;: 1000,
+              &quot;minimum&quot;: 2,
+              &quot;type&quot;: &quot;integer&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Hpamaxreplicas&quot;
+        },
+        &quot;readOnlyRootFs&quot;: {
+          &quot;default&quot;: true,
+          &quot;title&quot;: &quot;Readonlyrootfs&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;writablePaths&quot;: {
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Writablepaths&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;runAsUser&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;minimum&quot;: 1,
+              &quot;type&quot;: &quot;integer&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;Fixed UID (vanilla Kubernetes only)&quot;,
+          &quot;title&quot;: &quot;Runasuser&quot;
+        },
+        &quot;allowMonitoring&quot;: {
+          &quot;default&quot;: true,
+          &quot;title&quot;: &quot;Allowmonitoring&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        },
+        &quot;createNamespace&quot;: {
+          &quot;default&quot;: false,
+          &quot;title&quot;: &quot;Createnamespace&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        }
+      },
+      &quot;required&quot;: [
+        &quot;name&quot;,
+        &quot;namespace&quot;,
+        &quot;image&quot;
+      ],
+      &quot;title&quot;: &quot;Blueprint&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;Exposure&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;type&quot;: {
+          &quot;default&quot;: &quot;none&quot;,
+          &quot;enum&quot;: [
+            &quot;none&quot;,
+            &quot;route&quot;,
+            &quot;ingress&quot;,
+            &quot;gateway&quot;,
+            &quot;loadbalancer&quot;
+          ],
+          &quot;title&quot;: &quot;Type&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;host&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Host&quot;
+        },
+        &quot;path&quot;: {
+          &quot;default&quot;: &quot;/&quot;,
+          &quot;title&quot;: &quot;Path&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;tls&quot;: {
+          &quot;default&quot;: &quot;edge&quot;,
+          &quot;enum&quot;: [
+            &quot;edge&quot;,
+            &quot;reencrypt&quot;,
+            &quot;passthrough&quot;
+          ],
+          &quot;title&quot;: &quot;Tls&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;ingressClass&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Ingressclass&quot;
+        },
+        &quot;tlsSecret&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;Ingress TLS secret name (cert-manager can create it)&quot;,
+          &quot;title&quot;: &quot;Tlssecret&quot;
+        },
+        &quot;gatewayName&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Gatewayname&quot;
+        },
+        &quot;gatewayNamespace&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Gatewaynamespace&quot;
+        },
+        &quot;lbSourceRanges&quot;: {
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;title&quot;: &quot;Lbsourceranges&quot;,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        &quot;internalLb&quot;: {
+          &quot;default&quot;: true,
+          &quot;title&quot;: &quot;Internallb&quot;,
+          &quot;type&quot;: &quot;boolean&quot;
+        }
+      },
+      &quot;title&quot;: &quot;Exposure&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;Resources&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;cpuRequest&quot;: {
+          &quot;default&quot;: &quot;100m&quot;,
+          &quot;title&quot;: &quot;Cpurequest&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;memoryRequest&quot;: {
+          &quot;default&quot;: &quot;128Mi&quot;,
+          &quot;title&quot;: &quot;Memoryrequest&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;cpuLimit&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;title&quot;: &quot;Cpulimit&quot;
+        },
+        &quot;memoryLimit&quot;: {
+          &quot;default&quot;: &quot;256Mi&quot;,
+          &quot;title&quot;: &quot;Memorylimit&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        }
+      },
+      &quot;title&quot;: &quot;Resources&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;Storage&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;size&quot;: {
+          &quot;default&quot;: &quot;10Gi&quot;,
+          &quot;description&quot;: &quot;PVC size, e.g. 10Gi&quot;,
+          &quot;title&quot;: &quot;Size&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;accessMode&quot;: {
+          &quot;default&quot;: &quot;ReadWriteOnce&quot;,
+          &quot;enum&quot;: [
+            &quot;ReadWriteOnce&quot;,
+            &quot;ReadWriteMany&quot;,
+            &quot;ReadWriteOncePod&quot;
+          ],
+          &quot;title&quot;: &quot;Accessmode&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;storageClass&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;StorageClass name; platform default chosen when omitted&quot;,
+          &quot;title&quot;: &quot;Storageclass&quot;
+        },
+        &quot;mountPath&quot;: {
+          &quot;default&quot;: &quot;/data&quot;,
+          &quot;title&quot;: &quot;Mountpath&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        }
+      },
+      &quot;title&quot;: &quot;Storage&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    }
+  },
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;blueprint&quot;: {
+      &quot;$ref&quot;: &quot;#/$defs/Blueprint&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;blueprint&quot;
+  ],
+  &quot;title&quot;: &quot;BlueprintIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_search_knowledge">Search local knowledge</h2><p><code>kubenoob_search_knowledge</code> · available: always</p><p>BM25 search over the built-in curated knowledge and the ingested corpus (Kubernetes/OpenShift/ROSA/Helm/StackRox docs, Terraform modules, public RHACS Jira insights). Results include chunk ids to cite as [kn:...] plus source URL and license.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>query</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>limit</code></td><td><code>integer</code></td><td>5</td><td></td></tr><tr><td><code>source</code></td><td><code>string | null</code></td><td>null</td><td>Source id prefix filter, e.g. &#x27;builtin:&#x27;, &#x27;jira:ROX&#x27;, &#x27;k8s-docs&#x27;.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;query&quot;: {
+      &quot;maxLength&quot;: 500,
+      &quot;minLength&quot;: 2,
+      &quot;title&quot;: &quot;Query&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;limit&quot;: {
+      &quot;default&quot;: 5,
+      &quot;maximum&quot;: 20,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Limit&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;source&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 64,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Source id prefix filter, e.g. &#x27;builtin:&#x27;, &#x27;jira:ROX&#x27;, &#x27;k8s-docs&#x27;.&quot;,
+      &quot;title&quot;: &quot;Source&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;query&quot;
+  ],
+  &quot;title&quot;: &quot;SearchIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_get_knowledge">Read a knowledge chunk or document</h2><p><code>kubenoob_get_knowledge</code> · available: always</p><p>Fetch the full text of a chunk id (kn:&lt;doc&gt;#&lt;n&gt;) or every chunk of a document id.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>id</code> (required)</td><td><code>string</code></td><td></td><td>Chunk id &#x27;kn:&lt;doc&gt;#&lt;n&gt;&#x27; or a document id.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;description&quot;: &quot;Chunk id &#x27;kn:&lt;doc&gt;#&lt;n&gt;&#x27; or a document id.&quot;,
+      &quot;maxLength&quot;: 300,
+      &quot;title&quot;: &quot;Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;id&quot;
+  ],
+  &quot;title&quot;: &quot;ChunkIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_api_history">API removal history and version map</h2><p><code>kubenoob_api_history</code> · available: always</p><p>Removed/deprecated Kubernetes APIs relevant to a target version, and the OpenShift-&gt;Kubernetes version map.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>kind</code></td><td><code>string | null</code></td><td>null</td><td></td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot;</code></td><td>&quot;kubernetes&quot;</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;kind&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 64,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Kind&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;default&quot;: &quot;kubernetes&quot;,
+      &quot;enum&quot;: [
+        &quot;kubernetes&quot;,
+        &quot;openshift&quot;,
+        &quot;rosa-classic&quot;,
+        &quot;rosa-hcp&quot;
+      ],
+      &quot;title&quot;: &quot;Platform&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 16,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Version&quot;
+    }
+  },
+  &quot;title&quot;: &quot;ApiHistoryIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_explain_rule">Explain an audit rule</h2><p><code>kubenoob_explain_rule</code> · available: always</p><p>Rationale, remediation, citations for a rule id.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>rule_id</code> (required)</td><td><code>string</code></td><td></td><td>e.g. KN-S001</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;rule_id&quot;: {
+      &quot;description&quot;: &quot;e.g. KN-S001&quot;,
+      &quot;pattern&quot;: &quot;^[A-Za-z]{2}-[A-Za-z]{1,2}\\d{3}$&quot;,
+      &quot;title&quot;: &quot;Rule Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;rule_id&quot;
+  ],
+  &quot;title&quot;: &quot;RuleIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_list_rules">List audit rules</h2><p><code>kubenoob_list_rules</code> · available: always</p><p>All rule ids with stage, category and default severity.</p><p>No arguments.</p><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {},
+  &quot;title&quot;: &quot;EmptyIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_diagnose">Diagnose symptoms offline</h2><p><code>kubenoob_diagnose</code> · available: always</p><p>Match pasted events / describe output / logs / CLI errors or an Alertmanager webhook payload against troubleshooting playbooks, ranked by matching patterns and by the signals the text carries (alert names, reasons); returns the signals, ranked root causes, read-only checks with names filled in, fixes, reported issues for the version and policy denials.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>text</code> (required)</td><td><code>string</code></td><td></td><td>Events, `describe` output, logs, CLI errors, status JSON, Ceph health output (`ceph health detail`, `ceph status`, their JSON or a CephCluster) or an Alertmanager webhook payload (its alerts are read as text; an `openshift_version` or `version` label gives the version).</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>The cluster&#x27;s OpenShift version (4.20 or 4.20.8): leaves out reported issues already fixed there.</td></tr><tr><td><code>limit</code></td><td><code>integer</code></td><td>5</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;text&quot;: {
+      &quot;description&quot;: &quot;Events, `describe` output, logs, CLI errors, status JSON, Ceph health output (`ceph health detail`, `ceph status`, their JSON or a CephCluster) or an Alertmanager webhook payload (its alerts are read as text; an `openshift_version` or `version` label gives the version).&quot;,
+      &quot;maxLength&quot;: 400000,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Text&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20,
+          &quot;pattern&quot;: &quot;^\\d+\\.\\d+(\\.\\d+)?$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;The cluster&#x27;s OpenShift version (4.20 or 4.20.8): leaves out reported issues already fixed there.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    },
+    &quot;limit&quot;: {
+      &quot;default&quot;: 5,
+      &quot;maximum&quot;: 10,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Limit&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;text&quot;
+  ],
+  &quot;title&quot;: &quot;DiagnoseIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_extract_signals">Extract signals</h2><p><code>kubenoob_extract_signals</code> · available: always</p><p>Read the canonical names in an error: Alertmanager alert names (webhook payload or text), event and ClusterOperator condition reasons, container reasons, admission rules, components and normalised error templates, plus the alerts its words imply. Returns each signal with where it was found, the catalogue entry (components, playbooks, upstream source) and the playbooks it points at. Read-only and offline.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>text</code> (required)</td><td><code>string</code></td><td></td><td>An Alertmanager payload, events, a ClusterOperator, pod status, logs or an error in words.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;text&quot;: {
+      &quot;description&quot;: &quot;An Alertmanager payload, events, a ClusterOperator, pod status, logs or an error in words.&quot;,
+      &quot;maxLength&quot;: 400000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Text&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;text&quot;
+  ],
+  &quot;title&quot;: &quot;SignalsIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_insight">What is this, and what does it say?</h2><p><code>kubenoob_insight</code> · available: always</p><p>Start here for anything the user pastes. Names what the input is (events, pod status, logs, an Alertmanager payload, a policy denial, a ticket, manifests, a Helm template, a build log, a Containerfile, an SBOM or scanner report, a packet trace, must-gather paths, a question; several at once) and runs every analyser that applies: diagnosis with reported issues and team memory, the denial explainer, the audit, the documentation. Returns every finding with its source, read-only next steps and what was not analysed and why. Read-only, local.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>text</code> (required)</td><td><code>string</code></td><td></td><td>Anything pasted: events, describe output, logs, an Alertmanager payload, Ceph health output (ceph health detail or ceph status, text or JSON), a policy denial, a ticket, manifests or a Helm template, a build log, a Containerfile, an SBOM or scanner report, or a question.</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;text&quot;: {
+      &quot;description&quot;: &quot;Anything pasted: events, describe output, logs, an Alertmanager payload, Ceph health output (ceph health detail or ceph status, text or JSON), a policy denial, a ticket, manifests or a Helm template, a build log, a Containerfile, an SBOM or scanner report, or a question.&quot;,
+      &quot;maxLength&quot;: 400000,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Text&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20,
+          &quot;pattern&quot;: &quot;^\\d+\\.\\d+(\\.\\d+)?$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Version&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;text&quot;
+  ],
+  &quot;title&quot;: &quot;InsightIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_ticket_changes">What changed in Red Hat Jira</h2><p><code>kubenoob_ticket_changes</code> · available: always</p><p>Reconcile the local copy of Red Hat&#x27;s public Jira: tickets fixed (with fix versions), closed as not a bug, won&#x27;t fix or duplicate, reopened, given a fix version or opened since a date, with links, and the open tickets per project and verdict. Read-only and local; each sync records the changes.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>since</code></td><td><code>string</code></td><td>&quot;2d&quot;</td><td>How far back: 2d, 36h, 90m or a date such as 2026-10-25.</td></tr><tr><td><code>project</code></td><td><code>string | null</code></td><td>null</td><td></td></tr><tr><td><code>kinds</code></td><td><code>array of &quot;fixed&quot; | &quot;done&quot; | &quot;closed&quot; | &quot;not-a-bug&quot; | &quot;wont-fix&quot; | &quot;duplicate&quot; | &quot;cannot-reproduce&quot; | &quot;obsolete&quot; | &quot;reopened&quot; | &quot;fix-in-progress&quot; | &quot;fix-proposed&quot; | &quot;fix-version&quot; | &quot;opened&quot; | &quot;open&quot; | &quot;status&quot;</code></td><td></td><td></td></tr><tr><td><code>limit</code></td><td><code>integer</code></td><td>50</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;since&quot;: {
+      &quot;default&quot;: &quot;2d&quot;,
+      &quot;description&quot;: &quot;How far back: 2d, 36h, 90m or a date such as 2026-10-25.&quot;,
+      &quot;maxLength&quot;: 32,
+      &quot;pattern&quot;: &quot;^(\\d{1,4}[dhm]|\\d{4}-\\d{2}-\\d{2}([T ][0-9:+.Z-]{0,20})?)$&quot;,
+      &quot;title&quot;: &quot;Since&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;project&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 30,
+          &quot;pattern&quot;: &quot;^[A-Za-z][A-Za-z0-9_]{1,29}$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Project&quot;
+    },
+    &quot;kinds&quot;: {
+      &quot;items&quot;: {
+        &quot;enum&quot;: [
+          &quot;fixed&quot;,
+          &quot;done&quot;,
+          &quot;closed&quot;,
+          &quot;not-a-bug&quot;,
+          &quot;wont-fix&quot;,
+          &quot;duplicate&quot;,
+          &quot;cannot-reproduce&quot;,
+          &quot;obsolete&quot;,
+          &quot;reopened&quot;,
+          &quot;fix-in-progress&quot;,
+          &quot;fix-proposed&quot;,
+          &quot;fix-version&quot;,
+          &quot;opened&quot;,
+          &quot;open&quot;,
+          &quot;status&quot;
+        ],
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 15,
+      &quot;title&quot;: &quot;Kinds&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;limit&quot;: {
+      &quot;default&quot;: 50,
+      &quot;maximum&quot;: 500,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Limit&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  },
+  &quot;title&quot;: &quot;TicketChangesIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_known_issues">Is this a reported issue?</h2><p><code>kubenoob_known_issues</code> · available: always</p><p>Match an error or symptom against the issues listed in the OpenShift release notes (known issues and issues fixed in each update) and, when this install keeps a local copy of Red Hat&#x27;s public Jira, against those tickets too. Returns the issue id and link, what became of it (fixed and in which version, still open, closed as not a bug, won&#x27;t fix or a duplicate), the workaround and Red Hat&#x27;s remarks from the comments; with `version`, only issues that can affect that version.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>text</code> (required)</td><td><code>string</code></td><td></td><td>An error message, events, logs or a symptom in words.</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>The cluster&#x27;s OpenShift version (4.20 or 4.20.8): keeps only issues that can affect it.</td></tr><tr><td><code>limit</code></td><td><code>integer</code></td><td>3</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;text&quot;: {
+      &quot;description&quot;: &quot;An error message, events, logs or a symptom in words.&quot;,
+      &quot;maxLength&quot;: 100000,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Text&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20,
+          &quot;pattern&quot;: &quot;^\\d+\\.\\d+(\\.\\d+)?$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;The cluster&#x27;s OpenShift version (4.20 or 4.20.8): keeps only issues that can affect it.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    },
+    &quot;limit&quot;: {
+      &quot;default&quot;: 3,
+      &quot;maximum&quot;: 10,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Limit&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;text&quot;
+  ],
+  &quot;title&quot;: &quot;KnownIssuesIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_upgrade_risks">Known risks for an OpenShift update</h2><p><code>kubenoob_upgrade_risks</code> · available: always</p><p>Before updating OpenShift from one x.y.z version to another: the risks Red Hat declares for that update in the public update graph (conditional updates, as an OpenShift Update Service serves them), from a bundled snapshot, offline. Each risk has its name, message, link, the version that fixes it and a verdict: applies (declared for every cluster), check (one fact decides it, with the read-only command or must-gather file that shows it) or cannot evaluate offline (its PromQL, as written). Whether the update is in your channel is not checked.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>current</code> (required)</td><td><code>string</code></td><td></td><td>The OpenShift version the cluster runs, x.y.z, e.g. 4.20.3.</td></tr><tr><td><code>target</code> (required)</td><td><code>string</code></td><td></td><td>The version to update to, x.y.z, e.g. 4.21.4.</td></tr><tr><td><code>arch</code></td><td><code>&quot;amd64&quot; | &quot;arm64&quot; | &quot;multi&quot; | &quot;ppc64le&quot; | &quot;s390x&quot; | null</code></td><td>null</td><td>The release architecture (multi for a multi-architecture payload). Without it, every architecture is checked and a risk declared for some of them only says which.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;current&quot;: {
+      &quot;description&quot;: &quot;The OpenShift version the cluster runs, x.y.z, e.g. 4.20.3.&quot;,
+      &quot;maxLength&quot;: 20,
+      &quot;title&quot;: &quot;Current&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;target&quot;: {
+      &quot;description&quot;: &quot;The version to update to, x.y.z, e.g. 4.21.4.&quot;,
+      &quot;maxLength&quot;: 20,
+      &quot;title&quot;: &quot;Target&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;arch&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;amd64&quot;,
+            &quot;arm64&quot;,
+            &quot;multi&quot;,
+            &quot;ppc64le&quot;,
+            &quot;s390x&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;The release architecture (multi for a multi-architecture payload). Without it, every architecture is checked and a risk declared for some of them only says which.&quot;,
+      &quot;title&quot;: &quot;Arch&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;current&quot;,
+    &quot;target&quot;
+  ],
+  &quot;title&quot;: &quot;UpgradeRisksIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_ticket">Look up a Red Hat Jira ticket</h2><p><code>kubenoob_ticket</code> · available: always</p><p>One ticket from this install&#x27;s local copy of Red Hat&#x27;s public Jira (OCPBUGS, ROX, HOSTEDCP...): its status, what became of it, fix versions and whether `version` already has the fix, the workaround and remarks from the comments, and linked tickets. Local data only; nothing is fetched.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>key</code> (required)</td><td><code>string</code></td><td></td><td>A Red Hat Jira key, e.g. OCPBUGS-12345 or ROX-30000.</td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>The cluster&#x27;s OpenShift version: says whether the fix is already in it.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;key&quot;: {
+      &quot;description&quot;: &quot;A Red Hat Jira key, e.g. OCPBUGS-12345 or ROX-30000.&quot;,
+      &quot;maxLength&quot;: 40,
+      &quot;pattern&quot;: &quot;^[A-Za-z][A-Za-z0-9_]{1,29}-\\d{1,9}$&quot;,
+      &quot;title&quot;: &quot;Key&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20,
+          &quot;pattern&quot;: &quot;^\\d+\\.\\d+(\\.\\d+)?$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;The cluster&#x27;s OpenShift version: says whether the fix is already in it.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;key&quot;
+  ],
+  &quot;title&quot;: &quot;TicketIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_explain_denial">Why was this denied?</h2><p><code>kubenoob_explain_denial</code> · available: always</p><p>Explain an admission denial policy by policy: Kyverno, OPA Gatekeeper, ValidatingAdmissionPolicy, Pod Security Admission, OpenShift SCC, RHACS, ResourceQuota, LimitRange or RBAC. Returns the policy and rule, the failing field, read-only commands with names filled in, the fix (with a patch for Pod Security and RBAC) and the audit rules that catch it before deploy.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>text</code> (required)</td><td><code>string</code></td><td></td><td>The denial as printed: `kubectl apply` or `oc apply` output, a FailedCreate event or a Warning.</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;text&quot;: {
+      &quot;description&quot;: &quot;The denial as printed: `kubectl apply` or `oc apply` output, a FailedCreate event or a Warning.&quot;,
+      &quot;maxLength&quot;: 200000,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Text&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;text&quot;
+  ],
+  &quot;title&quot;: &quot;PolicyExplainIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_policy_generate">Turn audit rules into admission policies</h2><p><code>kubenoob_policy_generate</code> · available: always</p><p>Generate ValidatingAdmissionPolicy (with binding) and/or Kyverno ValidatingPolicy YAML from kube-noob&#x27;s audit rules, in audit (warn and record) or enforce mode, for a platform. One policy per rule decidable from one object; each names its rule, fix and source. Rules that need other objects or that the API server already enforces are listed with the reason. Nothing is applied.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot;</code></td><td>&quot;kubernetes&quot;</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>OpenShift (4.20) or Kubernetes (1.33)</td></tr><tr><td><code>engines</code></td><td><code>array of &quot;vap&quot; | &quot;kyverno&quot;</code></td><td></td><td>vap: ValidatingAdmissionPolicy + binding (built into Kubernetes 1.30+); kyverno: Kyverno ValidatingPolicy (policies.kyverno.io/v1, Kyverno 1.18+).</td></tr><tr><td><code>mode</code></td><td><code>&quot;audit&quot; | &quot;enforce&quot;</code></td><td>&quot;audit&quot;</td><td>audit warns and records; enforce refuses</td></tr><tr><td><code>rules</code></td><td><code>array of string</code></td><td></td><td>Rule ids such as KN-S001 (default: every rule).</td></tr><tr><td><code>exclude_namespaces</code></td><td><code>array of string</code></td><td></td><td>Namespaces the policies skip, besides kube-system, kube-public and kube-node-lease.</td></tr><tr><td><code>exceptions</code></td><td><code>string | null</code></td><td>null</td><td>An exception list (YAML, kube-noob.io/v1 ExceptionList): active entries become exemptions in their rule&#x27;s policy (with the ReplicaSets and pods their workloads make); expired or refused ones are listed.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;platform&quot;: {
+      &quot;default&quot;: &quot;kubernetes&quot;,
+      &quot;enum&quot;: [
+        &quot;kubernetes&quot;,
+        &quot;openshift&quot;,
+        &quot;rosa-classic&quot;,
+        &quot;rosa-hcp&quot;
+      ],
+      &quot;title&quot;: &quot;Platform&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;OpenShift (4.20) or Kubernetes (1.33)&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    },
+    &quot;engines&quot;: {
+      &quot;description&quot;: &quot;vap: ValidatingAdmissionPolicy + binding (built into Kubernetes 1.30+); kyverno: Kyverno ValidatingPolicy (policies.kyverno.io/v1, Kyverno 1.18+).&quot;,
+      &quot;items&quot;: {
+        &quot;enum&quot;: [
+          &quot;vap&quot;,
+          &quot;kyverno&quot;
+        ],
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 2,
+      &quot;minItems&quot;: 1,
+      &quot;title&quot;: &quot;Engines&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;mode&quot;: {
+      &quot;default&quot;: &quot;audit&quot;,
+      &quot;description&quot;: &quot;audit warns and records; enforce refuses&quot;,
+      &quot;enum&quot;: [
+        &quot;audit&quot;,
+        &quot;enforce&quot;
+      ],
+      &quot;title&quot;: &quot;Mode&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;rules&quot;: {
+      &quot;description&quot;: &quot;Rule ids such as KN-S001 (default: every rule).&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 10,
+        &quot;pattern&quot;: &quot;^[A-Za-z]{2}-[A-Za-z]{1,2}\\d{3}$&quot;,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 100,
+      &quot;title&quot;: &quot;Rules&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;exclude_namespaces&quot;: {
+      &quot;description&quot;: &quot;Namespaces the policies skip, besides kube-system, kube-public and kube-node-lease.&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 63,
+        &quot;pattern&quot;: &quot;^[a-z0-9-]{1,63}$&quot;,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 50,
+      &quot;title&quot;: &quot;Exclude Namespaces&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;exceptions&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 1000000,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;An exception list (YAML, kube-noob.io/v1 ExceptionList): active entries become exemptions in their rule&#x27;s policy (with the ReplicaSets and pods their workloads make); expired or refused ones are listed.&quot;,
+      &quot;title&quot;: &quot;Exceptions&quot;
+    }
+  },
+  &quot;title&quot;: &quot;PolicyGenerateIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_policy_migrate_check">Check legacy Kyverno policies for their CEL form</h2><p><code>kubenoob_policy_migrate_check</code> · available: always</p><p>Kyverno 1.20 removes the kyverno.io ClusterPolicy, Policy, CleanupPolicy and legacy PolicyException. Lint them rule by rule against the policies.kyverno.io types: direct, inverted (a deny or a negated pattern: the CEL validation must state what is allowed), manual (JMESPath, API calls, anchors, strategic merge patches) or blocked (no documented CEL equivalent), each with the field path, the target kind, the reason and the Kyverno documentation section (pinned commit). Rules that map directly get a draft CEL policy and a kyverno test fixture skeleton to prove it. Nothing is applied or rewritten.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>policies</code> (required)</td><td><code>string</code></td><td></td><td>One or more legacy Kyverno policies (YAML): kyverno.io ClusterPolicy, Policy, ClusterCleanupPolicy, CleanupPolicy or PolicyException. Other documents are listed and skipped; Secrets are not read.</td></tr><tr><td><code>drafts</code></td><td><code>boolean</code></td><td>true</td><td>Include a draft CEL policy for each rule whose fields all map directly, and a kyverno test fixture skeleton per policy (good and bad resources run against the legacy rule and the draft).</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;policies&quot;: {
+      &quot;description&quot;: &quot;One or more legacy Kyverno policies (YAML): kyverno.io ClusterPolicy, Policy, ClusterCleanupPolicy, CleanupPolicy or PolicyException. Other documents are listed and skipped; Secrets are not read.&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Policies&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;drafts&quot;: {
+      &quot;default&quot;: true,
+      &quot;description&quot;: &quot;Include a draft CEL policy for each rule whose fields all map directly, and a kyverno test fixture skeleton per policy (good and bad resources run against the legacy rule and the draft).&quot;,
+      &quot;title&quot;: &quot;Drafts&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;policies&quot;
+  ],
+  &quot;title&quot;: &quot;PolicyMigrateCheckIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_posture_scan">Attack paths in manifests</h2><p><code>kubenoob_posture_scan</code> · available: always</p><p>Rank the paths from an exposure (Route, Ingress, LoadBalancer or NodePort Service) to what a compromised pod could do: node access (privileged, hostPath, host namespaces) or Kubernetes API rights through its ServiceAccount token (read Secrets, exec, create workloads, escalate). Score = exposure x blast radius; every step names the field that proves it, with a fix. Secret objects are dropped unread.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>manifests</code> (required)</td><td><code>string</code></td><td></td><td>Routes, Ingresses, Services, workloads, ServiceAccounts and RBAC objects (YAML). Secret objects are dropped unread.</td></tr><tr><td><code>top</code></td><td><code>integer</code></td><td>20</td><td>How many ranked paths to return.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;manifests&quot;: {
+      &quot;description&quot;: &quot;Routes, Ingresses, Services, workloads, ServiceAccounts and RBAC objects (YAML). Secret objects are dropped unread.&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Manifests&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;top&quot;: {
+      &quot;default&quot;: 20,
+      &quot;description&quot;: &quot;How many ranked paths to return.&quot;,
+      &quot;maximum&quot;: 200,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Top&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;manifests&quot;
+  ],
+  &quot;title&quot;: &quot;PostureScanIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_build_diagnose">Diagnose a failed build log</h2><p><code>kubenoob_build_diagnose</code> · available: always</p><p>Read a failed GitHub Actions, Jenkins, Tekton or OpenShift build log: the failing step (and why it is that step), the error line and its template, the cause class (dependency fetch, compile, test, image push, registry auth, quota, timeout, out of memory, permissions) with its evidence, reported issues, team memory and the fix for that CI system. Read-only.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>log</code> (required)</td><td><code>string</code></td><td></td><td>A failed build or pipeline log: GitHub Actions, Jenkins, Tekton (tkn ... logs) or an OpenShift build (oc logs build/&lt;name&gt;). The end of the log matters most: when cutting, keep the end.</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td>The cluster&#x27;s OpenShift version, for reported issues that may apply.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;log&quot;: {
+      &quot;description&quot;: &quot;A failed build or pipeline log: GitHub Actions, Jenkins, Tekton (tkn ... logs) or an OpenShift build (oc logs build/&lt;name&gt;). The end of the log matters most: when cutting, keep the end.&quot;,
+      &quot;maxLength&quot;: 2000000,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Log&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20,
+          &quot;pattern&quot;: &quot;^\\d+\\.\\d+(\\.\\d+)?$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;The cluster&#x27;s OpenShift version, for reported issues that may apply.&quot;,
+      &quot;title&quot;: &quot;Version&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;log&quot;
+  ],
+  &quot;title&quot;: &quot;BuildDiagnoseIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_rhacs_compare">Compare RHACS policies with kube-noob&#x27;s rules</h2><p><code>kubenoob_rhacs_compare</code> · available: always</p><p>Map every policy in an RHACS (StackRox) export to kube-noob rules by name and criteria: overlap (same setting, with severity and scope differences), related (the same risk seen through image, runtime or API-event data), gap (a deploy-time setting kube-noob has no rule for), outside (image contents, runtime behaviour, API events, label conventions) or unexplained (criteria kube-noob does not know). Lists disagreements and the rules no policy covers. Local only.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>policies</code> (required)</td><td><code>string</code></td><td></td><td>An RHACS policy export as JSON: {&quot;policies&quot;: [...]} from the RHACS portal (Export policy to JSON) or POST /v1/policies/export, a list of policies, or one policy.</td></tr><tr><td><code>outcomes</code></td><td><code>array of &quot;overlap&quot; | &quot;related&quot; | &quot;gap&quot; | &quot;outside&quot; | &quot;unexplained&quot;</code></td><td></td><td>Only return policies with these outcomes (default: all).</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;policies&quot;: {
+      &quot;description&quot;: &quot;An RHACS policy export as JSON: {\&quot;policies\&quot;: [...]} from the RHACS portal (Export policy to JSON) or POST /v1/policies/export, a list of policies, or one policy.&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 2,
+      &quot;title&quot;: &quot;Policies&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;outcomes&quot;: {
+      &quot;description&quot;: &quot;Only return policies with these outcomes (default: all).&quot;,
+      &quot;items&quot;: {
+        &quot;enum&quot;: [
+          &quot;overlap&quot;,
+          &quot;related&quot;,
+          &quot;gap&quot;,
+          &quot;outside&quot;,
+          &quot;unexplained&quot;
+        ],
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 5,
+      &quot;title&quot;: &quot;Outcomes&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;policies&quot;
+  ],
+  &quot;title&quot;: &quot;RhacsCompareIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_vuln_report">Assess scanner output: VEX, exploitation, reachability</h2><p><code>kubenoob_vuln_report</code> · available: always</p><p>Read Trivy or Grype JSON, CycloneDX or SPDX SBOMs, or an RHACS image scan into one finding per package, version and CVE (with the fix version); apply Red Hat VEX (a not-affected or already-fixed finding drops out, citing the statement); mark CISA KEV entries; and, with the manifests, rank by exposure, privileges and RBAC reach with each finding&#x27;s attack path. SBOM packages are matched against Red Hat VEX. Local only.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>reports</code> (required)</td><td><code>array of string</code></td><td></td><td>Scanner output as JSON text: Trivy (trivy image -f json [--list-all-pkgs]), Grype (grype -o json), a CycloneDX or SPDX 2 JSON SBOM, or an RHACS image (GET /v1/images/{id}). Reports of the same image are assessed together.</td></tr><tr><td><code>vex</code></td><td><code>array of string</code></td><td></td><td>Optional Red Hat CSAF VEX documents (JSON) to apply on top of the local redhat-vex corpus.</td></tr><tr><td><code>kev</code></td><td><code>string | null</code></td><td>null</td><td>Optional: the CISA KEV catalog JSON (known_exploited_vulnerabilities.json, CC0).</td></tr><tr><td><code>manifests</code></td><td><code>string | null</code></td><td>null</td><td>Optional: the YAML that runs the images; findings are then ranked by exposure and privileges and shown with their attack path.</td></tr><tr><td><code>products</code></td><td><code>array of string</code></td><td></td><td>Red Hat product CPE prefixes the images belong to (default: from the RHEL release in the report, e.g. cpe:/o:redhat:enterprise_linux:9).</td></tr><tr><td><code>image</code></td><td><code>string | null</code></td><td>null</td><td>Treat every report as this image (registry/repo:tag or @sha256:...).</td></tr><tr><td><code>top</code></td><td><code>integer</code></td><td>20</td><td>How many ranked findings to return.</td></tr><tr><td><code>trust_report_vex</code></td><td><code>boolean</code></td><td>false</td><td>Honour a CycloneDX report&#x27;s own analysis (not_affected, resolved, false_positive). Off by default: the findings it marks are kept, with a note.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;reports&quot;: {
+      &quot;description&quot;: &quot;Scanner output as JSON text: Trivy (trivy image -f json [--list-all-pkgs]), Grype (grype -o json), a CycloneDX or SPDX 2 JSON SBOM, or an RHACS image (GET /v1/images/{id}). Reports of the same image are assessed together.&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 20000000,
+        &quot;minLength&quot;: 2,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 10,
+      &quot;minItems&quot;: 1,
+      &quot;title&quot;: &quot;Reports&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;vex&quot;: {
+      &quot;description&quot;: &quot;Optional Red Hat CSAF VEX documents (JSON) to apply on top of the local redhat-vex corpus.&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 25000000,
+        &quot;minLength&quot;: 2,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 20,
+      &quot;title&quot;: &quot;Vex&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;kev&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20000000,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Optional: the CISA KEV catalog JSON (known_exploited_vulnerabilities.json, CC0).&quot;,
+      &quot;title&quot;: &quot;Kev&quot;
+    },
+    &quot;manifests&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 1000000,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Optional: the YAML that runs the images; findings are then ranked by exposure and privileges and shown with their attack path.&quot;,
+      &quot;title&quot;: &quot;Manifests&quot;
+    },
+    &quot;products&quot;: {
+      &quot;description&quot;: &quot;Red Hat product CPE prefixes the images belong to (default: from the RHEL release in the report, e.g. cpe:/o:redhat:enterprise_linux:9).&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 200,
+        &quot;pattern&quot;: &quot;^cpe:/[aho]:[a-z0-9_.-]+:[a-z0-9_.-]+:[0-9][a-z0-9_.-]*(?::[A-Za-z0-9_.:-]*)?$&quot;,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 10,
+      &quot;title&quot;: &quot;Products&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;image&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 500,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Treat every report as this image (registry/repo:tag or @sha256:...).&quot;,
+      &quot;title&quot;: &quot;Image&quot;
+    },
+    &quot;top&quot;: {
+      &quot;default&quot;: 20,
+      &quot;description&quot;: &quot;How many ranked findings to return.&quot;,
+      &quot;maximum&quot;: 200,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Top&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;trust_report_vex&quot;: {
+      &quot;default&quot;: false,
+      &quot;description&quot;: &quot;Honour a CycloneDX report&#x27;s own analysis (not_affected, resolved, false_positive). Off by default: the findings it marks are kept, with a note.&quot;,
+      &quot;title&quot;: &quot;Trust Report Vex&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;reports&quot;
+  ],
+  &quot;title&quot;: &quot;VulnReportIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_threat_model">STRIDE threat model of an application</h2><p><code>kubenoob_threat_model</code> · available: always</p><p>From manifests: entry points, trust boundaries, data stores and identities, and per element the STRIDE threats with status (open, mitigated, not assessed), the evidence, the kube-noob rules, generated admission policies and RHACS policies that mitigate each, and MITRE ATT&amp;CK for Containers technique ids. Deterministic; Secrets are dropped unread.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>manifests</code> (required)</td><td><code>string</code></td><td></td><td>The application&#x27;s YAML.</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>version</code></td><td><code>string | null</code></td><td>null</td><td></td></tr><tr><td><code>reports</code></td><td><code>array of string</code></td><td></td><td>Optional scanner reports of its images, to assess public-facing exploits (threat TM-E01).</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;manifests&quot;: {
+      &quot;description&quot;: &quot;The application&#x27;s YAML.&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 10,
+      &quot;title&quot;: &quot;Manifests&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;version&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 20,
+          &quot;pattern&quot;: &quot;^\\d+\\.\\d+(\\.\\d+)?$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Version&quot;
+    },
+    &quot;reports&quot;: {
+      &quot;description&quot;: &quot;Optional scanner reports of its images, to assess public-facing exploits (threat TM-E01).&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 20000000,
+        &quot;minLength&quot;: 2,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 10,
+      &quot;title&quot;: &quot;Reports&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;manifests&quot;
+  ],
+  &quot;title&quot;: &quot;ThreatModelIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_posture_report">Latest drift and policy report</h2><p><code>kubenoob_posture_report</code> · available: always</p><p>The newest daily report in this install&#x27;s data folder: objects added, removed and changed since the previous snapshot (with the fields that changed), findings new and fixed, and open findings by namespace, owner and rule. Local data only.</p><p>No arguments.</p><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {},
+  &quot;title&quot;: &quot;EmptyIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_check_network_policy">Would this traffic be allowed?</h2><p><code>kubenoob_check_network_policy</code> · available: always</p><p>Evaluate NetworkPolicies offline: can the source reach the destination on this port? Checks egress from the source and ingress to the destination, names the policy and rule that decide each, says why the other rules did not match, and proposes the smallest NetworkPolicy that would allow it.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>source</code> (required)</td><td><code>string</code></td><td></td><td>Where the connection starts: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.</td></tr><tr><td><code>destination</code> (required)</td><td><code>string</code></td><td></td><td>Where it goes: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.</td></tr><tr><td><code>port</code> (required)</td><td><code>integer | string</code></td><td></td><td>Destination port number (1-65535) or a named container port.</td></tr><tr><td><code>protocol</code></td><td><code>&quot;TCP&quot; | &quot;UDP&quot; | &quot;SCTP&quot;</code></td><td>&quot;TCP&quot;</td><td></td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>manifests</code> (required)</td><td><code>string</code></td><td></td><td>The NetworkPolicies and the workloads they apply to (Deployments, Pods ...); add Namespace objects when policies select namespaces by label.</td></tr><tr><td><code>default_namespace</code></td><td><code>string</code></td><td>&quot;default&quot;</td><td>For objects without one.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;source&quot;: {
+      &quot;description&quot;: &quot;Where the connection starts: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.&quot;,
+      &quot;maxLength&quot;: 300,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Source&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;destination&quot;: {
+      &quot;description&quot;: &quot;Where it goes: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.&quot;,
+      &quot;maxLength&quot;: 300,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Destination&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;port&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        {
+          &quot;type&quot;: &quot;string&quot;
+        }
+      ],
+      &quot;description&quot;: &quot;Destination port number (1-65535) or a named container port.&quot;,
+      &quot;title&quot;: &quot;Port&quot;
+    },
+    &quot;protocol&quot;: {
+      &quot;default&quot;: &quot;TCP&quot;,
+      &quot;enum&quot;: [
+        &quot;TCP&quot;,
+        &quot;UDP&quot;,
+        &quot;SCTP&quot;
+      ],
+      &quot;title&quot;: &quot;Protocol&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;manifests&quot;: {
+      &quot;description&quot;: &quot;The NetworkPolicies and the workloads they apply to (Deployments, Pods ...); add Namespace objects when policies select namespaces by label.&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Manifests&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;default_namespace&quot;: {
+      &quot;default&quot;: &quot;default&quot;,
+      &quot;description&quot;: &quot;For objects without one.&quot;,
+      &quot;maxLength&quot;: 63,
+      &quot;pattern&quot;: &quot;^[a-z0-9]([-a-z0-9]*[a-z0-9])?$&quot;,
+      &quot;title&quot;: &quot;Default Namespace&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;source&quot;,
+    &quot;destination&quot;,
+    &quot;port&quot;,
+    &quot;manifests&quot;
+  ],
+  &quot;title&quot;: &quot;NetpolCheckIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_incidents">Incidents the watch has seen</h2><p><code>kubenoob_incidents</code> · available: always</p><p>Open (or resolved) incidents from the local incident ledger: workload, signal, how often it came back, the diagnosis and what changed before it started. Read this first when asked what is wrong.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>status</code></td><td><code>&quot;open&quot; | &quot;resolved&quot; | &quot;all&quot;</code></td><td>&quot;open&quot;</td><td>Which incidents to list.</td></tr><tr><td><code>namespace</code></td><td><code>string | null</code></td><td>null</td><td></td></tr><tr><td><code>limit</code></td><td><code>integer</code></td><td>20</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;status&quot;: {
+      &quot;default&quot;: &quot;open&quot;,
+      &quot;description&quot;: &quot;Which incidents to list.&quot;,
+      &quot;enum&quot;: [
+        &quot;open&quot;,
+        &quot;resolved&quot;,
+        &quot;all&quot;
+      ],
+      &quot;title&quot;: &quot;Status&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;namespace&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 63,
+          &quot;pattern&quot;: &quot;^[a-z0-9]([-a-z0-9]*[a-z0-9])?$&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Namespace&quot;
+    },
+    &quot;limit&quot;: {
+      &quot;default&quot;: 20,
+      &quot;maximum&quot;: 100,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Limit&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  },
+  &quot;title&quot;: &quot;IncidentsIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_incident">One incident in full</h2><p><code>kubenoob_incident</code> · available: always</p><p>An incident with its evidence (redacted), diagnosis, policy denials, reported issues, rollout change, every occurrence, the fixes a person confirmed, and confirmed fixes for the same problem elsewhere.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>id</code> (required)</td><td><code>string</code></td><td></td><td>Incident id, e.g. inc-3fa94c0e12.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;description&quot;: &quot;Incident id, e.g. inc-3fa94c0e12.&quot;,
+      &quot;pattern&quot;: &quot;^inc-[0-9a-f]{10}$&quot;,
+      &quot;title&quot;: &quot;Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;id&quot;
+  ],
+  &quot;title&quot;: &quot;IncidentIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_incident_confirm">Remember the fix for an incident</h2><p><code>kubenoob_incident_confirm</code> · available: always</p><p>AFTER the user confirms it worked: store the cause and fix on the incident (and as a learning note), so the next occurrence comes with it. Summaries only; never leaves the machine.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>id</code> (required)</td><td><code>string</code></td><td></td><td>Incident id, e.g. inc-3fa94c0e12.</td></tr><tr><td><code>cause</code> (required)</td><td><code>string</code></td><td></td><td>The confirmed root cause, in words.</td></tr><tr><td><code>fix</code> (required)</td><td><code>string</code></td><td></td><td>What fixed it, in words (no manifests).</td></tr><tr><td><code>confirmed_by_user</code> (required)</td><td><code>boolean</code></td><td></td><td>True only after the user explicitly confirmed this cause and fix worked.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;id&quot;: {
+      &quot;description&quot;: &quot;Incident id, e.g. inc-3fa94c0e12.&quot;,
+      &quot;pattern&quot;: &quot;^inc-[0-9a-f]{10}$&quot;,
+      &quot;title&quot;: &quot;Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;cause&quot;: {
+      &quot;description&quot;: &quot;The confirmed root cause, in words.&quot;,
+      &quot;maxLength&quot;: 600,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Cause&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;fix&quot;: {
+      &quot;description&quot;: &quot;What fixed it, in words (no manifests).&quot;,
+      &quot;maxLength&quot;: 1200,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Fix&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;confirmed_by_user&quot;: {
+      &quot;description&quot;: &quot;True only after the user explicitly confirmed this cause and fix worked.&quot;,
+      &quot;title&quot;: &quot;Confirmed By User&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;id&quot;,
+    &quot;cause&quot;,
+    &quot;fix&quot;,
+    &quot;confirmed_by_user&quot;
+  ],
+  &quot;title&quot;: &quot;IncidentConfirmIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learn_tracks">List learning tracks</h2><p><code>kubenoob_learn_tracks</code> · available: always</p><p>Tracks, lessons, exercises and the learner&#x27;s progress.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>learner</code></td><td><code>string</code></td><td>&quot;local&quot;</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;learner&quot;: {
+      &quot;default&quot;: &quot;local&quot;,
+      &quot;maxLength&quot;: 64,
+      &quot;title&quot;: &quot;Learner&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;title&quot;: &quot;LearnerIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learn_lesson">Open a lesson</h2><p><code>kubenoob_learn_lesson</code> · available: always</p><p>Lesson content with objectives, key points and citations. A shared HTTP server records no progress, so the learner id only selects whose tally to show when one is kept.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>lesson_id</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>learner</code></td><td><code>string | null</code></td><td>null</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;lesson_id&quot;: {
+      &quot;maxLength&quot;: 100,
+      &quot;title&quot;: &quot;Lesson Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;learner&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 64,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Learner&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;lesson_id&quot;
+  ],
+  &quot;title&quot;: &quot;LessonIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learn_exercise">Get an exercise</h2><p><code>kubenoob_learn_exercise</code> · available: always</p><p>Exercise prompt, starter YAML, hints and points.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>exercise_id</code> (required)</td><td><code>string</code></td><td></td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;exercise_id&quot;: {
+      &quot;maxLength&quot;: 100,
+      &quot;title&quot;: &quot;Exercise Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;exercise_id&quot;
+  ],
+  &quot;title&quot;: &quot;ExerciseIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learn_submit">Submit an exercise answer</h2><p><code>kubenoob_learn_submit</code> · available: always</p><p>Grade YAML offline with the audit engine; awards credits and returns feedback. A shared HTTP server grades the same way but records nothing, and says so in the result.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>exercise_id</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>answer</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>learner</code></td><td><code>string</code></td><td>&quot;local&quot;</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;exercise_id&quot;: {
+      &quot;maxLength&quot;: 100,
+      &quot;title&quot;: &quot;Exercise Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;answer&quot;: {
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Answer&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;learner&quot;: {
+      &quot;default&quot;: &quot;local&quot;,
+      &quot;maxLength&quot;: 64,
+      &quot;title&quot;: &quot;Learner&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;exercise_id&quot;,
+    &quot;answer&quot;
+  ],
+  &quot;title&quot;: &quot;SubmitIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learn_quiz">Quiz</h2><p><code>kubenoob_learn_quiz</code> · available: always</p><p>Fetch a quiz question (no choice) or answer it (choice index). A shared HTTP server marks the answer the same way but records nothing, and says so in the result.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>question_id</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>choice</code></td><td><code>integer | null</code></td><td>null</td><td>Omit to fetch the question; set to answer it.</td></tr><tr><td><code>learner</code></td><td><code>string</code></td><td>&quot;local&quot;</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;question_id&quot;: {
+      &quot;maxLength&quot;: 100,
+      &quot;title&quot;: &quot;Question Id&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;choice&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maximum&quot;: 9,
+          &quot;minimum&quot;: 0,
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Omit to fetch the question; set to answer it.&quot;,
+      &quot;title&quot;: &quot;Choice&quot;
+    },
+    &quot;learner&quot;: {
+      &quot;default&quot;: &quot;local&quot;,
+      &quot;maxLength&quot;: 64,
+      &quot;title&quot;: &quot;Learner&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;question_id&quot;
+  ],
+  &quot;title&quot;: &quot;QuizIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learn_progress">Learner progress</h2><p><code>kubenoob_learn_progress</code> · available: always</p><p>Credits earned and completed items.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>learner</code></td><td><code>string</code></td><td>&quot;local&quot;</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;learner&quot;: {
+      &quot;default&quot;: &quot;local&quot;,
+      &quot;maxLength&quot;: 64,
+      &quot;title&quot;: &quot;Learner&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;title&quot;: &quot;LearnerIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_grade_answer">Grade a model answer (enforcer + credit system)</h2><p><code>kubenoob_grade_answer</code> · available: always</p><p>Deterministic reward for a completion against a benchmark task: task correctness (audit engine or QA rules), source-attribution credit for valid [kn:...] citations, format, penalties.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>completion</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>task_id</code></td><td><code>string | null</code></td><td>null</td><td>Benchmark task id; or pass `task` inline.</td></tr><tr><td><code>task</code></td><td><code>object | null</code></td><td>null</td><td>Inline task. Its mustMention / mustNotMention / matches entries are matched as literal text, not regular expressions (only built-in benchmark tasks use regular expressions).</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;completion&quot;: {
+      &quot;maxLength&quot;: 200000,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Completion&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;task_id&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 100,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Benchmark task id; or pass `task` inline.&quot;,
+      &quot;title&quot;: &quot;Task Id&quot;
+    },
+    &quot;task&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;additionalProperties&quot;: true,
+          &quot;type&quot;: &quot;object&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Inline task. Its mustMention / mustNotMention / matches entries are matched as literal text, not regular expressions (only built-in benchmark tasks use regular expressions).&quot;,
+      &quot;title&quot;: &quot;Task&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;completion&quot;
+  ],
+  &quot;title&quot;: &quot;GradeIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learning_summary">Show what kube-noob has learned locally</h2><p><code>kubenoob_learning_summary</code> · available: always</p><p>The user&#x27;s environment profile (platform, versions, conventions), confirmed troubleshooting notes (cite as [kn:local-N#0]) and the most frequent playbooks/rules. Read this before tailoring advice.</p><p>No arguments.</p><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {},
+  &quot;title&quot;: &quot;EmptyIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learning_note_add">Remember a confirmed fix</h2><p><code>kubenoob_learning_note_add</code> · available: always</p><p>Save a short symptom -&gt; cause -&gt; fix note to the local learning file AFTER the user confirms it worked. Summaries only: credentials, manifests and raw logs are rejected. Never leaves the machine.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>symptom</code> (required)</td><td><code>string</code></td><td></td><td>What was observed, in one or two sentences.</td></tr><tr><td><code>cause</code> (required)</td><td><code>string</code></td><td></td><td>The confirmed root cause.</td></tr><tr><td><code>fix</code> (required)</td><td><code>string</code></td><td></td><td>What fixed it, in words (no manifests).</td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>tags</code></td><td><code>array of string</code></td><td></td><td></td></tr><tr><td><code>confirmed_by_user</code> (required)</td><td><code>boolean</code></td><td></td><td>True only after the user explicitly confirmed this cause and fix worked.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;symptom&quot;: {
+      &quot;description&quot;: &quot;What was observed, in one or two sentences.&quot;,
+      &quot;maxLength&quot;: 400,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Symptom&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;cause&quot;: {
+      &quot;description&quot;: &quot;The confirmed root cause.&quot;,
+      &quot;maxLength&quot;: 600,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Cause&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;fix&quot;: {
+      &quot;description&quot;: &quot;What fixed it, in words (no manifests).&quot;,
+      &quot;maxLength&quot;: 1200,
+      &quot;minLength&quot;: 3,
+      &quot;title&quot;: &quot;Fix&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;tags&quot;: {
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 8,
+      &quot;title&quot;: &quot;Tags&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;confirmed_by_user&quot;: {
+      &quot;description&quot;: &quot;True only after the user explicitly confirmed this cause and fix worked.&quot;,
+      &quot;title&quot;: &quot;Confirmed By User&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;symptom&quot;,
+    &quot;cause&quot;,
+    &quot;fix&quot;,
+    &quot;confirmed_by_user&quot;
+  ],
+  &quot;title&quot;: &quot;LearningNoteIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_learning_profile_set">Remember the user&#x27;s environment</h2><p><code>kubenoob_learning_profile_set</code> · available: always</p><p>Save platform, versions and team conventions the user stated, so later answers fit their setup.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr><tr><td><code>versions</code></td><td><code>object</code></td><td></td><td>Keys kubernetes|openshift|helm|rhacs|rosa, values like &#x27;4.22&#x27;.</td></tr><tr><td><code>conventions</code></td><td><code>array of string | null</code></td><td>null</td><td>Team conventions, e.g. &#x27;namespaces are &lt;team&gt;-&lt;env&gt;&#x27;.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    },
+    &quot;versions&quot;: {
+      &quot;additionalProperties&quot;: {
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;description&quot;: &quot;Keys kubernetes|openshift|helm|rhacs|rosa, values like &#x27;4.22&#x27;.&quot;,
+      &quot;title&quot;: &quot;Versions&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;conventions&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;items&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;maxItems&quot;: 20,
+          &quot;type&quot;: &quot;array&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Team conventions, e.g. &#x27;namespaces are &lt;team&gt;-&lt;env&gt;&#x27;.&quot;,
+      &quot;title&quot;: &quot;Conventions&quot;
+    }
+  },
+  &quot;title&quot;: &quot;LearningProfileIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_config_status">Show configuration</h2><p><code>kubenoob_config_status</code> · available: always</p><p>Effective configuration (webEnabled, cluster access, model), version and knowledge stats.</p><p>No arguments.</p><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {},
+  &quot;title&quot;: &quot;EmptyIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_cluster_get">Read cluster objects (read-only)</h2><p><code>kubenoob_cluster_get</code> · available: webEnabled</p><p>GET allowlisted resources from the live cluster. Secrets are never readable; sensitive values are redacted.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>resource</code> (required)</td><td><code>string</code></td><td></td><td>Allowlisted resource, e.g. pods, deployments, routes.</td></tr><tr><td><code>name</code></td><td><code>string | null</code></td><td>null</td><td></td></tr><tr><td><code>namespace</code></td><td><code>string | null</code></td><td>null</td><td></td></tr><tr><td><code>selector</code></td><td><code>string | null</code></td><td>null</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;resource&quot;: {
+      &quot;description&quot;: &quot;Allowlisted resource, e.g. pods, deployments, routes.&quot;,
+      &quot;maxLength&quot;: 64,
+      &quot;title&quot;: &quot;Resource&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;name&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 253,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Name&quot;
+    },
+    &quot;namespace&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 63,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Namespace&quot;
+    },
+    &quot;selector&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 512,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Selector&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;resource&quot;
+  ],
+  &quot;title&quot;: &quot;ClusterGetIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_cluster_debug_workload">Debug a live workload (read-only)</h2><p><code>kubenoob_cluster_debug_workload</code> · available: webEnabled</p><p>Collect status, events and recent logs for a workload and diagnose it.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>namespace</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>kind</code></td><td><code>&quot;deployment&quot; | &quot;statefulset&quot; | &quot;daemonset&quot; | &quot;job&quot; | &quot;pod&quot;</code></td><td>&quot;deployment&quot;</td><td></td></tr><tr><td><code>name</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;namespace&quot;: {
+      &quot;maxLength&quot;: 63,
+      &quot;title&quot;: &quot;Namespace&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;kind&quot;: {
+      &quot;default&quot;: &quot;deployment&quot;,
+      &quot;enum&quot;: [
+        &quot;deployment&quot;,
+        &quot;statefulset&quot;,
+        &quot;daemonset&quot;,
+        &quot;job&quot;,
+        &quot;pod&quot;
+      ],
+      &quot;title&quot;: &quot;Kind&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;name&quot;: {
+      &quot;maxLength&quot;: 253,
+      &quot;title&quot;: &quot;Name&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;namespace&quot;,
+    &quot;name&quot;
+  ],
+  &quot;title&quot;: &quot;ClusterDebugIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_cluster_check_traffic">Would this traffic be allowed? (live, read-only)</h2><p><code>kubenoob_cluster_check_traffic</code> · available: webEnabled</p><p>Read the NetworkPolicies, namespace labels and workloads for the two endpoints from the cluster and evaluate them like check_network_policy.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>source</code> (required)</td><td><code>string</code></td><td></td><td>Where the connection starts: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.</td></tr><tr><td><code>destination</code> (required)</td><td><code>string</code></td><td></td><td>Where it goes: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.</td></tr><tr><td><code>port</code> (required)</td><td><code>integer | string</code></td><td></td><td>Destination port number (1-65535) or a named container port.</td></tr><tr><td><code>protocol</code></td><td><code>&quot;TCP&quot; | &quot;UDP&quot; | &quot;SCTP&quot;</code></td><td>&quot;TCP&quot;</td><td></td></tr><tr><td><code>platform</code></td><td><code>&quot;kubernetes&quot; | &quot;openshift&quot; | &quot;rosa-classic&quot; | &quot;rosa-hcp&quot; | null</code></td><td>null</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;source&quot;: {
+      &quot;description&quot;: &quot;Where the connection starts: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.&quot;,
+      &quot;maxLength&quot;: 300,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Source&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;destination&quot;: {
+      &quot;description&quot;: &quot;Where it goes: namespace/name of a workload (namespace/kind/name when names clash), namespace:key=value,... for a set of pod labels, or an IP address / CIDR outside the cluster.&quot;,
+      &quot;maxLength&quot;: 300,
+      &quot;minLength&quot;: 1,
+      &quot;title&quot;: &quot;Destination&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;port&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;type&quot;: &quot;integer&quot;
+        },
+        {
+          &quot;type&quot;: &quot;string&quot;
+        }
+      ],
+      &quot;description&quot;: &quot;Destination port number (1-65535) or a named container port.&quot;,
+      &quot;title&quot;: &quot;Port&quot;
+    },
+    &quot;protocol&quot;: {
+      &quot;default&quot;: &quot;TCP&quot;,
+      &quot;enum&quot;: [
+        &quot;TCP&quot;,
+        &quot;UDP&quot;,
+        &quot;SCTP&quot;
+      ],
+      &quot;title&quot;: &quot;Protocol&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;platform&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;enum&quot;: [
+            &quot;kubernetes&quot;,
+            &quot;openshift&quot;,
+            &quot;rosa-classic&quot;,
+            &quot;rosa-hcp&quot;
+          ],
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;title&quot;: &quot;Platform&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;source&quot;,
+    &quot;destination&quot;,
+    &quot;port&quot;
+  ],
+  &quot;title&quot;: &quot;TrafficIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_cluster_posture_scan">Attack paths in the cluster (live, read-only)</h2><p><code>kubenoob_cluster_posture_scan</code> · available: webEnabled</p><p>Read Routes, Ingresses, Services, workloads, ServiceAccounts, RBAC and SCCs from the cluster (never Secrets) and rank the attack paths like posture_scan.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>namespaces</code></td><td><code>array of string</code></td><td></td><td>Namespaces to read (default: all the account can list).</td></tr><tr><td><code>top</code></td><td><code>integer</code></td><td>20</td><td>How many ranked paths to return.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;namespaces&quot;: {
+      &quot;description&quot;: &quot;Namespaces to read (default: all the account can list).&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 63,
+        &quot;pattern&quot;: &quot;^[a-z0-9]([-a-z0-9]*[a-z0-9])?$&quot;,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 50,
+      &quot;title&quot;: &quot;Namespaces&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;top&quot;: {
+      &quot;default&quot;: 20,
+      &quot;description&quot;: &quot;How many ranked paths to return.&quot;,
+      &quot;maximum&quot;: 200,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Top&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  },
+  &quot;title&quot;: &quot;ClusterPostureIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_cluster_check_namespace">Check a namespace now (live, read-only)</h2><p><code>kubenoob_cluster_check_namespace</code> · available: webEnabled</p><p>Run one watch poll on a namespace: find crash loops, OOM kills, image pulls, policy denials, scheduling, mount and probe failures, explain each new one, and record them in the ledger.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>namespace</code> (required)</td><td><code>string</code></td><td></td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;namespace&quot;: {
+      &quot;maxLength&quot;: 63,
+      &quot;pattern&quot;: &quot;^[a-z0-9]([-a-z0-9]*[a-z0-9])?$&quot;,
+      &quot;title&quot;: &quot;Namespace&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;namespace&quot;
+  ],
+  &quot;title&quot;: &quot;NamespaceCheckIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_cluster_version">Cluster version</h2><p><code>kubenoob_cluster_version</code> · available: webEnabled</p><p>Kubernetes and OpenShift versions of the live cluster, and whether they are newer than kube-noob&#x27;s knowledge.</p><p>No arguments.</p><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {},
+  &quot;title&quot;: &quot;EmptyIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_code_report">Assess SAST findings: where the code ships and who runs it</h2><p><code>kubenoob_code_report</code> · available: always</p><p>Read the SARIF that Semgrep, Bandit, SpotBugs/FindSecBugs, ESLint or CodeQL wrote (kube-noob has no analysis engine of its own): one finding per file, line and CWE across tools, suppressed and fixed results excluded with the reason, lint kept apart. With Containerfiles, each file is followed into the images that ship it (copied or built; tests and tools are not shipped); with manifests, findings rank by exposure and privileges with the attack path. With scanner reports and dependency files, each language-package vulnerability points at the file and line to change. Local only.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>sarif</code></td><td><code>array of string</code></td><td></td><td>SARIF 2.1.0 as JSON text from Semgrep, Bandit, SpotBugs/FindSecBugs, ESLint or CodeQL (any SARIF producer works). The same file, line and CWE from several tools become one finding.</td></tr><tr><td><code>containerfiles</code></td><td><code>array of CodeBuildIn</code></td><td></td><td>Containerfiles, to know which images ship each file.</td></tr><tr><td><code>manifests</code></td><td><code>string | null</code></td><td>null</td><td>YAML that runs the images: ranks by exposure and privileges.</td></tr><tr><td><code>reports</code></td><td><code>array of string</code></td><td></td><td>Trivy or Grype JSON or a CycloneDX report of an image: each language-package vulnerability points at the dependency file and line that declares it.</td></tr><tr><td><code>dependency_files</code></td><td><code>object</code></td><td></td><td>Dependency files by repository path (requirements.txt, package.json, package-lock.json, pom.xml, go.mod, ...), to find the line that declares a vulnerable package.</td></tr><tr><td><code>source_roots</code></td><td><code>array of string</code></td><td></td><td>Absolute directories the scanners ran in (the CI checkout), so absolute paths map to the repository.</td></tr><tr><td><code>top</code></td><td><code>integer</code></td><td>20</td><td>How many ranked findings to return.</td></tr><tr><td><code>include_quality</code></td><td><code>boolean</code></td><td>false</td><td>Also list lint and quality results (never ranked).</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;$defs&quot;: {
+    &quot;CodeBuildIn&quot;: {
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;: {
+        &quot;path&quot;: {
+          &quot;description&quot;: &quot;Its path in the repository, e.g. web/Containerfile.&quot;,
+          &quot;maxLength&quot;: 500,
+          &quot;minLength&quot;: 1,
+          &quot;title&quot;: &quot;Path&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;text&quot;: {
+          &quot;description&quot;: &quot;The Containerfile.&quot;,
+          &quot;maxLength&quot;: 1000000,
+          &quot;minLength&quot;: 5,
+          &quot;title&quot;: &quot;Text&quot;,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        &quot;image&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;maxLength&quot;: 500,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;The image it builds (registry/repository[:tag]); places it in workloads.&quot;,
+          &quot;title&quot;: &quot;Image&quot;
+        },
+        &quot;context&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;maxLength&quot;: 500,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;Build context in the repository (default: the Containerfile&#x27;s directory).&quot;,
+          &quot;title&quot;: &quot;Context&quot;
+        },
+        &quot;ignore&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;maxLength&quot;: 1000000,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;The context&#x27;s .dockerignore text.&quot;,
+          &quot;title&quot;: &quot;Ignore&quot;
+        },
+        &quot;target&quot;: {
+          &quot;anyOf&quot;: [
+            {
+              &quot;maxLength&quot;: 100,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            {
+              &quot;type&quot;: &quot;null&quot;
+            }
+          ],
+          &quot;default&quot;: null,
+          &quot;description&quot;: &quot;The --target stage, if the build sets one.&quot;,
+          &quot;title&quot;: &quot;Target&quot;
+        }
+      },
+      &quot;required&quot;: [
+        &quot;path&quot;,
+        &quot;text&quot;
+      ],
+      &quot;title&quot;: &quot;CodeBuildIn&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    }
+  },
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;sarif&quot;: {
+      &quot;description&quot;: &quot;SARIF 2.1.0 as JSON text from Semgrep, Bandit, SpotBugs/FindSecBugs, ESLint or CodeQL (any SARIF producer works). The same file, line and CWE from several tools become one finding.&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 20000000,
+        &quot;minLength&quot;: 2,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 10,
+      &quot;title&quot;: &quot;Sarif&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;containerfiles&quot;: {
+      &quot;description&quot;: &quot;Containerfiles, to know which images ship each file.&quot;,
+      &quot;items&quot;: {
+        &quot;$ref&quot;: &quot;#/$defs/CodeBuildIn&quot;
+      },
+      &quot;maxItems&quot;: 20,
+      &quot;title&quot;: &quot;Containerfiles&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;manifests&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 1000000,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;YAML that runs the images: ranks by exposure and privileges.&quot;,
+      &quot;title&quot;: &quot;Manifests&quot;
+    },
+    &quot;reports&quot;: {
+      &quot;description&quot;: &quot;Trivy or Grype JSON or a CycloneDX report of an image: each language-package vulnerability points at the dependency file and line that declares it.&quot;,
+      &quot;items&quot;: {
+        &quot;maxLength&quot;: 20000000,
+        &quot;minLength&quot;: 2,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 10,
+      &quot;title&quot;: &quot;Reports&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;dependency_files&quot;: {
+      &quot;additionalProperties&quot;: {
+        &quot;maxLength&quot;: 5000000,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;description&quot;: &quot;Dependency files by repository path (requirements.txt, package.json, package-lock.json, pom.xml, go.mod, ...), to find the line that declares a vulnerable package.&quot;,
+      &quot;maxProperties&quot;: 200,
+      &quot;propertyNames&quot;: {
+        &quot;maxLength&quot;: 500,
+        &quot;minLength&quot;: 1
+      },
+      &quot;title&quot;: &quot;Dependency Files&quot;,
+      &quot;type&quot;: &quot;object&quot;
+    },
+    &quot;source_roots&quot;: {
+      &quot;description&quot;: &quot;Absolute directories the scanners ran in (the CI checkout), so absolute paths map to the repository.&quot;,
+      &quot;items&quot;: {
+        &quot;pattern&quot;: &quot;^/[^\\x00]{0,499}$&quot;,
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;maxItems&quot;: 5,
+      &quot;title&quot;: &quot;Source Roots&quot;,
+      &quot;type&quot;: &quot;array&quot;
+    },
+    &quot;top&quot;: {
+      &quot;default&quot;: 20,
+      &quot;description&quot;: &quot;How many ranked findings to return.&quot;,
+      &quot;maximum&quot;: 200,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Top&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;include_quality&quot;: {
+      &quot;default&quot;: false,
+      &quot;description&quot;: &quot;Also list lint and quality results (never ranked).&quot;,
+      &quot;title&quot;: &quot;Include Quality&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;title&quot;: &quot;CodeReportIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_containerfile_audit">Audit a Containerfile</h2><p><code>kubenoob_containerfile_audit</code> · available: always</p><p>Static checks of a Containerfile or Dockerfile: base images pinned by digest, a non-root USER, no credentials in ENV, ARG, LABEL, RUN or copied files, no download piped into a shell, package caches cleaned, a health check or probes, a multi-stage build. Each finding names its fix and source. The CLI (kube-noob build audit) also reads the build context and the built image&#x27;s layers.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>containerfile</code> (required)</td><td><code>string</code></td><td></td><td>The Containerfile or Dockerfile text.</td></tr><tr><td><code>manifests</code></td><td><code>string | null</code></td><td>null</td><td>Optional: the workload YAML that runs the image; its readiness or liveness probes satisfy the health check.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;containerfile&quot;: {
+      &quot;description&quot;: &quot;The Containerfile or Dockerfile text.&quot;,
+      &quot;maxLength&quot;: 1000000,
+      &quot;minLength&quot;: 4,
+      &quot;title&quot;: &quot;Containerfile&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;manifests&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;maxLength&quot;: 1000000,
+          &quot;type&quot;: &quot;string&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;default&quot;: null,
+      &quot;description&quot;: &quot;Optional: the workload YAML that runs the image; its readiness or liveness probes satisfy the health check.&quot;,
+      &quot;title&quot;: &quot;Manifests&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;containerfile&quot;
+  ],
+  &quot;title&quot;: &quot;ContainerfileIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_analyze_must_gather">Analyse a must-gather</h2><p><code>kubenoob_analyze_must_gather</code> · available: always</p><p>Open an OpenShift must-gather (or oc adm inspect output) safely and say what is wrong, most severe first: the cluster version and update, cluster operators, nodes, machine config pools, OLM operators, pods, warning events and etcd log hints. Each finding has its evidence file, its signals, read-only commands to confirm it, and the known OpenShift bugs and team memory entries that match it for the version the cluster runs. Nothing is extracted or run and Secrets are never read. Local: reads the path you give on this machine.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>path</code> (required)</td><td><code>string</code></td><td></td><td>Absolute path of a must-gather directory or .tar, .tar.gz or .tgz archive on the machine the server runs on (under mustGather.allowedDir when it is set). Nothing is extracted or run; Secrets are never read.</td></tr><tr><td><code>top</code></td><td><code>integer</code></td><td>50</td><td>How many findings to return, most severe first.</td></tr><tr><td><code>case_draft</code></td><td><code>boolean</code></td><td>false</td><td>Also return caseDraft: a support case draft with placeholders for what only you know.</td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;path&quot;: {
+      &quot;description&quot;: &quot;Absolute path of a must-gather directory or .tar, .tar.gz or .tgz archive on the machine the server runs on (under mustGather.allowedDir when it is set). Nothing is extracted or run; Secrets are never read.&quot;,
+      &quot;maxLength&quot;: 4096,
+      &quot;minLength&quot;: 2,
+      &quot;pattern&quot;: &quot;^[^\\x00]+$&quot;,
+      &quot;title&quot;: &quot;Path&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;top&quot;: {
+      &quot;default&quot;: 50,
+      &quot;description&quot;: &quot;How many findings to return, most severe first.&quot;,
+      &quot;maximum&quot;: 500,
+      &quot;minimum&quot;: 1,
+      &quot;title&quot;: &quot;Top&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    },
+    &quot;case_draft&quot;: {
+      &quot;default&quot;: false,
+      &quot;description&quot;: &quot;Also return caseDraft: a support case draft with placeholders for what only you know.&quot;,
+      &quot;title&quot;: &quot;Case Draft&quot;,
+      &quot;type&quot;: &quot;boolean&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;path&quot;
+  ],
+  &quot;title&quot;: &quot;MustGatherIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details><h2 id="kubenoob_web_fetch">Fetch an allowlisted web page</h2><p><code>kubenoob_web_fetch</code> · available: webEnabled</p><p>Fetch documentation from web.allowedDomains (HTTPS only). Only available because webEnabled is true.</p><div class="table-wrap"><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>url</code> (required)</td><td><code>string</code></td><td></td><td></td></tr><tr><td><code>max_chars</code></td><td><code>integer</code></td><td>20000</td><td></td></tr></tbody></table></div><details><summary>JSON schema</summary><pre>{
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;: {
+    &quot;url&quot;: {
+      &quot;maxLength&quot;: 2000,
+      &quot;pattern&quot;: &quot;^https://&quot;,
+      &quot;title&quot;: &quot;Url&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    },
+    &quot;max_chars&quot;: {
+      &quot;default&quot;: 20000,
+      &quot;maximum&quot;: 200000,
+      &quot;minimum&quot;: 500,
+      &quot;title&quot;: &quot;Max Chars&quot;,
+      &quot;type&quot;: &quot;integer&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;url&quot;
+  ],
+  &quot;title&quot;: &quot;WebFetchIn&quot;,
+  &quot;type&quot;: &quot;object&quot;
+}</pre></details></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>kube-noob Helm chart · kube-noob</title>
+<meta name="description" content="Runs kube-noob as a token-protected MCP service on OpenShift 4.20 and later or Kubernetes 1.33 and later. kube-noob has no AI inside: OpenShift…">
+<link rel="canonical" href="https://kube-noob.com/docs/helm-chart/">
+<meta property="og:title" content="kube-noob Helm chart · kube-noob">
+<meta property="og:description" content="Runs kube-noob as a token-protected MCP service on OpenShift 4.20 and later or Kubernetes 1.33 and later. kube-noob has no AI inside: OpenShift…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/helm-chart/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/" aria-current="page">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="kube-noob-helm-chart">kube-noob Helm chart</h1>
+<p>Runs kube-noob as a token-protected MCP service on OpenShift 4.20 and later or Kubernetes 1.33 and later. kube-noob
+has no AI inside: OpenShift Lightspeed, Claude or any MCP client calls its tools (audit, diagnose, cited docs,
+learning), and it calls no model itself.</p>
+<h2 id="install">Install</h2>
+<pre><code class="language-bash">helm install kube-noob oci://ghcr.io/aashishmahajan/charts/kube-noob -n kube-noob --create-namespace
+</code></pre>
+<p>The chart generates a random bearer token in the Secret <code>&lt;release&gt;-kube-noob-token</code> and keeps it across
+<code>helm upgrade</code>. To bring your own, create a Secret with the key <code>token</code> and set <code>auth.existingSecret</code>; do this with
+<code>helm template</code> or GitOps (Argo CD, Flux), where the chart cannot look the Secret up and would rotate the token.
+Clients connect to <code>http://&lt;release&gt;-kube-noob.&lt;namespace&gt;.svc:8080/mcp</code> with <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+<h2 id="secure-by-default">Secure by default</h2>
+<ul>
+<li>Pods run under <code>restricted-v2</code> (arbitrary UID, no capabilities, <code>RuntimeDefault</code> seccomp, read-only root
+  filesystem) and Pod Security <code>restricted</code>.</li>
+<li>NetworkPolicy: ingress only from the same namespace and the OpenShift router; egress to DNS only.</li>
+<li>No web access, no cluster access and no model calls unless you turn them on.</li>
+<li>The admission webhook is off unless you set <code>admission.enabled</code>, and denies nothing unless you list a rule in
+  <code>admission.enforce</code>.</li>
+</ul>
+<h2 id="main-values">Main values</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Default</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth.existingSecret</code></td>
+<td><code>""</code></td>
+<td>Your token Secret; empty generates one</td>
+</tr>
+<tr>
+<td><code>config.offline</code></td>
+<td><code>false</code></td>
+<td>Admin lock: no web, no downloads, local models only</td>
+</tr>
+<tr>
+<td><code>config.webEnabled</code></td>
+<td><code>false</code></td>
+<td>HTTPS GET to allowlisted documentation domains; opens egress 443</td>
+</tr>
+<tr>
+<td><code>config.clusterEnabled</code></td>
+<td><code>false</code></td>
+<td>Read-only cluster tools (never Secrets), including the attack-path scan, which reads RBAC objects (Roles and RoleBindings; ClusterRoles and ClusterRoleBindings with <code>rbac.scope: cluster</code>); needs <code>networkPolicy.egress.apiServerCIDRs</code></td>
+</tr>
+<tr>
+<td><code>posture.report.enabled</code>, <code>.keep</code></td>
+<td><code>false</code>, <code>14</code></td>
+<td>A daily drift and policy report (read-only snapshot of hashes and names, compared with yesterday's) on the PVC; the MCP tool <code>posture_report</code> returns the newest. Needs <code>config.clusterEnabled</code>, <code>persistence.enabled</code> and <code>replicaCount: 1</code></td>
+</tr>
+<tr>
+<td><code>rhacs.enabled</code>, <code>.endpoint</code>, <code>.tokenSecret</code>, <code>.caConfigMap</code>, <code>.centralNamespace</code>, <code>.egressCIDRs</code></td>
+<td><code>false</code>, <code>https://central.stackrox.svc</code></td>
+<td>Read RHACS Central's policies (GET only) for the MCP tool <code>rhacs_compare_live</code>: overlap and gaps between your RHACS policies and kube-noob's rules. The token Secret is sent only to <code>endpoint</code>; egress opens to the Central pods (TCP 8443) or <code>egressCIDRs</code> (TCP 443)</td>
+</tr>
+<tr>
+<td><code>watch.enabled</code></td>
+<td><code>false</code></td>
+<td>Always-on incident watch in the release namespace and <code>rbac.namespaces</code>; needs <code>config.clusterEnabled</code> and <code>replicaCount: 1</code></td>
+</tr>
+<tr>
+<td><code>probe.enabled</code>, <code>dryRun.enabled</code></td>
+<td><code>false</code></td>
+<td>Capability tiers P and D (SECURITY.md): render a Role in the release namespace and <code>rbac.namespaces</code> only when enabled; need <code>config.clusterEnabled</code>; every action still needs a person's approval; <code>dryRun.rules</code> lists what may be dry-run (never Secrets)</td>
+</tr>
+<tr>
+<td><code>itsm.writeEnabled</code>, <code>notify.enabled</code>, <code>gate.enabled</code></td>
+<td><code>false</code></td>
+<td>Tiers W and G: attach evidence to tickets, forward reports, forward approved tool calls; W is refused under <code>config.offline</code></td>
+</tr>
+<tr>
+<td><code>jira.sync.enabled</code></td>
+<td><code>false</code></td>
+<td>Keep a local copy of Red Hat's public Jira (<code>jira.sync.projects</code>, default set) for "what became of this bug?" answers; REST API at one request per second, <code>jira.sync.maxRequests</code> per run every <code>jira.sync.intervalHours</code> (24 daily, 48 every 2 days), recording what changed for <code>kube-noob corpus jira-changes</code>; opens egress 443 (EgressFirewall: redhat.atlassian.net only); needs <code>persistence.enabled</code> and <code>replicaCount: 1</code>; refused under <code>config.offline</code></td>
+</tr>
+<tr>
+<td><code>db.enabled</code>, <code>db.image.digest</code></td>
+<td><code>false</code>, <code>""</code></td>
+<td>The public <code>kube-noob-db</code> image (docs with licenses, release history, known issues; no Jira data), pinned by digest only (the chart refuses to render without one): an init container copies <code>db.path</code> with <code>cp</code> into a <code>db.sizeLimit</code> scratch volume and <code>serve</code> imports it when it was built after the copy the pod has. No egress. Verify the signature with <code>cosign verify</code> first</td>
+</tr>
+<tr>
+<td><code>jira.seed.source</code></td>
+<td><code>none</code></td>
+<td>Start every new pod from your organisation's Jira main copy (<code>kube-noob corpus jira-snapshot</code>) instead of waiting for a first sync: <code>image</code> (an init container copies <code>jira.seed.path</code> from the private, pinned <code>jira.seed.image</code> with <code>cp</code>) or <code>pvc</code> (<code>jira.seed.pvc.claimName</code>, read-only, <code>jira.seed.pvc.subPath</code> folder); <code>serve</code> imports the newest <code>*.tgz</code> once when the pod has no copy, then the sync fetches only what changed. The snapshot holds Red Hat ticket text: keep it private</td>
+</tr>
+<tr>
+<td><code>jira.seed.keySecret.name</code>, <code>.key</code></td>
+<td><code>""</code>, <code>key</code></td>
+<td>Opens a sealed seed (<code>kube-noob corpus seal</code>, <code>jira.seed.path</code> ending in <code>.tgz.enc</code>): the Secret's key file is mounted read-only (0440) for the server container only and named by <code>KUBE_NOOB_SEED_KEY_FILE</code>. A wrong or missing key imports nothing and is logged; the pod keeps serving. Needs <code>jira.seed.source</code></td>
+</tr>
+<tr>
+<td><code>mustGather.pvc.claimName</code></td>
+<td><code>""</code></td>
+<td>A claim of must-gathers, mounted read-only at <code>/srv/kube-noob/must-gather</code> (<code>mustGather.pvc.subPath</code> optional). Sets <code>mustGather.allowedDir</code>: the <code>analyze_must_gather</code> MCP tool reads only paths inside it; without a claim the service offers no such tool</td>
+</tr>
+<tr>
+<td><code>memory.source</code></td>
+<td><code>none</code></td>
+<td>Your team's memory repository (<code>kube-noob memory init</code>), mounted read-only at <code>/srv/kube-noob/memory</code> and read by every tool: <code>configMap</code> (<code>memory.configMap.name</code>, entries as keys), <code>pvc</code> (<code>memory.pvc.claimName</code>) or <code>git</code> (an init container clones <code>memory.git.url</code> at <code>memory.git.ref</code> with <code>memory.git.image</code>; ssh:// needs <code>memory.git.sshSecret</code> with <code>ssh-privatekey</code> and <code>known_hosts</code>; egress opens only to <code>memory.git.egressCIDRs</code>, and the EgressFirewall names the host; under <code>config.offline</code> only an in-cluster <code>*.svc</code> host)</td>
+</tr>
+<tr>
+<td><code>admission.enabled</code></td>
+<td><code>false</code></td>
+<td>kube-noob-admission, a validating webhook (tier A, SECURITY.md): every finding of a created or updated object is a <code>kubectl</code> warning. <code>admission.enforce</code> (rule ids) denies those rules only, and on an update only a new finding; <code>failurePolicy: Ignore</code>, <code>admission.timeoutSeconds</code> 3. Serving certificate: <code>admission.certificates</code> <code>openshift-service-ca</code> (default), <code>cert-manager</code> (<code>admission.certManager.issuerRef</code>) or <code>secret</code> (<code>admission.tls.secretName</code>, <code>.caBundle</code>). Skips the system namespaces, <code>openshift-*</code>, the release namespace, <code>admission.excludedNamespaces</code> and namespaces labelled <code>kube-noob.io/admission=disabled</code>. <code>admission.lookups</code> (a ClusterRole that lists PDBs, NetworkPolicies, PVCs, HPAs and StorageClasses) lets cross-object rules warn; needs <code>networkPolicy.egress.apiServerCIDRs</code>. Two replicas, a PodDisruptionBudget and soft anti-affinity; port 8443 is open to every source unless <code>admission.networkPolicy.from</code> narrows it</td>
+</tr>
+<tr>
+<td><code>rbac.namespaces</code></td>
+<td><code>[]</code></td>
+<td>Namespaces it may read besides its own (<code>rbac.scope=cluster</code> for all)</td>
+</tr>
+<tr>
+<td><code>egressFirewall.enabled</code></td>
+<td><code>false</code></td>
+<td>OVN-Kubernetes EgressFirewall: API server and allowlisted domains only, then deny (namespace-wide)</td>
+</tr>
+<tr>
+<td><code>persistence.enabled</code></td>
+<td><code>false</code></td>
+<td>Keep progress, notes and indexed runbooks on a PVC; with the default ReadWriteOnce access mode it needs <code>replicaCount: 1</code> and switches the Deployment to the Recreate strategy</td>
+</tr>
+<tr>
+<td><code>route.enabled</code></td>
+<td><code>false</code></td>
+<td>OpenShift Route with edge TLS</td>
+</tr>
+<tr>
+<td><code>resources</code></td>
+<td>256Mi request, 512Mi limit</td>
+<td>About 85 MiB peak with built-in knowledge, plus about 25 MiB per MB of indexed text</td>
+</tr>
+</tbody>
+</table></div>
+<p>All values and their schema: <code>values.yaml</code> and <code>values.schema.json</code>. Guides for service, sidecar and OpenShift
+Lightspeed setups: <a href="/docs/openshift/">https://github.com/aashishmahajan/kube-noob/blob/main/docs/openshift.md</a>.</p>
+<h2 id="test">Test</h2>
+<pre><code class="language-bash">helm test kube-noob -n kube-noob
+</code></pre><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/deploy/helm/kube-noob/README.md">deploy/helm/kube-noob/README.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

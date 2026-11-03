@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Overview · kube-noob</title>
+<meta name="description" content="No AI inside. Works with yours. kube-noob is a Kubernetes, OpenShift, ROSA HCP, Helm and RHACS/StackRox expert in a box: audit rules, read-only-first…">
+<link rel="canonical" href="https://kube-noob.com/docs/overview/">
+<meta property="og:title" content="Overview · kube-noob">
+<meta property="og:description" content="No AI inside. Works with yours. kube-noob is a Kubernetes, OpenShift, ROSA HCP, Helm and RHACS/StackRox expert in a box: audit rules, read-only-first…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/overview/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/" aria-current="page">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/" aria-current="page">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1>Overview</h1>
+
+<h1 id="kube-noob">kube-noob</h1>
+<p><a href="https://github.com/aashishmahajan/kube-noob/actions/workflows/ci.yml"><span class="badge">ci</span></a>
+<a href="https://securityscorecards.dev/viewer/?uri=github.com/aashishmahajan/kube-noob"><span class="badge">OpenSSF Scorecard</span></a>
+<a href="https://pypi.org/project/kube-noob/"><span class="badge">PyPI</span></a>
+<a href="https://github.com/aashishmahajan/kube-noob/blob/main/LICENSE"><span class="badge">License</span></a></p>
+<p><strong>No AI inside. Works with yours.</strong> kube-noob is a Kubernetes, OpenShift, ROSA HCP, Helm and RHACS/StackRox expert
+in a box: audit rules, read-only-first playbooks, cited docs and graded exercises. Claude, OpenShift Lightspeed or any
+MCP client calls it as tools; the CLI runs it with no AI at all. No network calls unless enabled.</p>
+<ul>
+<li><strong>Audit</strong>: 77 rules plus strict schemas (Kubernetes 1.35, Routes, SCCs, EgressFirewall, Gateway API, StackRox),
+  removed-API checks, safe auto-fixes, attack paths, 9 red-team scenarios, RHACS policy comparison, Containerfiles;
+  scanner and SAST findings ranked by reachability (VEX, KEV); STRIDE threat models.</li>
+<li><strong>Generate</strong>: hardened manifests and Helm charts, re-audited; admission policies (VAP, Kyverno) and webhook; CI gate.</li>
+<li><strong>Debug</strong>: 67 offline playbooks, read-only steps first; must-gathers triaged into a case draft; OpenShift bugs
+  with fix versions; policy denials explained (Kyverno, Gatekeeper, Pod Security, SCC, RBAC); NetworkPolicy
+  reachability; cluster evidence (never Secrets); CI build failures.</li>
+<li><strong>Learn</strong>: 5 tracks, 16 lessons, graded exercises; your team's fixes as code.</li>
+<li><strong>Cite</strong>: answers cite local knowledge as <code>[kn:&lt;doc&gt;#&lt;n&gt;]</code>.</li>
+</ul>
+<p>Design requests run a 7-step protocol: Clarify, Validate, Research, Audit, Calibrate, Generate, Red Team.</p>
+<h2 id="who-does-the-thinking">Who does the thinking</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>You use</th>
+<th>Who answers</th>
+<th>What leaves your machine</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The Claude plugin (Claude Code, Cowork)</td>
+<td>Claude, calling kube-noob's tools</td>
+<td>What you share with Claude, as in any chat; kube-noob sends nothing</td>
+</tr>
+<tr>
+<td>OpenShift Lightspeed or another MCP client</td>
+<td>That client's model</td>
+<td>What that client sends; kube-noob sends nothing</td>
+</tr>
+<tr>
+<td>The CLI</td>
+<td>kube-noob's rules, no model</td>
+<td>Nothing</td>
+</tr>
+<tr>
+<td><code>kube-noob ask</code> (optional)</td>
+<td>A model you configure: Anthropic or a local one</td>
+<td>Your question, to that model only</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="quick-start">Quick start</h2>
+<pre><code class="language-bash">brew tap aashishmahajan/kube-noob https://github.com/aashishmahajan/kube-noob
+brew trust --formula aashishmahajan/kube-noob/kube-noob
+brew install kube-noob
+kube-noob demo --list
+kube-noob audit -f k8s/ --platform openshift --version 4.22
+kube-noob insight 'paste anything'
+kube-noob doctor
+kube-noob selftest
+</code></pre>
+<p>No Homebrew: <code>uv tool install kube-noob</code> (Python 3.11+); <a href="/docs/install/">install help</a>.</p>
+<h2 id="use-with-claude-or-any-mcp-client">Use with Claude or any MCP client</h2>
+<p>Claude plugin, in Claude Code (needs <a href="https://docs.astral.sh/uv/">uv</a>):</p>
+<pre><code>/plugin marketplace add aashishmahajan/kube-noob
+/plugin install kube-noob@kube-noob
+</code></pre>
+<p>Desktop app: <strong>Customize &gt; Plugins &gt; Add &gt; Add marketplace</strong>, <code>aashishmahajan/kube-noob</code>. claude.ai chat: upload the
+<a href="/docs/install/#agent-skill">Agent Skill</a> under <strong>Customize &gt; Skills</strong>.</p>
+<p>Any MCP client:</p>
+<pre><code class="language-json">{&quot;mcpServers&quot;: {&quot;kube-noob&quot;: {&quot;command&quot;: &quot;uvx&quot;, &quot;args&quot;: [&quot;--from&quot;, &quot;kube-noob==0.7.1&quot;, &quot;kube-noob&quot;, &quot;mcp&quot;]}}}
+</code></pre>
+<h2 id="run-on-openshift">Run on OpenShift</h2>
+<p>As a token-protected service, loopback-only sidecar or Lightspeed tool:
+<a href="/docs/openshift/">docs/openshift.md</a>. The chart ships
+NetworkPolicies and runs under <code>restricted-v2</code>.</p>
+<h2 id="safe-by-default">Safe by default</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Change with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Web lookups (allowlisted HTTPS docs, text only)</td>
+<td>off</td>
+<td><code>webEnabled: true</code> / <code>KUBE_NOOB_WEB_ENABLED=true</code></td>
+</tr>
+<tr>
+<td>Admin offline lock (overrides web)</td>
+<td>off</td>
+<td><code>offline: true</code> / <code>KUBE_NOOB_OFFLINE=1</code> / chart <code>config.offline</code></td>
+</tr>
+<tr>
+<td>Live cluster (read-only, no Secrets)</td>
+<td>off</td>
+<td><code>cluster.enabled: true</code> / <code>--cluster-enabled</code></td>
+</tr>
+<tr>
+<td>Local learning file (confirmed notes)</td>
+<td>on</td>
+<td><code>learningEnabled: false</code></td>
+</tr>
+<tr>
+<td>Model for <code>kube-noob ask</code> only</td>
+<td>none</td>
+<td><code>llm.provider: anthropic</code> (<code>kube-noob[ask]</code>) or <code>openai-compatible</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>kube-noob doctor</code> shows what it can reach. Config never comes from the current directory. All keys: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/kube-noob.example.yaml">kube-noob.example.yaml</a>.</p>
+<h2 id="docs">Docs</h2>
+<ul>
+<li><a href="/docs/use-cases/">Use cases</a> and <a href="/docs/learning/">learning</a></li>
+<li><a href="/docs/roadmap/">Enterprise roadmap</a></li>
+<li><a href="/docs/architecture/">Architecture</a></li>
+<li><a href="/docs/training/">Training</a> and <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/evals/supported-technologies.md">measured accuracy</a></li>
+<li><a href="/docs/operations/">Operations</a></li>
+<li><a href="/docs/guidance/">Guidance traceability</a> and <a href="/docs/release-readiness/">release readiness</a></li>
+<li><a href="/docs/privacy/">Privacy</a>, <a href="/docs/security/">security policy</a> and <a href="/docs/contributing/">contributing</a></li>
+</ul>
+<h2 id="credits">Credits</h2>
+<p>Notices: <a href="/docs/third-party-notices/">THIRD_PARTY_NOTICES.md</a>.
+Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS are
+trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+License: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/LICENSE">Apache-2.0</a>.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/README.md">README.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

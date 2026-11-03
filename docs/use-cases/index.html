@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Use cases · kube-noob</title>
+<meta name="description" content="Pick your role, run the demo, then try it on your own files. Every demo runs offline in under a second and never touches your cluster or your saved…">
+<link rel="canonical" href="https://kube-noob.com/docs/use-cases/">
+<meta property="og:title" content="Use cases · kube-noob">
+<meta property="og:description" content="Pick your role, run the demo, then try it on your own files. Every demo runs offline in under a second and never touches your cluster or your saved…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/use-cases/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/" aria-current="page">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="use-cases">Use cases</h1>
+<p>Pick your role, run the demo, then try it on your own files. Every demo runs offline in under a second and never
+touches your cluster or your saved progress: <code>kube-noob demo --list</code>.</p>
+<h2 id="no-ai-inside-three-ways-to-use-it">No AI inside: three ways to use it</h2>
+<p>kube-noob is the rulebook, not the chatbot. Its audit rules, playbooks, docs index and graders give the same answer
+every time, and they run where you put them.</p>
+<ol>
+<li><strong>With Claude</strong> (plugin in Claude Code or Cowork): ask in your own words and paste YAML, events or logs. Claude
+   calls kube-noob's tools and explains the results. Your conversation goes to Claude as usual; kube-noob sends
+   nothing.</li>
+<li><strong>With OpenShift Lightspeed or another MCP client</strong>: the same tools, served in your cluster
+   (<a href="/docs/openshift/">openshift.md</a>). That client's model does the talking.</li>
+<li><strong>With no AI at all</strong>: the CLI below. Audits, diagnoses, cited search, lessons and evidence bundles need no model
+   and no network, which suits CI gates and air-gapped clusters.</li>
+</ol>
+<p><code>kube-noob ask</code> is the one optional command that uses a model: one you configure, and only a local one under the
+offline lock.</p>
+<h2 id="learner-or-trainer-practise-kubernetes-objects-offline">Learner or trainer: practise Kubernetes objects offline</h2>
+<p>You write YAML and get graded feedback straight away. The grader uses the same rules as a production review, and it
+knows the platform: an SCC rejection on OpenShift, a storage class on ROSA HCP.</p>
+<pre><code class="language-bash">kube-noob demo learn
+kube-noob learn tracks
+kube-noob learn lesson k8s-101-objects
+kube-noob learn exercise k8s-ex-hardened-deployment
+kube-noob learn submit k8s-ex-hardened-deployment -f my-answer.yaml
+</code></pre>
+<p>The <a href="/docs/learning/">learning guide</a> covers running a class.</p>
+<h2 id="developer-ship-yaml-that-passes-on-openshift-and-rosa-hcp">Developer: ship YAML that passes on OpenShift and ROSA HCP</h2>
+<pre><code class="language-bash">kube-noob demo audit
+kube-noob audit -f k8s/ --platform openshift --version 4.22
+kube-noob fix -f k8s/deployment.yaml --platform openshift -o fixed.yaml
+kube-noob protocol &quot;deploy orders-api&quot; --blueprint examples/blueprint.yaml
+kube-noob helm-chart --name orders-api --namespace shop --image quay.io/acme/orders:1.4.2 --platform rosa-hcp -o charts
+</code></pre>
+<p>To gate pull requests, run <code>kube-noob audit -f k8s/ --fail-on high</code> in CI. It exits 1 on any HIGH or CRITICAL finding.</p>
+<h2 id="sre-or-on-call-diagnose-before-you-change-anything">SRE or on-call: diagnose before you change anything</h2>
+<p>Not sure what you have? <code>insight</code> names it first (events, logs, a denial, manifests, a ticket, a build log, a
+question; several at once), runs every analyser that applies and merges the answer: findings with their source,
+read-only next steps, and what it did not analyse and why. Input with no evidence gets the read-only commands that
+collect some. A document is related reading for a long pasted post only when it shares words with the post beyond
+the name of its subject: every Gatekeeper post says "gatekeeper".</p>
+<pre><code class="language-bash">kube-noob insight -f whatever-you-copied.txt
+oc describe pod web-1 -n shop | kube-noob insight --platform openshift
+kube-noob insight 'why does my pod stay Pending?'
+kube-noob insight -f trace.pcap --format json
+</code></pre>
+<ol>
+<li>Paste events, <code>describe</code> output or logs into <code>diagnose</code>: as quoted text (multi-line is fine; single quotes stop the
+   shell expanding <code>$</code>), as a file with <code>-f</code>, or piped in. An Alertmanager webhook payload works as it is. You get
+   the signals it found (alert names, event and container reasons), the likely cause, then read-only steps (get,
+   describe, logs, events).</li>
+<li>Commands that run inside a container are listed next, and changes come last. Both are marked as needing approval.</li>
+</ol>
+<pre><code class="language-bash">kube-noob demo diagnose
+kube-noob diagnose 'Back-off restarting failed container api in pod api-1'
+kube-noob diagnose -f events.txt
+kube-noob diagnose -f alert.json
+kube-noob signals -f alert.json
+oc get events -n shop --sort-by=.lastTimestamp | kube-noob diagnose
+kube-noob bundle deployment/orders-api -n shop --cluster-enabled
+</code></pre>
+<p>Signals rank the playbooks: a firing <code>etcdHighNumberOfLeaderChanges</code> puts the etcd playbook first even when the
+words differ, and a payload's <code>openshift_version</code> (or <code>version</code>) label, when it names an OpenShift 4 release, picks
+the reported issues for that version. <code>signals</code> (MCP: <code>kubenoob_extract_signals</code>) lists what was found, the alerts the
+words imply ("leader changed"), each catalogue entry's upstream source and the playbooks they point at.</p>
+<p>An ImagePullBackOff whose pull secret sits in another namespace is named for what it is: kubelet's
+<code>FailedToRetrieveImagePullSecret</code> event (or the question in those words) ranks the pull-secret playbook first, with the
+secret and namespace filled in, read-only checks that list Secret names (never values), and the cause the words point
+at shown first with its own fix and steps: a secret in another namespace gets "create or sync it in the pod's
+namespace and link it" and <code>kubectl get secrets -A --field-selector metadata.name=&lt;secret&gt;</code>; only a question that says
+OpenShift and names another project's internal registry gets <code>system:image-puller</code>. The 17 playbooks that answer
+most real posts work this way (cause-linked triage): each cause carries the words that point at it, the read-only
+steps that confirm it and its fixes, and text that never says OpenShift gets <code>kubectl</code> steps. When nothing in the text
+points at one cause, the playbook's most common cause is shown rather than a guess. Plain words name a playbook when
+they are specific to the failure ("my Service has no endpoints", "my pod keeps restarting", "the readiness probe keeps
+failing", "the PVC stays Pending"), and the steps carry the names in what you paste: <code>kubectl get svc web</code> and its
+<code>{.spec.selector}</code> output give <code>kubectl describe svc web</code> and <code>kubectl get pods -l app=web-frontend</code>. <code>audit</code> catches it before deploy
+(KN-C013) when the bundle defines the Secret only in another namespace, and the in-cluster debug reads the pod's and
+its ServiceAccount's pull secret names.</p>
+<pre><code class="language-bash">kube-noob diagnose 'ImagePullBackOff when the pull secret sits in a different namespace from the pod'
+oc describe pod web-7d9c6b9f5-x2k8p -n shop | kube-noob diagnose --platform openshift
+</code></pre>
+<p><code>bundle</code> writes a redacted, read-only evidence pack (<code>bundle.md</code> and <code>bundle.json</code>) that you can attach to a ticket.
+Once a fix is confirmed, save it with <code>kube-noob learning note</code>. The team finds it next time as <code>[kn:local-N#0]</code>.</p>
+<h3 id="does-it-answer-our-problems-test-it-on-them">Does it answer our problems? Test it on them</h3>
+<p><code>kube-noob selftest --cases</code> runs your own problems through the same diagnosis, search, known-issue and audit paths
+the CLI and MCP server use, offline. Start with a plain list of questions (one per line, or multi-line pastes
+separated by <code>---</code>): each is answered and listed for you to label. Add <code>expect</code> (the playbook, documents, issues or
+rules you expect, phrases the answer must or must not mention) and the case becomes a test with a pass or fail.
+YAML, JSONL and CSV (for a spreadsheet export) work too; <code>examples/problems.yaml</code> shows every field.</p>
+<pre><code class="language-bash">kube-noob selftest --cases examples/problems.yaml
+kube-noob selftest --cases our-problems.txt --out problem-report
+kube-noob selftest --cases our-problems.yaml --gate 0.9
+</code></pre>
+<p>kube-noob has no model, so nothing is learned by itself: a failed case is fixed with a playbook, signal, rule or
+team memory entry that is reviewed like any other change, and then guards against regressions.</p>
+<h3 id="is-this-cve-fixed-in-my-openshift">Is this CVE fixed in my OpenShift?</h3>
+<p><code>corpus advisories</code> keeps Red Hat's VEX statements for the products kube-noob covers, so search answers which
+component is fixed by which erratum, which is not affected and why, offline. The public <code>kube-noob-db</code> image carries
+them already.</p>
+<pre><code class="language-bash">kube-noob corpus advisories --online --cves CVE-2023-44487
+kube-noob search 'CVE-2023-44487 openshift haproxy router'
+</code></pre>
+<h3 id="is-this-a-known-bug">Is this a known bug?</h3>
+<p><code>known-issues</code> matches an error or symptom against the issues Red Hat lists in the OpenShift 4.20, 4.21 and 4.22 release
+notes: known issues, and the issues each update fixed. You get the issue link, whether a fix exists and in which
+version, the workaround, and the release-notes file it came from. Pass your version and issues already fixed there are
+left out. <code>diagnose</code> runs the same check, and on a live cluster <code>debug</code> and <code>bundle</code> read the version themselves.
+A match needs several rare words in common, so everyday errors such as OOMKilled never pull in an unrelated bug;
+an error copied word for word from an issue (seven words in a row, one of them rare) is a match on its own.</p>
+<pre><code class="language-bash">kube-noob known-issues 'could not find any suitable subnets for creating the ELB' --version 4.20.8
+kube-noob diagnose -f events.txt --platform openshift --version 4.21.4
+kube-noob corpus known-issues --online
+</code></pre>
+<p>The bundled index is dated (<code>kube-noob doctor</code> prints it, and every MCP result carries <code>knowledgeAsOf</code>);
+<code>corpus known-issues --online</code> refreshes it from the release notes on GitHub.</p>
+<h3 id="what-could-go-wrong-with-this-update">What could go wrong with this update?</h3>
+<p>Red Hat attaches known risks to some OpenShift updates ("conditional updates"): a cluster sees them in
+<code>oc adm upgrade --include-not-recommended</code> when it can reach an update service, and a disconnected cluster only through
+a local OpenShift Update Service. <code>upgrade-risks</code> answers before you start, with no network: it lists the risks declared
+for your update in the public update graph (targets 4.18 and later), with the message, the link and the version that
+fixes each. A risk either applies to every cluster, or one fact decides it (the platform type, whether the cluster is a
+hosted control plane, a ClusterOperator, an enabled capability, a node label, assigned egress IPs) and you get the
+read-only <code>oc</code> command or the must-gather file that shows it, or its PromQL query is shown as written because it
+cannot be evaluated offline. Whether the update is in your channel is not checked.</p>
+<pre><code class="language-bash">kube-noob upgrade-risks --from 4.20.3 --to 4.21.4
+kube-noob upgrade-risks --from 4.18.5 --to 4.19.0 --format json
+</code></pre>
+<p>The snapshot is dated and pinned to an upstream commit (<code>kube-noob doctor</code> prints it);
+<code>scripts/vendor_upgrade_risks.py</code> refreshes it from a clone of openshift/cincinnati-graph-data.</p>
+<h3 id="has-red-hat-seen-this-error-before">Has Red Hat seen this error before?</h3>
+<p>The release notes list only a few hundred issues. Red Hat's public Jira holds every reported ticket, including the ones
+closed as Not a Bug, Won't Do or Duplicate, which often answer the question faster than a fix would. <code>corpus jira</code>
+keeps a local copy of every ticket in the OpenShift, ROSA, ACM and RHACS projects (OCPBUGS, ROX, HOSTEDCP and 25
+more; <code>jira-projects</code> lists them), whatever its status. After that, <code>known-issues</code>, <code>diagnose</code>, <code>debug</code> and the
+incident watch also say what became of each matching ticket:</p>
+<ul>
+<li>fixed, in which release, and whether your version already has the fix ("updating to 4.21.3 or later fixes it");</li>
+<li>open, with a fix merged or proposed;</li>
+<li>closed as Not a Bug (expected behaviour or a configuration issue), Won't Do, Cannot Reproduce, Obsolete, or as a
+  duplicate of another ticket, which is then followed;</li>
+<li>the workaround, cause or "why closed" sentence from the latest comments.</li>
+</ul>
+<p>The copy keeps each ticket's full description and every comment, so you can audit it yourself; commenters appear as
+Commenter A, B and so on (per ticket), and names, emails, phone numbers and account ids are removed.</p>
+<pre><code class="language-bash">kube-noob corpus jira-projects --online
+kube-noob corpus jira --online
+kube-noob known-issues 'x509: certificate signed by unknown authority' --version 4.21.1
+kube-noob ticket OCPBUGS-12345 --version 4.21.1
+</code></pre>
+<p>The copy is read through Jira's REST API, never by scraping its web pages, at one request per second or slower (the
+site's robots.txt asks for that), with a request budget per run (<code>--max-requests</code>, default 600). Each later run
+fetches only what changed and resumes where a budget stopped it; a request returns up to 100 tickets, and OCPBUGS alone
+has keys past 87,000, so the first copy of the default set completes over several runs. Tickets are public but not
+licensed for redistribution: they stay in
+your data directory (<code>corpus/jira-*.jsonl</code> plus a search index in <code>jira/</code>), kube-noob never publishes them, and
+<code>--projects all</code> or <code>--projects OCPBUGS,ROX</code> choose other projects. In the cluster, <code>jira.sync.enabled</code> keeps the copy
+current from the service; offline clusters import a copy built elsewhere with <code>corpus import</code>.</p>
+<h3 id="one-main-copy-for-the-whole-organisation-and-what-changed-since-yesterday">One main copy for the whole organisation, and what changed since yesterday</h3>
+<p>Seal the copy with your own key before it goes into an image, and give pods the key from a Secret: a new pod answers
+ticket questions from its first minute with no Jira egress, and a wrong key imports nothing and says so. The
+<code>jira-db-image</code> workflow does this after every refresh and refuses a public repository.</p>
+<pre><code class="language-bash">openssl rand -base64 32 &gt; seed.key
+kube-noob corpus jira-snapshot -o jira-snapshot.tgz
+kube-noob corpus seal jira-snapshot.tgz -o jira-snapshot.tgz.enc --key-file seed.key
+kubectl create secret generic kn-seed-key --from-file=key=seed.key
+helm upgrade --install kube-noob deploy/helm/kube-noob --set jira.seed.source=image --set jira.seed.image.repository=quay.io/acme/kube-noob-db-jira --set jira.seed.image.digest=sha256:&lt;digest&gt; --set jira.seed.path=/seed/jira-snapshot.tgz.enc --set jira.seed.keySecret.name=kn-seed-key --set config.offline=true
+</code></pre>
+<p>Nobody should wait hours for a first sync. Keep one main copy, refresh it daily (or every two days), and start every
+other install from it:</p>
+<pre><code class="language-bash">kube-noob corpus jira --online
+kube-noob corpus jira-snapshot -o jira-snapshot.tgz
+kube-noob corpus import jira-snapshot.tgz
+</code></pre>
+<p>The snapshot holds the tickets, the sync state and the change log; an install that imports it answers at once and its
+own sync (if any) only fetches what changed since. A brand-new copy fetches each project's open tickets first, so the
+tickets people reconcile arrive in the first run. Every sync records what moved, and reconciliation reads it offline:</p>
+<pre><code class="language-bash">kube-noob corpus jira-changes --since 1d
+kube-noob corpus jira-changes --since 2026-10-25 --project OCPBUGS --kind fixed --kind reopened
+</code></pre>
+<p>You get the tickets fixed (and in which versions), closed as not a bug, won't fix or duplicate, reopened, given a fix
+version or opened, each with its link, and the open tickets per project and verdict. Over MCP the same is the
+<code>kubenoob_ticket_changes</code> tool. <code>kube-noob corpus jira-audit</code> shows what the copy holds: tickets per project and
+verdict, comments kept against what Jira reported, tickets cut at the size cap or still in the older format, key
+coverage, size, sync state, what the anonymiser replaced, and a self-check that no email, account id or profile link
+is left (the daily workflow fails if one is).</p>
+<p>The <code>corpus-refresh</code> workflow keeps the main copy in GitHub Actions: daily at 05:17 UTC (set the repository variable
+<code>JIRA_EVERY_DAYS</code> to <code>2</code> for every two days), continuing the previous run's copy, with the changes and open tickets in
+the run summary, and the new copy uploaded only encrypted with your <code>CORPUS_PASSPHRASE</code>. In OpenShift, put the
+snapshot in a private image and set <code>jira.seed</code> so every new pod starts from it (an init container copies it; the
+image needs <code>cp</code> and must run as non-root):</p>
+<pre><code class="language-bash">gh run download &quot;$(gh run list --repo aashishmahajan/kube-noob --workflow corpus-refresh.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')&quot; --repo aashishmahajan/kube-noob -n jira-main-copy-encrypted -D seed
+openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in seed/jira-snapshot.tgz.enc -out seed/jira-snapshot.tgz -pass env:CORPUS_PASSPHRASE
+printf 'FROM registry.access.redhat.com/ubi9/ubi-micro:latest\nCOPY --chmod=0444 jira-snapshot.tgz /seed/jira-snapshot.tgz\nUSER 1001\n' &gt; seed/Containerfile
+podman build -t registry.example.com/platform/kube-noob-jira-seed:2026-10-28 seed
+podman push registry.example.com/platform/kube-noob-jira-seed:2026-10-28
+helm upgrade --install kube-noob deploy/helm/kube-noob --reuse-values --set jira.seed.source=image --set jira.seed.image.repository=registry.example.com/platform/kube-noob-jira-seed --set jira.seed.image.tag=2026-10-28
+</code></pre>
+<p><code>jira.seed.source: pvc</code> reads the snapshot from a read-only claim instead. Keep the image, bucket or volume private:
+the tickets are public but not licensed for redistribution.</p>
+<h3 id="what-is-in-this-must-gather-opening-one-safely">What is in this must-gather? Opening one safely</h3>
+<p>A must-gather from a customer or another team is untrusted input. <code>must-gather analyze</code> reads the directory, or the
+<code>.tar.gz</code> that <code>tar cvaf</code> made of it, without extracting anything or running anything: an archive member with an
+absolute path or <code>..</code> refuses the whole archive, links and device files are never followed, nested archives (audit
+logs) are listed and not opened, and files named like Secrets are never read. It says which gather images wrote
+what, for which version (<code>version</code>) and when (<code>timestamp</code>), and how many resources, namespaces, pods and logs each
+holds.</p>
+<p>Then it says what is wrong, most severe first: a Failing or unavailable cluster version and an update that stopped
+partway, cluster operators that are not Available or are Degraded, NotReady nodes (control-plane first) and node
+pressure, degraded machine config pools, failed OLM operators, pods that cannot start (CrashLoopBackOff with the last
+error line from the container's log, image pull errors, OOM kills, Unschedulable), warning events by reason, and
+etcd's slow-disk and leader-election lines. Each finding names the file it came from, the signals it carries (the
+same keys known-issue and memory matching use) and read-only commands to confirm it on the live cluster. A plain
+<code>oc adm inspect</code> output works too; whatever was not collected is listed.</p>
+<pre><code class="language-bash">oc adm must-gather
+tar cvaf must-gather.tar.gz must-gather.local.*/
+kube-noob must-gather analyze must-gather.tar.gz
+kube-noob must-gather analyze must-gather.tar.gz --fail-on critical
+kube-noob --format json must-gather analyze must-gather.local.5421342344627712289/
+</code></pre>
+<p>Before you open a case, <code>--report</code> writes <code>report.md</code> and <code>report.json</code> with every finding matched to the known
+OpenShift bugs for the version the cluster runs (and to your team's approved memory entries), and <code>--case-draft</code>
+adds <code>case-draft.md</code>: environment, update history, evidence files, matched bugs and the read-only checks to paste,
+with a <code>[FILL IN: ...]</code> for everything only you know. <code>kube-noob demo must-gather</code> shows the whole flow offline.</p>
+<pre><code class="language-bash">kube-noob must-gather analyze must-gather.tar.gz --report case-01 --case-draft
+kube-noob demo must-gather
+</code></pre>
+<p>From an MCP client, <code>kubenoob_analyze_must_gather</code> takes the must-gather's path. The local server reads any path
+you give it; a shared server on OpenShift reads only the must-gathers on the claim you mount
+(<code>mustGather.pvc.claimName</code>).</p>
+<pre><code class="language-bash">helm upgrade --install kube-noob deploy/helm/kube-noob --reuse-values --set mustGather.pvc.claimName=case-files
+</code></pre>
+<pre><code class="language-text">OpenShift 4.20.3; updating to 4.20.4; platform AWS; 1/2 nodes Ready; 2/3 cluster operators Available, 1 Degraded
+findings: 2 critical, 8 high, 10 medium, 2 low, 2 info
+  CRITICAL clusterversion: the cluster version operator reports Failing [ClusterOperatorDegraded]
+  CRITICAL clusteroperators: cluster operator image-registry is not Available [NoReplicasAvailable]
+  HIGH     pods: shop/ReplicaSet/web-6b8f9: container web: CrashLoopBackOff (2 pods), 14 restarts
+           log: Error: connect ECONNREFUSED 10.0.0.5:5432
+           next: oc describe pod -n shop web-7d9f
+  MEDIUM   etcd: etcd logged &quot;slow fdatasync&quot; 1 time(s) on 1 member(s)
+</code></pre>
+<h3 id="why-was-this-denied">Why was this denied?</h3>
+<p><code>policy explain</code> reads a denial and explains it policy by policy: Kyverno, OPA Gatekeeper, ValidatingAdmissionPolicy,
+Pod Security Admission, OpenShift SCC, RHACS, ResourceQuota, LimitRange and RBAC. You get the policy and rule, the
+field that failed, read-only commands with the names filled in, the change that satisfies the policy (a ready patch
+for Pod Security and RBAC, scoped to exactly the missing permission) and the audit rules that would have caught it
+before deploy. Exceptions, quota increases and new permissions are marked as the policy owner's decision. <code>diagnose</code>,
+<code>debug</code> and <code>bundle</code> add the same explanation when a denial is in the text.</p>
+<pre><code class="language-bash">kubectl apply -f deploy.yaml 2&gt;&amp;1 | kube-noob policy explain
+kube-noob policy explain -f examples/events-scc.txt --platform openshift
+</code></pre>
+<h3 id="can-pod-a-reach-pod-b">Can pod A reach pod B?</h3>
+<p><code>policy reach</code> evaluates all three network policy tiers the way the cluster does: egress from the source and
+ingress to the destination must both allow the port, and each direction runs through <code>AdminNetworkPolicy</code>, then the
+namespace's NetworkPolicies, then <code>BaselineAdminNetworkPolicy</code>. The two cluster-scoped tiers are why the answer
+needs them: an ANP <code>Deny</code> blocks traffic every NetworkPolicy in the namespace allows, and a BANP decides the traffic
+no NetworkPolicy selects. Each verdict names the tier, the policy and the rule that decided it, says for every other
+rule whether the peer or the port did not match, and proposes the smallest NetworkPolicy that would allow the
+traffic. It exits 1 when the traffic is denied, so CI can assert the paths an application needs. <code>--live</code> reads the
+policies, both admin tiers, namespace labels and workloads from the cluster (read-only); a cluster without the
+<code>network-policy-api</code> CRDs is a note, not a failure. EgressFirewall and CNI-specific policies are listed as not
+evaluated.</p>
+<pre><code class="language-bash">kube-noob policy reach --from web/frontend --to shop/orders-api --port 8080 -f examples/netpol-shop.yaml
+kube-noob policy reach --from shop/orders-api --to shop/payments --port 9090 -f examples/netpol-shop.yaml
+kube-noob policy reach --from web/frontend --to shop/orders-api --port 8080 -f examples/netpol-admin-tiers.yaml
+kube-noob policy reach --from shop/orders-api --to shop/payments --port grpc --live --cluster-enabled
+</code></pre>
+<h3 id="what-did-we-learn-last-time">What did we learn last time?</h3>
+<p><code>memory</code> keeps your team's fixes as code: one reviewed YAML file per lesson in a repository you own
+(<code>entries/MEM-&lt;n&gt;.yaml</code>), with the signals it shows, the cause, the fix and what happened each time someone applied it.
+<code>memory match</code> puts the entries next to the playbooks: signals first (an alert name in a payload), then distinctive
+words. Fixes come first, then runbooks, then what was tried and did not work; an entry whose fix is already in your
+version shows as retired. Each match says how often it was applied and how often it resolved the problem.</p>
+<pre><code class="language-bash">kube-noob memory init team-memory
+kube-noob memory add team-memory --symptom &quot;etcd leader changes after the update&quot; --cause &quot;catalog sync I/O&quot; --fix &quot;update to 4.21.1&quot; --signal alert:etcdHighNumberOfLeaderChanges --platform openshift
+kube-noob memory validate team-memory
+kube-noob memory match -f alert.json --dir team-memory --version 4.21.0
+kube-noob memory outcome team-memory MEM-1 --result resolved --ticket INC-4211 --cluster prod-east
+kube-noob demo memory
+</code></pre>
+<p><code>validate</code> is the guard against a poisoned entry, and <code>init</code> writes a CI workflow that runs it on every pull request:
+every patch is validated, audited and red-teamed, commands must carry the classifier's labels, and grants of the
+privileged SCC, cluster-admin, hostPath or wildcard RBAC fail unless the entry records who accepted the risk and why.
+<code>add</code> writes a proposed entry and never commits; <code>migrate-learning</code> turns confirmed learning notes into proposed
+entries, and <code>import --from servicenow-json|servicenow-csv|jira-json|jira-csv -f export</code> turns resolved tickets into
+proposed entries with their outcomes, without the people in them. <code>replay</code> answers whether that memory would have
+helped: it replays later tickets in order, without hindsight, and reports hits, misses and, with your labels,
+how many matches were useful (the gate is 30%). kube-noob reads the repository where it runs and never uploads, bundles or exports it.</p>
+<p>Set <code>memory.paths</code> (or <code>KUBE_NOOB_MEMORY_PATHS</code>) and <code>diagnose</code>, <code>known-issues</code>, <code>debug</code> and <code>bundle</code> add the
+matching approved entries to every answer, cited as <code>[mem:MEM-&lt;n&gt;]</code>. Over MCP, <code>kubenoob_memory_match</code> searches
+them and <code>kubenoob_memory_propose</code> turns a fix the user confirmed into an entry; only a local stdio server saves
+it (as proposed, after the user asks), and the HTTP server never writes.</p>
+<h3 id="always-on-the-incident-watch">Always on: the incident watch</h3>
+<p><code>watch</code> polls your namespaces read-only (pods, events, deployments, replicasets; never Secrets) and turns what it sees
+into incidents: crash loops, OOM kills, image pulls, container config errors, pods that cannot be created (with the
+policy that denied them), scheduling, mount and probe failures, stuck rollouts and evictions. Each new incident is
+explained once (playbook, policy denial, reported OpenShift bug) and gets a "what changed" note when it started soon
+after a rollout ("started 4 min after the rollout to revision 2: image 2.7.0 -&gt; 2.7.1; memory limit 256Mi -&gt; 128Mi").</p>
+<p>The incident ledger is its memory: how often each incident came back, how long each one lasted, and the fix your team
+confirmed, which comes back with the next occurrence and with the same problem in other workloads. Claude or
+Lightspeed read it through <code>kubenoob_incidents</code>; in the cluster, set <code>watch.enabled</code> in the chart.</p>
+<pre><code class="language-bash">kube-noob --cluster-enabled watch -n shop -n payments
+kube-noob --cluster-enabled watch -n shop --once
+kube-noob incidents
+kube-noob incidents show inc-3fa94c0e12
+kube-noob incidents confirm inc-3fa94c0e12 --cause &quot;memory limit cut to 128Mi&quot; --fix &quot;restored the 256Mi limit&quot;
+</code></pre>
+<h3 id="what-does-this-ceph-health-code-mean-rook-ceph-and-openshift-data-foundation">What does this Ceph health code mean? Rook-Ceph and OpenShift Data Foundation</h3>
+<p>Paste <code>ceph health detail</code>, <code>ceph status</code> (text or <code>-f json</code>), a CephCluster's status or a firing Rook or ODF alert
+into <code>kube-noob insight</code>. Each health code gets what it means, the likely causes, the fix in words and the read-only
+steps that confirm it: the CephCluster status first (no shell needed), then the Ceph commands to run in the Rook
+toolbox, which need approval because they execute in a container. On ODF the steps use <code>oc</code> and <code>openshift-storage</code>;
+on Rook they use <code>kubectl</code> and <code>rook-ceph</code>. When the usual fix can lose data (unfound objects, inconsistent placement
+groups, lost monitor quorum, full OSDs), the answer says to stop and involve storage support, and kube-noob never
+offers the destructive command. ODF alerts that only say "contact support" come with the evidence to collect first.</p>
+<pre><code class="language-bash">oc get cephcluster -n openshift-storage -o jsonpath='{.status.ceph.details}' | kube-noob insight -f -
+kube-noob insight -f ceph-health-detail.txt --platform openshift
+</code></pre>
+<h2 id="platform-admin-run-it-inside-the-cluster-locked-down">Platform admin: run it inside the cluster, locked down</h2>
+<pre><code class="language-bash">kube-noob demo posture
+helm install kube-noob deploy/helm/kube-noob --set auth.existingSecret=kube-noob-token --set config.offline=true
+kube-noob doctor
+</code></pre>
+<p><code>config.offline=true</code> (or <code>KUBE_NOOB_OFFLINE=1</code>) is an admin lock:</p>
+<ul>
+<li>no web, no corpus downloads, and local models only;</li>
+<li>nothing later in the config chain can lift it;</li>
+<li>the chart refuses to render if web access is also requested.</li>
+</ul>
+<p>Start answering from day one without any egress: the public <code>kube-noob-db</code> image carries the documentation corpus
+(with its licenses), release history and known issues, rebuilt daily and checked to hold no Jira data. Pin it by
+digest; pods import it on start when it is newer than what they have.</p>
+<pre><code class="language-bash">cosign verify ghcr.io/aashishmahajan/kube-noob-db@sha256:&lt;digest&gt; --certificate-identity-regexp https://github.com/aashishmahajan/kube-noob/ --certificate-oidc-issuer https://token.actions.githubusercontent.com
+helm upgrade --install kube-noob deploy/helm/kube-noob --set db.enabled=true --set db.image.digest=sha256:&lt;digest&gt; --set config.offline=true
+kube-noob corpus db-check kube-noob-db.tgz
+</code></pre>
+<p><code>doctor</code> prints what the process can reach and exits 1 if the configuration contradicts the lock. To add kube-noob
+as a tool in OpenShift Lightspeed, or to run it as a sidecar, follow <a href="/docs/openshift/">openshift.md</a>. Index your own
+runbooks with <code>kube-noob corpus add-docs &lt;folder&gt; --source platform-runbooks</code>, and prove the answers on your
+machine with <code>kube-noob selftest</code>.</p>
+<h2 id="build-from-a-failed-build-to-the-fix">Build: from a failed build to the fix</h2>
+<p><code>build diagnose</code> reads the log your CI system already wrote: GitHub Actions (<code>gh run view &lt;id&gt; --log-failed</code>),
+Jenkins (the console), Tekton (<code>tkn pipelinerun logs &lt;run&gt;</code>) or an OpenShift build (<code>oc logs build/&lt;name&gt;</code>). It names
+the failing step and why it is that step (the step with <code>##[error]</code>, the stage that ran before the skipped ones, the
+task that <code>tkn</code> reports failed, the STEP buildah stopped at), the error line and its template, the cause class
+(dependency fetch, compile, test, image push, registry auth, quota, timeout, out of memory, permissions), reported
+issues and team memory for the error lines, and the fix for that system (a BuildConfig push secret, a Tekton step's
+<code>computeResources</code>, <code>timeout-minutes</code>). Quoted lines are redacted.</p>
+<pre><code class="language-bash">gh run view 1234567890 --log-failed &gt; build.log
+kube-noob build diagnose -f build.log --format text
+oc logs build/web-7 -n shop | kube-noob build diagnose -f - --platform openshift --version 4.20
+</code></pre>
+<p><code>build audit</code> checks a Containerfile before it is built and the image after: base images pinned by digest, a
+non-root <code>USER</code> (on OpenShift: group 0 owns what it writes), no credentials in <code>ENV</code>, <code>ARG</code>, <code>LABEL</code>, <code>RUN</code> or copied
+files, no download piped into a shell, package caches cleaned, a health check or the workload's probes, a multi-stage
+build. With <code>--context</code> it lists the credential files <code>COPY . .</code> would take; with <code>--image-layout</code> it reads the built
+image from disk (no pull, no extraction) and finds credentials in its layers, including one a later layer deleted,
+and in its config and history. Values are never printed, only the kind and where.</p>
+<pre><code class="language-bash">kube-noob build audit -f Containerfile --context . --manifests k8s/deployment.yaml
+skopeo copy docker://quay.io/acme/web:1.8.0 oci:/tmp/web-oci:1.8.0
+kube-noob build audit -f Containerfile --image-layout /tmp/web-oci --fail-on high
+</code></pre>
+<h3 id="gate-a-release-before-it-deploys">Gate a release before it deploys</h3>
+<p><code>gate</code> is one command for CI: the audit rules over manifests and rendered charts, the exception list, whether each
+finding would be refused by the generated admission policy in enforce mode, open reported issues in the target
+OpenShift release that name a kind you deploy, and the Containerfile checks. It exits 1 at <code>--fail-on</code> and writes
+SARIF (GitHub code scanning), a Markdown summary and GitLab code quality JSON. Findings in a rendered chart point at
+the template file.</p>
+<pre><code class="language-bash">kube-noob gate --chart deploy/helm/shop --values deploy/helm/shop/values-prod.yaml --containerfile Containerfile \
+  --platform openshift --version 4.20 --exceptions kube-noob-exceptions.yaml --sarif kube-noob.sarif \
+  --summary kube-noob-summary.md
+</code></pre>
+<p>GitHub Actions (add <code>github/codeql-action/upload-sarif</code> after it to see findings in code scanning):</p>
+<pre><code class="language-yaml">- uses: aashishmahajan/kube-noob@&lt;tag&gt;
+  with:
+    chart: deploy/helm/shop
+    values: deploy/helm/shop/values-prod.yaml
+    containerfiles: Containerfile
+    platform: openshift
+    version: &quot;4.20&quot;
+</code></pre>
+<p>With the images' scanner output (<code>--scanner-report</code>, plus <code>--vex</code> and <code>--kev</code>), the gate also lists their
+vulnerabilities after Red Hat VEX, ranked against the manifests; a fixable or known-exploited one at <code>--fail-on</code>
+fails it, an unfixable one is reported without blocking.</p>
+<pre><code class="language-bash">trivy image -f json --list-all-pkgs -o trivy.json quay.io/acme/shop:1.4
+kube-noob gate -f k8s/ --platform openshift --version 4.20 --scanner-report trivy.json \
+  --kev known_exploited_vulnerabilities.json --sarif kube-noob.sarif
+</code></pre>
+<p>Tekton: <code>oc apply -f deploy/tekton/kube-noob-gate.yaml</code>, then a pipeline task with <code>taskRef: {name: kube-noob-gate}</code>,
+the source workspace and <code>params: [{name: paths, value: k8s}]</code>. GitLab: include
+<code>deploy/gitlab/kube-noob-gate.gitlab-ci.yml</code> and extend <code>.kube-noob-gate</code> with <code>KUBE_NOOB_PATHS</code>; findings show in
+the merge request through the code quality report.</p>
+<h3 id="which-tests-are-flaky-and-which-steps-got-slower">Which tests are flaky, and which steps got slower?</h3>
+<p><code>build analytics</code> reads a CI history on disk: one folder per run with <code>run.json</code> (the run, its jobs and steps, as the
+GitHub Actions API or <code>gh run view --json</code> writes it), the run's JUnit XML reports and, for failed runs, the build
+log. It lists the flaky tests (passed and failed on the same commit, or failed then passed on a rerun within a run),
+tests that fail without being flaky, commits with both a failed and a successful run, each step's mean, median, p90
+and maximum with its trend (newest half against oldest half), and the failure classes per week.</p>
+<pre><code class="language-bash">kube-noob build analytics --history ci-history/ --format text
+GITHUB_TOKEN=&lt;token&gt; kube-noob --config ci.yaml build history --github acme/shop --workflow ci.yml -o ci-history
+</code></pre>
+<p><code>build history</code> needs <code>ci.githubEnabled: true</code> and reads only: every attempt of every run, with a random pause between
+requests. GitHub serves test reports and logs from another host, so add them with <code>gh run download &lt;run-id&gt; -D
+ci-history/run-&lt;run-id&gt;-&lt;attempt&gt;</code> for flaky-test analysis.</p>
+<h2 id="security-policy-aligned-reviews-and-red-team-scenarios">Security: policy-aligned reviews and red-team scenarios</h2>
+<p>Each audit finding maps to the RHACS (StackRox) policy that would fire. <code>redteam</code> shows how an attacker would use a
+bundle: escape paths, lateral movement, credential exposure.</p>
+<pre><code class="language-bash">kube-noob redteam -f k8s/ --platform openshift
+kube-noob explain KN-S004
+</code></pre>
+<h3 id="what-does-rhacs-check-that-kube-noob-does-not-and-the-other-way-round">What does RHACS check that kube-noob does not, and the other way round?</h3>
+<p><code>rhacs compare</code> maps every RHACS policy (export them from the RHACS portal with Export policy to JSON, or
+<code>POST /v1/policies/export</code>) to kube-noob's rules, by the default policy names each rule cites and by the
+policy's criteria, and gives each one outcome with the reason. Overlap names the rules and any difference in severity
+or scope (RHACS scopes a policy by namespace; kube-noob checks every object). Related means the same risk seen another
+way: RHACS records who exec'd into a pod, kube-noob checks who is allowed to (KN-S017); RHACS combines a privileged
+container with fixable CVEs, kube-noob checks the privileged part. Gap names a deploy-time setting kube-noob has no
+rule for. Outside is what a static manifest check cannot see: image contents and vulnerabilities, processes and
+network flows at runtime, API events, label conventions. The report also lists where the two disagree, the default
+policies RHACS ships disabled that kube-noob checks, and the kube-noob rules no policy covers. A policy with
+criteria kube-noob does not know is unexplained and the command exits 1.</p>
+<pre><code class="language-bash">kube-noob rhacs compare -f policies.json --format text
+kube-noob rhacs compare -f policies.json --format text --outcome gap --outcome related
+ROX_API_TOKEN=&lt;token&gt; kube-noob --config rhacs.yaml rhacs compare --live
+</code></pre>
+<p><code>--live</code> reads Central with <code>rhacs.enabled: true</code> and <code>rhacs.endpoint</code> in the configuration: GET only, to that host
+only, a token that can read policies (the Analyst role is enough), a short random pause between requests; under the
+offline lock only an in-cluster Central (<code>*.svc</code>).</p>
+<h3 id="which-exposure-leads-where-attack-paths">Which exposure leads where? Attack paths</h3>
+<p><code>posture scan</code> follows what is exposed (a Route, an Ingress, a LoadBalancer, NodePort or externalIPs Service) to the
+pods it reaches and what an attacker running code in them could do: take the node (a privileged container, a
+hostPath volume, the host's PID or network namespace, near-root capabilities) or use the pod's ServiceAccount token
+(read Secrets, exec into pods, create workloads that run as any ServiceAccount of the namespace, escalate, bind or
+impersonate, the kubelet API, or on OpenShift a privileged SCC plus the right to create pods). Each path scores
+exposure (internet 3, node network or a restricted load balancer 2, internal 1) times blast radius (1-10, cluster-wide
+above one namespace), lists every step with the field that proves it, and ends with a fix. A pod with
+<code>automountServiceAccountToken: false</code> has no token step; unexposed pods are not paths. It reads RBAC objects, never
+Secrets (Secret objects in a bundle are dropped unread). <code>--fail-above</code> makes it a CI gate. NetworkPolicies on the
+entry edge are not applied: check a path with <code>policy reach</code>.</p>
+<pre><code class="language-bash">kube-noob posture scan -f k8s/
+kube-noob posture scan -f k8s/ --fail-above 17
+kube-noob --cluster-enabled posture scan --live -n shop -n payments
+</code></pre>
+<h3 id="which-vulnerabilities-matter-here-scanner-output-vex-and-reachability">Which vulnerabilities matter here? Scanner output, VEX and reachability</h3>
+<p><code>vuln report</code> reads what your scanner already wrote: Trivy or Grype JSON, a CycloneDX or SPDX SBOM, or an RHACS
+image scan. Every format gives the same finding per package, installed version, CVE and fix version. Red Hat VEX
+then removes what Red Hat says does not affect the image's product (or is already fixed in the installed version),
+and each removed finding cites the statement, its justification and the VEX document. SBOMs carry packages, not
+findings: their RPMs are matched against the same VEX statements. With the CISA KEV catalog (CC0) and the manifests
+that run the images, findings are ranked by base score x exposure (internet 3, node network 2, internal 1) x
+privileges (1 + the workload's blast radius / 10) x known exploitation (2 when listed), each with its attack path.</p>
+<pre><code class="language-bash">kube-noob corpus advisories --online --since 2026-10-01
+trivy image -f json --list-all-pkgs -o trivy.json quay.io/acme/shop:1.4
+kube-noob vuln report -r trivy.json -m k8s/ --kev known_exploited_vulnerabilities.json
+kube-noob vuln report -r sbom.spdx.json --vex csaf_vex/ --format json
+ROX_API_TOKEN=&lt;token&gt; kube-noob --config rhacs.yaml vuln report --rhacs-image sha256:&lt;digest&gt; -m k8s/
+</code></pre>
+<p>VEX for RHEL speaks about Red Hat RPMs only; Python, Java and JavaScript packages keep the scanner's verdict, and the
+output says how many were outside VEX. A vendor's own RPM (nginx.org's <code>1.26.1-2.el9.ngx</code>) is not Red Hat's build,
+so Red Hat's statements leave it alone. A module stream's statement (<code>nodejs:18</code>) applies to that stream only, and
+when statements for one package disagree the finding stays. RHACS and Trivy without <code>--list-all-pkgs</code> name binary
+packages only; give the image's SBOM too so not-affected statements, which name source RPMs, can match.</p>
+<p>Reports of the same image (same digest or image id, or the same tag and the same RHEL release) are assessed
+together; two images never share VEX scoping. A finding with no severity in the report is graded by its CVSS score,
+or medium without one, and a known-exploited one counts as at least high, so it cannot slip past <code>--fail-on</code>. A
+CycloneDX report's own analysis (<code>not_affected</code>, <code>resolved</code>) does not clear its findings unless you pass
+<code>--trust-report-vex</code>: whoever wrote the report could otherwise empty it. <code>--product</code> takes CPE prefixes down to a
+release (<code>cpe:/o:redhat:enterprise_linux:9</code>), so RHEL 8 statements never speak for a RHEL 9 image.</p>
+<h3 id="which-code-findings-matter-sast-output-the-images-that-ship-it-and-the-pods-that-run-it">Which code findings matter? SAST output, the images that ship it and the pods that run it</h3>
+<p><code>code report</code> reads the SARIF your SAST tools already write: Semgrep, Bandit, SpotBugs with FindSecBugs, ESLint and
+CodeQL (kube-noob has no analysis engine of its own). The same file, line and CWE reported by several tools becomes
+one finding with every tool as a source; suppressed results, results the baseline says are fixed and non-failing
+results are excluded with the reason, and lint or quality results are counted but never ranked. Severity comes from
+the tool's <code>security-severity</code> score (bands as GitHub code scanning uses them), Bandit's issue severity, or the SARIF
+level.</p>
+<p>With the Containerfiles (<code>-c PATH=IMAGE[,context=DIR][,target=STAGE]</code>; the context defaults to the Containerfile's
+directory, so <code>docker build -f deploy/Containerfile .</code> is <code>-c deploy/Containerfile=IMAGE,context=.</code>), each file is
+followed into the images that ship it: copied (with its path in the image) or built (an input of a stage the final
+image copies from or builds on, including sources bind-mounted with <code>RUN --mount=type=bind</code>), and the
+<code>&lt;Containerfile&gt;.dockerignore</code> or the context's <code>.dockerignore</code> is honoured. Containerfiles are read the way
+BuildKit reads them (a byte order mark, tabs, heredocs only in RUN, COPY and ADD; COPY wildcards that never cross
+<code>/</code>). With
+the manifests, findings rank by exposure and privileges like image vulnerabilities, each with its attack path, so an
+SQL injection behind a Route ranks above the same weakness in an internal worker, and a finding in <code>tests/</code> that no
+image ships is listed apart. With the images' scanner reports (<code>-r</code>), every language-package vulnerability points at
+the line to change: the lockfile the image copied, and the manifest that declares the package.</p>
+<pre><code class="language-bash">semgrep --config auto --sarif -o semgrep.sarif
+bandit -r web -f sarif -o bandit.sarif
+kube-noob code report -s semgrep.sarif -s bandit.sarif -s codeql.sarif \
+  -c web/Containerfile=quay.io/acme/shop-web -c worker/Containerfile=quay.io/acme/shop-worker \
+  -m deploy/ -r trivy-web.json --source-root &quot;$GITHUB_WORKSPACE&quot; --fail-on high
+kube-noob gate -f deploy/ --containerfile web/Containerfile --sarif-report semgrep.sarif --fail-on high
+kube-noob gate --containerfile deploy/Containerfile,context=. --sarif-report codeql.sarif --fail-on high
+</code></pre>
+<p>Bandit writes SARIF with its <code>sarif</code> extra (<code>pip install "bandit[sarif]"</code>), ESLint with
+<code>@microsoft/eslint-formatter-sarif</code>, SpotBugs with <code>-sarif</code>, CodeQL with <code>codeql database analyze --format=sarif-latest</code>.
+Pass <code>--source-root</code> with the directory the tools ran in when their SARIF has absolute paths (ESLint always writes
+them; SpotBugs names its source directories). In the gate, a finding fails the build only when one of the gate's
+Containerfiles ships its file, or when shipping cannot be known: a path outside the source root, a path that is no
+file of the repository (the scanner ran in a subdirectory), or a Containerfile that could not be read as a build.
+Those fail closed and say why.</p>
+<h3 id="what-could-go-wrong-with-this-application-a-threat-model">What could go wrong with this application? A threat model</h3>
+<p><code>vuln threat</code> builds a STRIDE threat model per application (workloads sharing <code>app.kubernetes.io/part-of</code>, else a
+namespace): entry points (Routes, Ingresses, exposed Services), trust boundaries (internet to cluster, pod to node,
+pod to the API through its token, the namespace network), data stores (StatefulSets, PVCs, database and cache
+images) and identities (the mounted ServiceAccounts and their RBAC). Each threat has a status (open with the failing
+rules as evidence, mitigated, or not assessed), the kube-noob rules, generated admission policies and RHACS policies
+that mitigate it, and MITRE ATT&amp;CK for Containers technique ids. With <code>-r</code>, public-facing exploits are assessed from
+the images' scanner reports.</p>
+<pre><code class="language-bash">kube-noob vuln threat -f k8s/ --platform openshift --version 4.20
+kube-noob vuln threat -f k8s/ -r trivy.json --format json
+</code></pre>
+<h3 id="move-off-legacy-kyverno-policies-before-120">Move off legacy Kyverno policies before 1.20</h3>
+<p>Kyverno 1.19 deprecated ClusterPolicy, Policy, the cleanup
+policies and the legacy PolicyException, and 1.20 removes them. <code>kube-noob policy migrate-check -f policies/</code> reads
+your policies and says, rule by rule, what moves to the CEL types and how. A rule is <code>direct</code> when a
+<code>validationFailureAction: Enforce</code> becomes <code>validationActions: [Deny]</code> or a label pattern becomes a CEL check. It is
+<code>inverted</code> when a <code>deny</code> must be rewritten as the allowed case. It is <code>manual</code> for JMESPath, API lookups, anchors or
+strategic merge patches, and <code>blocked</code> when Kyverno documents no CEL equivalent, such as <code>sum()</code> or manifest
+validation. Each finding points at the line and the Kyverno documentation section. With <code>-o migration/</code> it writes a
+draft CEL policy for each rule that maps directly, plus a <code>kyverno test</code> skeleton that runs the old rule and the draft
+on the same good and bad resources; run <code>kyverno test migration/</code> and keep a draft only when both pass. In CI,
+<code>--fail-on blocked</code> stops a pipeline that still depends on something CEL cannot do. Nothing is applied: kube-noob
+lints, your Kyverno CLI proves.</p>
+<pre><code class="language-bash">kube-noob policy migrate-check -f policies/
+kube-noob policy migrate-check -f policies/ -o migration/ --fail-on blocked
+</code></pre>
+<h3 id="what-changed-since-yesterday-the-daily-drift-and-policy-report">What changed since yesterday? The daily drift and policy report</h3>
+<p><code>posture snapshot</code> records every watched object (workloads, Services, Routes, Ingresses, NetworkPolicies, RBAC,
+SCCs, PDBs, HPAs, ConfigMaps, StorageClasses, claims and namespaces) as a hash of its desired state plus a short hash
+per field, and today's findings with each object's owner (its <code>owner</code> or <code>team</code> label, else its namespace's). No
+values are kept. <code>posture diff</code> compares two snapshots: objects added, removed and changed with the fields that
+changed, findings new and fixed, and open findings by namespace, owner and rule. Scaling, status, server-set
+metadata and the ReplicaSets and pods a controller makes are not drift. <code>posture report</code> does both in one step and
+keeps the newest snapshots and reports (JSON and Markdown) in a folder; <code>serve</code> with <code>posture.reportEnabled</code> (chart:
+<code>posture.report.enabled</code>) writes one a day at a random time, and the MCP tool <code>posture_report</code> returns the newest.
+Excepted findings (<code>--exceptions</code>) are not counted open.</p>
+<pre><code class="language-bash">kube-noob posture snapshot -f k8s/ -o monday.json
+kube-noob posture diff monday.json tuesday.json --markdown drift.md
+kube-noob --cluster-enabled posture report --live -n shop --exceptions kube-noob-exceptions.yaml
+</code></pre>
+<h3 id="accept-a-risk-on-purpose-exceptions-as-code">Accept a risk on purpose: exceptions as code</h3>
+<p>An exception is a file entry, reviewed by pull request like the manifests: the rule, the objects it covers (a
+namespace, or a prefix such as <code>team-*</code>, optionally a kind and a name pattern; a cluster-scoped object by kind and
+exact name), who owns it, why, and when it expires (at most 400 days ahead). <code>kube-noob audit --exceptions</code> hides
+exactly the findings an active exception covers and lists them as excepted with the owner and expiry; the same rule on
+any other object still fails. An expired entry, or one refused for a missing owner or reason, an unknown rule, a scope
+wider than a namespace or an expiry too far out, fails the gate (exit 1) with the reason. Exceptions nothing uses are
+reported so they can be deleted. <code>policy generate --exceptions</code> turns the active entries into exemptions in their
+rule's admission policy, including the ReplicaSets and pods the excepted workload makes.</p>
+<pre><code class="language-bash">kube-noob exceptions check examples/kube-noob-exceptions.yaml
+kube-noob audit -f k8s/ --exceptions examples/kube-noob-exceptions.yaml
+kube-noob policy generate --mode enforce --exceptions examples/kube-noob-exceptions.yaml -o policies.yaml
+</code></pre>
+<h3 id="enforce-the-audit-rules-at-admission">Enforce the audit rules at admission</h3>
+<p><code>policy generate</code> turns every audit rule that can be decided from one object into an admission policy: a
+ValidatingAdmissionPolicy with its binding (built into Kubernetes 1.30+, so every OpenShift 4.20+), a Kyverno
+ValidatingPolicy (<code>policies.kyverno.io/v1</code>, Kyverno 1.18+), or both, carrying the same CEL. Each policy is named
+after its rule (<code>kube-noob-kn-s001</code>), and its message carries the rule id, the fix and the source. Start in audit
+mode, which admits and warns (<code>kubectl</code> prints the warning; the API audit log and Kyverno reports record it), then
+switch a rule to enforce when its warnings are gone.</p>
+<p>The policies refuse exactly what <code>kube-noob audit</code> reports for that one object at low severity or above, never
+more: a test compares both on 2,700 generated objects, and CI applies every policy to a kind cluster and checks
+that a server-side dry-run refuses the rule's bad fixture and admits its good one. Four rules check less than the
+audit and say so in a <code>kube-noob.io/limitation</code> annotation (a <code>--password</code> value in the next argument, a
+ServiceAccount's token opt-out, an HPA-scaled workload, a budget compared with the replica count). Rules that need
+other objects (a Service and its pods, a claim and its StorageClass) or that the API server already enforces are
+listed in the file header with the reason. Platform namespaces (<code>kube-*</code>, and <code>openshift-*</code> on OpenShift) and the
+platform's operators are exempt; calibrate rules (probes, resources, replicas) skip objects a controller owns, so a
+rollout is never blocked by its own ReplicaSets.</p>
+<pre><code class="language-bash">kube-noob policy generate --platform openshift --version 4.20 --mode audit -o kube-noob-policies.yaml
+oc apply -f kube-noob-policies.yaml
+kube-noob policy generate --rule KN-S001 --rule KN-S009 --mode enforce --engine vap -o enforce.yaml
+kube-noob policy generate --engine kyverno --exclude-namespace legacy-apps -o kyverno.yaml
+</code></pre>
+<h3 id="every-finding-as-a-kubectl-warning-the-admission-webhook">Every finding as a kubectl warning: the admission webhook</h3>
+<p>The generated policies cover the rules CEL can decide. <code>kube-noob-admission</code> runs the audit itself: every finding of
+a created or updated object comes back to <code>kubectl</code> and <code>oc</code> as an admission warning (<code>Warning: [KN-S001] Privileged
+container: ...</code>, at most <code>admission.maxWarnings</code>, each at most 256 characters), so developers see them where they
+work. It denies nothing until you list a rule in <code>admission.enforce</code>, and then only that rule, and on an update only
+a finding the old object did not have: turning a rule on never freezes a Deployment that already breaks it. The
+webhook has <code>failurePolicy: Ignore</code> and a 3-second timeout, so a dead or slow webhook never blocks the cluster; it
+never mutates, stores nothing but counters, and fetches nothing. The system namespaces, <code>openshift-*</code>, its own
+namespace, <code>admission.excludedNamespaces</code> and namespaces labelled <code>kube-noob.io/admission=disabled</code> are skipped, and
+so are Pods, ReplicaSets and Jobs a controller owns (their owner was checked). Rules about other objects of the
+namespace (a PodDisruptionBudget for a Deployment, a NetworkPolicy, a claim's StorageClass) warn only with
+<code>admission.lookups</code>, which lists those kinds read-only in the background, and can never be enforced. Exceptions use
+the same ExceptionList as <code>kube-noob audit --exceptions</code>.</p>
+<pre><code class="language-bash">helm upgrade --install kube-noob oci://ghcr.io/aashishmahajan/charts/kube-noob -n kube-noob --create-namespace \
+  --set admission.enabled=true
+helm upgrade kube-noob oci://ghcr.io/aashishmahajan/charts/kube-noob -n kube-noob --reuse-values \
+  --set &quot;admission.enforce={KN-S001,KN-S009}&quot;
+kube-noob admission review -f review.json --enforce KN-S001
+</code></pre>
+<p>On OpenShift the service CA operator issues the serving certificate and injects the CA (the default,
+<code>admission.certificates: openshift-service-ca</code>); elsewhere use <code>cert-manager</code> with an issuer, or <code>secret</code> with your
+own certificate and CA bundle. CI installs it on a kind cluster: warnings in warn mode, 600 fuzzed reviews never
+denied, 50 requests per second for 30 seconds under 50 ms at p99, denial of the enforced rule only, an update of an
+existing breaker admitted, and nothing blocked with the webhook scaled to zero.</p>
+<h2 id="claude-and-mcp-users">Claude and MCP users</h2>
+<p>Install the plugin or add the MCP server (see the <a href="/docs/overview/">README</a>), then ask for the <code>getting_started</code> prompt.
+It reads your saved profile, asks for your role and platform, and suggests the first three tools to use.</p>
+<h3 id="chat-on-claudeai-the-agent-skill">Chat on claude.ai: the Agent Skill</h3>
+<p>The local MCP server does not run in chat on claude.ai. Upload <code>kube-noob-skill-&lt;version&gt;.zip</code> (a release asset, or
+<code>python scripts/build_skill.py --zip kube-noob-skill.zip</code> from a checkout) under <strong>Customize &gt; Skills</strong> and turn on
+code execution. Paste a describe, an event or a manifest: Claude runs <code>kn.py insight</code> or <code>kn.py audit_manifests</code> in
+its sandbox and cites the playbook, rule and issue ids kube-noob returns. The skill is always offline: no web lookups,
+no cluster, no model inside.</p>
+<h2 id="model-builders">Model builders</h2>
+<p>Build the corpus, score answers with the deterministic reward and export datasets: see <a href="/docs/training/">training</a>.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/use-cases.md">docs/use-cases.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

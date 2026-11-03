@@ -1,0 +1,1987 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>CLI reference · kube-noob</title>
+<meta name="description" content="Every kube-noob command and option.">
+<link rel="canonical" href="https://kube-noob.com/reference/cli/">
+<meta property="og:title" content="CLI reference · kube-noob">
+<meta property="og:description" content="Every kube-noob command and option.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/reference/cli/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/" aria-current="page">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose" style="max-width:none"><h1>CLI</h1><p>Every command and option, from the CLI's own help. <code>noob</code> is the same program. None of these call a model except <code>kube-noob ask</code>, and only when you configure one.</p><pre>usage: kube-noob [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+                 [--version]
+                 {audit,exceptions,gate,build,rhacs,vuln,code,must-gather,admission,validate,redteam,fix,protocol,generate,helm-chart,helm-audit,diagnose,insight,known-issues,upgrade-risks,ticket,signals,policy,posture,watch,incidents,debug,bundle,search,rules,explain,learn,learning,memory,ask,mcp,serve,corpus,train,config,doctor,selftest,demo}
+                 ...
+
+Kubernetes/OpenShift/ROSA/Helm/RHACS audit, debugging and learning tools. No AI inside.
+
+positional arguments:
+  {audit,exceptions,gate,build,rhacs,vuln,code,must-gather,admission,validate,redteam,fix,protocol,generate,helm-chart,helm-audit,diagnose,insight,known-issues,upgrade-risks,ticket,signals,policy,posture,watch,incidents,debug,bundle,search,rules,explain,learn,learning,memory,ask,mcp,serve,corpus,train,config,doctor,selftest,demo}
+    audit               Validate + audit + calibrate + red-team manifests
+    exceptions          Check an exception list: owner, reason, expiry and scope of every entry
+    gate                CI gate before deploy: audit, admission policy, reported issues and Containerfiles;
+                        SARIF and a summary
+    build               Build insight: why a build failed, and a Containerfile and image audit
+    rhacs               Compare RHACS (StackRox) policies with kube-noob&#x27;s rules: overlap, related, gaps,
+                        outside its scope
+    vuln                Vulnerabilities from scanner output: normalise, apply Red Hat VEX, rank by
+                        reachability; threat model
+    code                Code findings from SAST tools (SARIF), the images that ship them, the pods that run
+                        them
+    must-gather         Read an OpenShift must-gather safely, offline (nothing extracted or run; Secrets
+                        never read)
+    admission           The kube-noob-admission webhook: admission warnings for every rule, denials only for
+                        enforced rules
+    validate            Schema/API/platform validation only
+    redteam             Red-team scenarios only
+    fix                 Apply safe mechanical fixes
+    protocol            Run the 7-step protocol on a request
+    generate            Generate audited manifests
+    helm-chart          Generate a Helm chart
+    helm-audit          Render a chart with helm and audit the output
+    diagnose            Diagnose pasted events/logs/errors offline
+    insight             Paste anything (events, logs, an alert, a denial, a ticket, manifests, a question):
+                        it names what it is and runs every analyser that applies
+    known-issues        Is this a reported OpenShift issue? Match an error against the release notes
+    upgrade-risks       Known risks for an OpenShift update, from the public update graph (offline)
+    ticket              Look up a Red Hat Jira ticket in the local copy: what became of it, fix versions,
+                        workaround
+    signals             Extract signals: alert names, event and condition reasons, container reasons,
+                        admission rules, components and error templates
+    policy              Why was this denied? Would a NetworkPolicy allow this traffic?
+    posture             Attack paths: from what is exposed to what a compromised pod could do (read-only)
+    watch               Watch namespaces read-only: open, explain and remember incidents (needs cluster
+                        access)
+    incidents           Incidents the watch recorded: list, show, or confirm the fix
+    debug               Collect live read-only evidence for a workload and diagnose it
+    bundle              Write a redacted, read-only diagnostic bundle (Markdown + JSON) for a workload
+    search              Search local knowledge
+    rules               List audit rules
+    explain             Explain a rule
+    learn               Learning tracks, lessons, exercises, quizzes
+    learning            What kube-noob remembers locally (profile, confirmed notes, counters)
+    memory              Your team&#x27;s fixes as code: reviewed entries in your own repository, validated and
+                        matched
+    ask                 Optional: ask a model you configure, which calls these tools
+    mcp                 Run the MCP server over stdio
+    serve               Run the MCP server over streamable HTTP (sidecar/service)
+    corpus              Build / inspect the local corpus (network: maintainers &amp; CI)
+    train               Training enforcer, credit system and dataset export
+    config              Show the effective configuration
+    doctor              Show what kube-noob can reach (network, cluster, model); exit 1 on conflicts
+    selftest            Answer a battery of real questions offline and score the results
+    demo                Offline walkthroughs of common use cases (no network, no cluster)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --version             show program&#x27;s version number and exit
+</pre><h2 id="audit">kube-noob audit</h2><pre>usage: kube-noob audit [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}] -f FILE
+                       [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                       [--min-severity {info,low,medium,high,critical}] [--skip-unreadable]
+                       [--fail-on {info,low,medium,high,critical,never}] [--exceptions EXCEPTIONS]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  YAML file, directory or &#x27;-&#x27; for stdin
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.22) or Kubernetes (1.35) version
+  --min-severity {info,low,medium,high,critical}
+  --skip-unreadable     audit the files that could be read and list the rest under &#x27;unreadable&#x27; in the
+                        report; without it a directory holding a file that is not UTF-8 or not YAML exits 5,
+                        so a gate never reads a partial audit as a clean one (exit 1 stays findings at or
+                        above --fail-on)
+  --fail-on {info,low,medium,high,critical,never}
+  --exceptions EXCEPTIONS
+                        exception list (kube-noob.io/v1 ExceptionList): active entries hide the findings
+                        they cover; an expired or refused entry fails the gate (exit 1)
+</pre><h2 id="exceptions">kube-noob exceptions</h2><pre>usage: kube-noob exceptions [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                            [--format {text,json,yaml}]
+                            {check} ...
+
+Refuses entries with no owner or reason, an unknown rule, a scope wider than a namespace (or a named
+cluster-scoped object), or an expiry more than 400 days ahead; reports expired ones. Exit 1 when any entry
+is refused or expired. Example: kube-noob exceptions check kube-noob-exceptions.yaml
+
+positional arguments:
+  {check}
+    check               Check every entry and say why one is refused or expired
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="exceptions-check">kube-noob exceptions check</h2><pre>usage: kube-noob exceptions check [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                  [--format {text,json,yaml}] [--today TODAY]
+                                  file
+
+positional arguments:
+  file                  the exception list (YAML)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --today TODAY         check as of this date (YYYY-MM-DD), for planning renewals
+</pre><h2 id="gate">kube-noob gate</h2><pre>usage: kube-noob gate [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+                      [-f FILE] [--chart CHART] [--values VALUES] [--namespace NAMESPACE]
+                      [--containerfile PATH[=IMAGE][,context=DIR][,target=STAGE]]
+                      [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                      [--exceptions EXCEPTIONS] [--fail-on {info,low,medium,high,critical,never}]
+                      [--skip-unreadable] [--chart-path CHART_PATH] [--sarif SARIF] [--summary SUMMARY]
+                      [--codequality CODEQUALITY] [--scanner-report SCANNER_REPORT] [--vex VEX] [--kev KEV]
+                      [--sarif-report SARIF_REPORT] [--source-root SOURCE_ROOT] [--trust-report-vex]
+
+Audits manifests and rendered charts (with an exception list when given), says which findings the generated
+admission policies would refuse, lists open reported issues in the target OpenShift release that name a
+deployed kind, audits Containerfiles, and exits 1 at --fail-on. Writes SARIF 2.1.0, a Markdown summary and
+GitLab code quality JSON. Offline. Example: helm template app chart/ &gt; rendered.yaml &amp;&amp; kube-noob gate -f
+rendered.yaml --chart-path chart --platform openshift --version 4.20 --sarif out.sarif
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  manifests: a file, a directory, or -; repeat
+  --chart CHART         a Helm chart directory to render; repeat
+  --values VALUES       values file for --chart; repeat
+  --namespace NAMESPACE
+                        namespace to render charts into
+  --containerfile PATH[=IMAGE][,context=DIR][,target=STAGE]
+                        a Containerfile to audit and, with --sarif-report, the build that ships code
+                        (context defaults to its directory: context=. for docker build -f
+                        deploy/Containerfile .); repeat
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.20) or Kubernetes (1.33) version
+  --exceptions EXCEPTIONS
+                        exception list (kube-noob.io/v1 ExceptionList)
+  --fail-on {info,low,medium,high,critical,never}
+  --skip-unreadable     gate the files that could be read and list the rest under &#x27;unreadable&#x27; in the
+                        report; without it a file that is not UTF-8 or not YAML exits 5, which a pipeline
+                        can tell apart from 1 (findings at or above --fail-on)
+  --chart-path CHART_PATH
+                        the chart in the repository: findings point at its templates
+  --sarif SARIF         write SARIF 2.1.0 here (GitHub code scanning)
+  --summary SUMMARY     write the Markdown summary here ($GITHUB_STEP_SUMMARY)
+  --codequality CODEQUALITY
+                        write GitLab code quality JSON here
+  --scanner-report SCANNER_REPORT
+                        Trivy or Grype JSON, CycloneDX or SPDX SBOM, or RHACS image JSON of a deployed
+                        image; repeat. Fixable or known-exploited findings at --fail-on fail the gate
+  --vex VEX             Red Hat CSAF VEX for --scanner-report; repeat
+  --kev KEV             the CISA KEV catalog JSON for --scanner-report
+  --sarif-report SARIF_REPORT
+                        SARIF 2.1.0 from Semgrep, Bandit, SpotBugs, ESLint or CodeQL; repeat. Security
+                        findings at --fail-on fail the gate unless no --containerfile ships the file
+  --source-root SOURCE_ROOT
+                        an absolute directory the SAST tools ran in (the current directory always is one);
+                        repeat
+  --trust-report-vex    honour a CycloneDX report&#x27;s own analysis (not_affected, resolved, false_positive);
+                        off by default: whoever wrote the report could otherwise clear its findings
+</pre><h2 id="build">kube-noob build</h2><pre>usage: kube-noob build [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}]
+                       {diagnose,audit,analytics,history} ...
+
+diagnose reads a failed GitHub Actions, Jenkins, Tekton or OpenShift build log and names the failing step,
+the error, the cause class and the fix. audit checks a Containerfile (and, with --context, what COPY takes
+from the build context; with --image-layout, the built image&#x27;s config and layers). Examples: kube-noob build
+diagnose -f build.log; kube-noob build audit -f Containerfile --context .
+
+positional arguments:
+  {diagnose,audit,analytics,history}
+    diagnose            Name the failing step, the cause class and the fix of a build log
+    audit               Audit a Containerfile, the build context and an image on disk (static, offline)
+    analytics           Flaky tests, slow steps and their trend, failure classes over time, from a CI
+                        history folder
+    history             Write a CI history folder from the GitHub Actions API (read-only; needs
+                        ci.githubEnabled)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="build-diagnose">kube-noob build diagnose</h2><pre>usage: kube-noob build diagnose [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] -f FILE
+                                [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                                [--version PVERSION]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  the build log, - for stdin
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    the cluster&#x27;s OpenShift version, for reported issues
+</pre><h2 id="build-audit">kube-noob build audit</h2><pre>usage: kube-noob build audit [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] [-f FILE] [--context CONTEXT]
+                             [--image-layout IMAGE_LAYOUT] [--image-platform IMAGE_PLATFORM]
+                             [--manifests MANIFESTS] [--fail-on {info,low,medium,high,critical,never}]
+
+Exit 1 when a finding is at or above --fail-on. An OCI layout comes from skopeo copy docker://&lt;image&gt;
+oci:&lt;dir&gt;, podman save --format oci-dir or buildah push &lt;image&gt; oci:&lt;dir&gt;; nothing is pulled or extracted.
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  the Containerfile or Dockerfile
+  --context CONTEXT     the build context directory: check what COPY takes from it
+  --image-layout IMAGE_LAYOUT
+                        an OCI image layout directory of the built image
+  --image-platform IMAGE_PLATFORM
+                        os/arch to read from a multi-arch layout (linux/amd64)
+  --manifests MANIFESTS
+                        the workload YAML that runs the image: its probes satisfy KN-B007
+  --fail-on {info,low,medium,high,critical,never}
+</pre><h2 id="build-analytics">kube-noob build analytics</h2><pre>usage: kube-noob build analytics [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                 [--format {text,json,yaml}] --history HISTORY [--top TOP]
+
+Reads one folder per run: run.json (the GitHub Actions run with its jobs and steps), JUnit XML reports and
+optional build logs. Example: kube-noob build analytics --history ci-history/
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --history HISTORY     the folder of run folders
+  --top TOP             rows per table (1-200)
+</pre><h2 id="build-history">kube-noob build history</h2><pre>usage: kube-noob build history [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] --github GITHUB [--workflow WORKFLOW]
+                               [--branch BRANCH] [--max-runs MAX_RUNS] -o OUTPUT
+
+GET only, to ci.githubApiUrl only, with a random pause between requests and every attempt of every run. Test
+reports and logs are not fetched: add JUnit artifacts with gh run download. Example: GITHUB_TOKEN=&lt;token&gt;
+kube-noob build history --github acme/shop --workflow ci.yml -o ci-history
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --github GITHUB       owner/repo
+  --workflow WORKFLOW   the workflow file (ci.yml) or id; default: every workflow
+  --branch BRANCH       only runs on this branch
+  --max-runs MAX_RUNS   attempts to read (default ci.maxRuns, 200)
+  -o OUTPUT, --output OUTPUT
+                        the history folder to write
+</pre><h2 id="rhacs">kube-noob rhacs</h2><pre>usage: kube-noob rhacs [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}]
+                       {compare} ...
+
+Maps every policy in an RHACS export (the portal&#x27;s Export policy to JSON, or POST /v1/policies/export) to
+kube-noob rules by name and criteria, and says why the rest differ: image and vulnerability data, runtime
+events, API events, label conventions, or a deploy-time setting kube-noob has no rule for. Exit 1 when a
+policy is unexplained. Example: kube-noob rhacs compare -f policies.json
+
+positional arguments:
+  {compare}
+    compare             Compare an export (-f) or Central&#x27;s policies (--live, read-only)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="rhacs-compare">kube-noob rhacs compare</h2><pre>usage: kube-noob rhacs compare [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] [-f FILE] [--live]
+                               [--outcome {overlap,related,gap,outside,unexplained}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  policy export (JSON), - for stdin
+  --live                read Central&#x27;s policies (GET only; needs rhacs.enabled, rhacs.endpoint and
+                        $ROX_API_TOKEN)
+  --outcome {overlap,related,gap,outside,unexplained}
+                        with --format text: only these outcomes; repeat
+</pre><h2 id="vuln">kube-noob vuln</h2><pre>usage: kube-noob vuln [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+                      {report,threat} ...
+
+report reads Trivy or Grype JSON, CycloneDX or SPDX JSON SBOMs and RHACS image scans into one finding per
+package, version and CVE, drops what Red Hat VEX says is not affected or already fixed (citing the
+statement), marks CISA KEV entries, and with the manifests ranks findings by exposure, privileges and RBAC
+reach with their attack path. threat writes a STRIDE threat model with the rules, policies and MITRE ATT&amp;CK
+techniques for each threat. Offline unless --rhacs-image. Examples: trivy image -f json --list-all-pkgs -o
+trivy.json &lt;image&gt; &amp;&amp; kube-noob vuln report -r trivy.json -m deploy/ --kev
+known_exploited_vulnerabilities.json; kube-noob vuln threat -f deploy/ --platform openshift
+
+positional arguments:
+  {report,threat}
+    report              Normalise scanner output, apply VEX and KEV, rank by reachability
+    threat              STRIDE threat model of the applications in manifests
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="vuln-report">kube-noob vuln report</h2><pre>usage: kube-noob vuln report [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] [-r REPORT] [--rhacs-image RHACS_IMAGE] [--vex VEX]
+                             [--no-corpus-vex] [--product PRODUCT] [--kev KEV] [--trust-report-vex]
+                             [-m MANIFESTS] [--image IMAGE] [--top TOP]
+                             [--fail-on {low,medium,high,critical,never}]
+
+Exit 1 when a fixable or known-exploited finding is at or above --fail-on (default never).
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -r REPORT, --report REPORT
+                        Trivy or Grype JSON, a CycloneDX or SPDX 2 JSON SBOM, or an RHACS image (GET
+                        /v1/images/{id}); repeat
+  --rhacs-image RHACS_IMAGE
+                        read this image&#x27;s scan from RHACS Central (sha256:&lt;digest&gt;; GET only, needs
+                        rhacs.enabled); repeat
+  --vex VEX             Red Hat CSAF VEX: a file, a folder of &lt;year&gt;/cve-*.json or the csaf_vex archive;
+                        repeat. The redhat-vex corpus shard (kube-noob corpus advisories) is read too
+  --no-corpus-vex       do not read the redhat-vex corpus shard
+  --product PRODUCT     Red Hat product CPE prefix (default: from the report&#x27;s RHEL release,
+                        cpe:/o:redhat:enterprise_linux:9)
+  --kev KEV             the CISA KEV catalog (known_exploited_vulnerabilities.json, CC0)
+  --trust-report-vex    honour a CycloneDX report&#x27;s own analysis (not_affected, resolved, false_positive);
+                        off by default: the findings it marks are kept, with a note
+  -m MANIFESTS, --manifests MANIFESTS
+                        YAML that runs the images (a file or a directory); ranks findings by exposure and
+                        privileges; repeat
+  --image IMAGE         treat every report as this image (registry/repo:tag or digest)
+  --top TOP             ranked findings to show (1-200)
+  --fail-on {low,medium,high,critical,never}
+                        exit 1 when a fixable or known-exploited finding is at or above this severity
+</pre><h2 id="vuln-threat">kube-noob vuln threat</h2><pre>usage: kube-noob vuln threat [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] -f FILE
+                             [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                             [-r REPORT]
+
+Entry points, trust boundaries, data stores and identities from the manifests; each threat with its status,
+evidence, mitigating rules and policies, and ATT&amp;CK technique ids. With -r, public-facing exploits (TM-E01)
+are assessed from the images&#x27; reports.
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  manifests: a file or a directory; repeat
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.20) or Kubernetes (1.33) version
+  -r REPORT, --report REPORT
+                        a scanner report of an image; repeat
+</pre><h2 id="code">kube-noob code</h2><pre>usage: kube-noob code [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+                      {report} ...
+
+report reads the SARIF 2.1.0 that Semgrep, Bandit, SpotBugs/FindSecBugs, ESLint and CodeQL write (kube-noob
+has no analysis engine of its own), merges the same file, line and CWE across tools, drops suppressed and
+fixed results with the reason, follows each file through the Containerfiles into the images that ship it
+(copied or built), and with the manifests ranks findings by exposure and privileges with their attack path.
+With scanner reports of the images (-r), each language-package vulnerability points at the dependency file
+and line to change. Offline. Example: kube-noob code report -s semgrep.sarif -s codeql.sarif -c
+web/Containerfile=quay.io/acme/web -m deploy/ -r trivy-web.json
+
+positional arguments:
+  {report}
+    report              Normalise SARIF, map files to images and workloads, rank; dependency fixes from
+                        scanner reports
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="code-report">kube-noob code report</h2><pre>usage: kube-noob code report [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] [-s SARIF] [-c CONTAINERFILE] [--repo REPO]
+                             [--source-root SOURCE_ROOT] [-m MANIFESTS] [-r SCANNER_REPORT]
+                             [--include-quality] [--top TOP] [--fail-on {low,medium,high,critical,never}]
+
+Exit 1 when a security finding in shipped code, or a fixable or known-exploited dependency vulnerability, is
+at or above --fail-on (default never). Without -c every finding counts as shipped.
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -s SARIF, --sarif SARIF
+                        a SARIF 2.1.0 file; repeat
+  -c CONTAINERFILE, --containerfile CONTAINERFILE
+                        PATH[=IMAGE][,context=DIR][,target=STAGE]: a Containerfile in the repository and the
+                        image it builds (context defaults to the Containerfile&#x27;s directory); repeat
+  --repo REPO           the repository on disk (default: the current directory)
+  --source-root SOURCE_ROOT
+                        an absolute directory the scanners ran in (CI checkout path), so absolute paths in
+                        SARIF map to the repository; the --repo path is always one; repeat
+  -m MANIFESTS, --manifests MANIFESTS
+                        YAML that runs the images (file or directory); repeat
+  -r SCANNER_REPORT, --scanner-report SCANNER_REPORT
+                        Trivy or Grype JSON or a CycloneDX report of an image, for dependency fixes; repeat
+  --include-quality     list lint and quality results too
+  --top TOP             ranked findings to show (1-200)
+  --fail-on {low,medium,high,critical,never}
+                        exit 1 at or above this severity (shipped code findings; fixable or exploited
+                        dependencies)
+</pre><h2 id="must-gather">kube-noob must-gather</h2><pre>usage: kube-noob must-gather [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}]
+                             {analyze} ...
+
+analyze opens a must-gather directory or a .tar, .tar.gz or .tgz archive of one (oc adm must-gather, oc adm
+inspect) without extracting or executing anything. An archive member with an absolute path or .. is refused;
+links, devices and nested archives are not followed or opened; files named like Secrets are never read.
+Prints what was gathered, for which version and when, then what is wrong: the cluster version and update,
+cluster operators, nodes, machine config pools, OLM operators, pods, warning events and etcd log hints,
+ranked, each with its file, its signals and read-only next steps. Example: kube-noob must-gather analyze
+must-gather.tar.gz --fail-on high
+
+positional arguments:
+  {analyze}
+    analyze             Open a must-gather safely and say what is wrong: cluster version, operators, nodes,
+                        machine config pools, OLM operators, pods, events and etcd logs, ranked, with read-
+                        only next steps
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="must-gather-analyze">kube-noob must-gather analyze</h2><pre>usage: kube-noob must-gather analyze [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                     [--format {text,json,yaml}]
+                                     [--fail-on {low,medium,high,critical,never}] [--require-complete]
+                                     [--report DIR] [--case-draft]
+                                     path
+
+positional arguments:
+  path                  a must-gather directory, or a .tar, .tar.gz or .tgz archive of one
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --fail-on {low,medium,high,critical,never}
+                        exit 1 when a finding is at or above this severity
+  --require-complete    exit 5 when the must-gather was missing analysers or held files that could not be
+                        read, so a gate never reads a blind run as a clean one (exit 1 stays findings at or
+                        above --fail-on)
+  --report DIR          write report.md and report.json here: findings with the known issues and team memory
+                        that match them
+  --case-draft          with --report, also write case-draft.md: a support case with the facts filled in and
+                        placeholders for what only you know
+</pre><h2 id="admission">kube-noob admission</h2><pre>usage: kube-noob admission [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                           [--format {text,json,yaml}]
+                           {serve,review} ...
+
+serve answers AdmissionReview requests over HTTPS (POST /validate; /healthz, /readyz, /metrics). Warn mode
+by default: nothing is denied. admission.enforce lists the rules that deny; on UPDATE an enforced rule
+denies only a finding the old object did not have. System namespaces are excluded and nothing is mutated.
+review evaluates one AdmissionReview JSON offline. Install with the chart (admission.enabled). Examples:
+kube-noob admission review -f review.json; kube-noob admission serve --tls-cert tls.crt --tls-key tls.key
+
+positional arguments:
+  {serve,review}
+    serve               Serve the webhook over HTTPS
+    review              Evaluate one AdmissionReview (JSON) offline and print the response
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="admission-serve">kube-noob admission serve</h2><pre>usage: kube-noob admission serve [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                 [--format {text,json,yaml}] [--host HOST] [--port PORT] --tls-cert TLS_CERT
+                                 --tls-key TLS_KEY
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --host HOST           address to listen on (default 0.0.0.0)
+  --port PORT
+  --tls-cert TLS_CERT   the serving certificate (PEM)
+  --tls-key TLS_KEY     its private key (PEM)
+</pre><h2 id="admission-review">kube-noob admission review</h2><pre>usage: kube-noob admission review [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                  [--format {text,json,yaml}] -f FILE [--enforce ENFORCE]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  the AdmissionReview JSON, - for stdin
+  --enforce ENFORCE     a rule to enforce (overrides the config)
+</pre><h2 id="validate">kube-noob validate</h2><pre>usage: kube-noob validate [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                          [--format {text,json,yaml}] -f FILE
+                          [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  YAML file, directory or &#x27;-&#x27; for stdin
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.22) or Kubernetes (1.35) version
+</pre><h2 id="redteam">kube-noob redteam</h2><pre>usage: kube-noob redteam [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                         [--format {text,json,yaml}] -f FILE
+                         [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  YAML file, directory or &#x27;-&#x27; for stdin
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.22) or Kubernetes (1.35) version
+</pre><h2 id="fix">kube-noob fix</h2><pre>usage: kube-noob fix [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+                     -f FILE [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                     [-o OUTPUT] [--no-harden]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  YAML file, directory or &#x27;-&#x27; for stdin
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.22) or Kubernetes (1.35) version
+  -o OUTPUT, --output OUTPUT
+                        Write fixed YAML here (default: stdout)
+  --no-harden
+</pre><h2 id="protocol">kube-noob protocol</h2><pre>usage: kube-noob protocol [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                          [--format {text,json,yaml}] [-f FILE] [--blueprint BLUEPRINT]
+                          [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                          [--no-fix]
+                          request
+
+positional arguments:
+  request
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  Manifests to review
+  --blueprint BLUEPRINT
+                        Blueprint YAML to generate from
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION
+  --no-fix
+</pre><h2 id="generate">kube-noob generate</h2><pre>usage: kube-noob generate [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                          [--format {text,json,yaml}] [--blueprint BLUEPRINT] [--name NAME]
+                          [--namespace NAMESPACE] [--image IMAGE]
+                          [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                          [--platform-version PLATFORM_VERSION] [--replicas REPLICAS] [--port PORT]
+                          [--workload {deployment,statefulset}]
+                          [--expose {none,route,ingress,gateway,loadbalancer}] [--host HOST]
+                          [--storage-size STORAGE_SIZE]
+                          [--access-mode {ReadWriteOnce,ReadWriteMany,ReadWriteOncePod}]
+                          [--storage-class STORAGE_CLASS] [-o OUTPUT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --blueprint BLUEPRINT
+                        Blueprint YAML file
+  --name NAME
+  --namespace NAMESPACE
+  --image IMAGE
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --platform-version PLATFORM_VERSION
+  --replicas REPLICAS
+  --port PORT
+  --workload {deployment,statefulset}
+  --expose {none,route,ingress,gateway,loadbalancer}
+  --host HOST
+  --storage-size STORAGE_SIZE
+  --access-mode {ReadWriteOnce,ReadWriteMany,ReadWriteOncePod}
+  --storage-class STORAGE_CLASS
+  -o OUTPUT, --output OUTPUT
+                        Output file (generate) or directory (helm-chart)
+</pre><h2 id="helm-chart">kube-noob helm-chart</h2><pre>usage: kube-noob helm-chart [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                            [--format {text,json,yaml}] [--blueprint BLUEPRINT] [--name NAME]
+                            [--namespace NAMESPACE] [--image IMAGE]
+                            [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                            [--platform-version PLATFORM_VERSION] [--replicas REPLICAS] [--port PORT]
+                            [--workload {deployment,statefulset}]
+                            [--expose {none,route,ingress,gateway,loadbalancer}] [--host HOST]
+                            [--storage-size STORAGE_SIZE]
+                            [--access-mode {ReadWriteOnce,ReadWriteMany,ReadWriteOncePod}]
+                            [--storage-class STORAGE_CLASS] [-o OUTPUT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --blueprint BLUEPRINT
+                        Blueprint YAML file
+  --name NAME
+  --namespace NAMESPACE
+  --image IMAGE
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --platform-version PLATFORM_VERSION
+  --replicas REPLICAS
+  --port PORT
+  --workload {deployment,statefulset}
+  --expose {none,route,ingress,gateway,loadbalancer}
+  --host HOST
+  --storage-size STORAGE_SIZE
+  --access-mode {ReadWriteOnce,ReadWriteMany,ReadWriteOncePod}
+  --storage-class STORAGE_CLASS
+  -o OUTPUT, --output OUTPUT
+                        Output file (generate) or directory (helm-chart)
+</pre><h2 id="helm-audit">kube-noob helm-audit</h2><pre>usage: kube-noob helm-audit [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                            [--format {text,json,yaml}] [-f VALUES]
+                            [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                            [--namespace NAMESPACE]
+                            chart
+
+positional arguments:
+  chart
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f VALUES, --values VALUES
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION
+  --namespace NAMESPACE
+</pre><h2 id="diagnose">kube-noob diagnose</h2><pre>usage: kube-noob diagnose [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                          [--format {text,json,yaml}] [-f FILE]
+                          [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                          [text ...]
+
+Diagnose events, describe output, logs or errors. Pass the text in quotes, a file with -f, or pipe it in.
+Examples: kube-noob diagnose &#x27;Back-off restarting failed container&#x27; | kube-noob diagnose -f events.txt |
+pbpaste | kube-noob diagnose
+
+positional arguments:
+  text                  the error text; quote multi-line text (single quotes avoid $ expansion)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  a file, &#x27;-&#x27; for stdin, or the text itself
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    your OpenShift version, e.g. 4.20.8: leaves out issues already fixed there
+</pre><h2 id="insight">kube-noob insight</h2><pre>usage: kube-noob insight [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                         [--format {text,json,yaml}] [-f FILE]
+                         [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                         [text ...]
+
+Recognises what the input is and merges the diagnosis, reported issues, team memory, policy explanations,
+audit findings and documentation that apply. Text in quotes, a file with -f, or stdin.
+
+positional arguments:
+  text                  the input; quote multi-line text (single quotes avoid $ expansion)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  a file (a .pcap is recognised by its header), or &#x27;-&#x27;
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    your OpenShift version, e.g. 4.20.8
+</pre><h2 id="known-issues">kube-noob known-issues</h2><pre>usage: kube-noob known-issues [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [-f FILE]
+                              [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
+                              [--limit LIMIT]
+                              [text ...]
+
+Match an error or symptom against the known and fixed issues in the OpenShift release notes. Example: kube-
+noob known-issues &#x27;could not find any suitable subnets for creating the ELB&#x27; --version 4.20.8
+
+positional arguments:
+  text                  the error text or symptom, in quotes
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  a file, &#x27;-&#x27; for stdin, or the text itself
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    your OpenShift version, e.g. 4.20.8
+  --limit LIMIT
+</pre><h2 id="upgrade-risks">kube-noob upgrade-risks</h2><pre>usage: kube-noob upgrade-risks [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] --from FROM_VERSION --to TO_VERSION
+                               [--arch {amd64,arm64,multi,ppc64le,s390x}]
+
+List the risks Red Hat declares for updating from one OpenShift version to another (conditional updates in
+github.com/openshift/cincinnati-graph-data), from a bundled snapshot: whether each applies, the read-only
+check that decides it, or its PromQL when that cannot be evaluated offline. Example: kube-noob upgrade-risks
+--from 4.20.3 --to 4.21.4
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --from FROM_VERSION   the version the cluster runs, e.g. 4.20.3
+  --to TO_VERSION       the version to update to, e.g. 4.21.4
+  --arch {amd64,arm64,multi,ppc64le,s390x}
+                        the release architecture; without it every architecture is checked
+</pre><h2 id="ticket">kube-noob ticket</h2><pre>usage: kube-noob ticket [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}] [--version PVERSION]
+                        key
+
+Show one ticket from the local copy of Red Hat&#x27;s public Jira (kube-noob corpus jira --online). Example:
+kube-noob ticket OCPBUGS-12345 --version 4.21.1
+
+positional arguments:
+  key                   a Jira key such as OCPBUGS-12345 or ROX-30000
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --version PVERSION    your OpenShift version: says whether the fix is in it
+</pre><h2 id="signals">kube-noob signals</h2><pre>usage: kube-noob signals [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                         [--format {text,json,yaml}] [-f FILE]
+                         [text ...]
+
+Find the canonical names in an alert payload, events, ClusterOperators, pod status or pasted text. Example:
+oc get events -o json | kube-noob signals
+
+positional arguments:
+  text                  text to read; or -f FILE; or pipe it in
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  a file, &#x27;-&#x27; for stdin, or the text itself
+</pre><h2 id="policy">kube-noob policy</h2><pre>usage: kube-noob policy [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}]
+                        {explain,reach,generate,migrate-check} ...
+
+Explain admission denials (Kyverno, Gatekeeper, ValidatingAdmissionPolicy, Pod Security, OpenShift SCC,
+RHACS, quota, LimitRange, RBAC), check NetworkPolicy reachability, generate admission policies and check
+legacy Kyverno policies for their CEL form. Read-only and offline unless --live is given.
+
+positional arguments:
+  {explain,reach,generate,migrate-check}
+    explain             Explain an admission denial, policy by policy
+    reach               Would NetworkPolicies let the source reach the destination on a port? (exit 1 when
+                        denied)
+    generate            Turn kube-noob&#x27;s audit rules into ValidatingAdmissionPolicy and Kyverno
+                        ValidatingPolicy YAML
+    migrate-check       Lint legacy Kyverno policies (removed in Kyverno 1.20) rule by rule for their CEL
+                        policy form
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="policy-explain">kube-noob policy explain</h2><pre>usage: kube-noob policy explain [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] [-f FILE]
+                                [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                                [text ...]
+
+Pass the error in quotes, a file with -f, or pipe it in. Example: kubectl apply -f deploy.yaml 2&gt;&amp;1 | kube-
+noob policy explain
+
+positional arguments:
+  text                  the denial text; quote it (single quotes avoid $ expansion)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  a file, &#x27;-&#x27; for stdin, or the text itself
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+</pre><h2 id="policy-reach">kube-noob policy reach</h2><pre>usage: kube-noob policy reach [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] --from SOURCE --to DESTINATION --port PORT
+                              [--protocol {TCP,UDP,SCTP}] [-f FILE] [--namespace DEFAULT_NAMESPACE] [--live]
+                              [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+
+Endpoints: namespace/name, namespace/kind/name, namespace:key=value,... or an IP/CIDR. Example: kube-noob
+policy reach --from web/frontend --to shop/orders-api --port 8080 -f k8s/
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --from SOURCE         source endpoint
+  --to DESTINATION      destination endpoint
+  --port PORT           port number or named container port
+  --protocol {TCP,UDP,SCTP}
+  -f FILE, --file FILE  YAML file or directory; repeat for several
+  --namespace DEFAULT_NAMESPACE
+                        for objects without one
+  --live                read the policies from the cluster (read-only)
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+</pre><h2 id="policy-generate">kube-noob policy generate</h2><pre>usage: kube-noob policy generate [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                 [--format {text,json,yaml}]
+                                 [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                                 [--version PVERSION] [--engine {vap,kyverno}] [--mode {audit,enforce}]
+                                 [--rule RULES] [--exclude-namespace EXCLUDE_NAMESPACES]
+                                 [--exceptions EXCEPTIONS] [-o OUTPUT]
+
+One policy per rule that can be decided from one object at admission; the others are listed with the reason.
+Audit mode warns and records, enforce refuses. Example: kube-noob policy generate --platform openshift
+--version 4.20 --mode audit -o kube-noob-policies.yaml
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.20) or Kubernetes (1.33) version
+  --engine {vap,kyverno}
+                        vap (ValidatingAdmissionPolicy, built in) or kyverno (ValidatingPolicy, Kyverno
+                        1.18+); repeat for both (default: both)
+  --mode {audit,enforce}
+                        audit (default) or enforce
+  --rule RULES          a rule id such as KN-S001; repeat
+  --exclude-namespace EXCLUDE_NAMESPACES
+                        a namespace the policies skip, besides kube-system, kube-public and kube-node-lease;
+                        repeat
+  --exceptions EXCEPTIONS
+                        exception list (kube-noob.io/v1 ExceptionList): active entries become exemptions in
+                        their rule&#x27;s policy
+  -o OUTPUT, --output OUTPUT
+                        write the YAML here (default: stdout)
+</pre><h2 id="policy-migrate-check">kube-noob policy migrate-check</h2><pre>usage: kube-noob policy migrate-check [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                      [--format {text,json,yaml}] -f FILE [--fail-on {never,manual,blocked}]
+                                      [--no-drafts] [-o OUTPUT_DIR]
+
+For each rule of a kyverno.io ClusterPolicy, Policy, ClusterCleanupPolicy, CleanupPolicy or PolicyException:
+direct, inverted, manual or blocked, with the field path, the policies.kyverno.io target kind, the reason
+and the Kyverno documentation section. Rules that map directly get a draft CEL policy and a kyverno test
+fixture skeleton to prove it. Lint only: nothing is applied or rewritten. Example: kube-noob policy migrate-
+check -f policies/ --fail-on blocked
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  policy YAML, a directory or -; repeat
+  --fail-on {never,manual,blocked}
+                        exit 1 when a finding is at or above this verdict (default never)
+  --no-drafts           findings only: no draft policies or test fixtures
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        write the drafts and kyverno test fixtures under this directory (refuses to
+                        overwrite a file)
+</pre><h2 id="posture">kube-noob posture</h2><pre>usage: kube-noob posture [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                         [--format {text,json,yaml}]
+                         {scan,snapshot,diff,report} ...
+
+Ranks paths from a Route, Ingress, LoadBalancer or NodePort Service to the pods it reaches and what they can
+do: node access (privileged, hostPath, host namespaces) or Kubernetes API rights through the ServiceAccount
+token (read Secrets, exec, create workloads, escalate). Score = exposure x blast radius. Secrets are never
+read. Example: kube-noob posture scan -f k8s/
+
+positional arguments:
+  {scan,snapshot,diff,report}
+    scan                Rank the attack paths in manifests (-f) or the live cluster (--live)
+    snapshot            Record the objects&#x27; hashes and today&#x27;s findings (no values) to a file
+    diff                What changed between two snapshots: objects, new and fixed findings, owners
+    report              Snapshot now, compare with the newest snapshot kept, write the report (the daily
+                        job)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="posture-scan">kube-noob posture scan</h2><pre>usage: kube-noob posture scan [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [-f FILE] [--live] [-n NAMESPACES] [--top TOP]
+                              [--fail-above FAIL_ABOVE]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  YAML file or directory; repeat for several
+  --live                read the cluster (read-only, never Secrets)
+  -n NAMESPACES, --namespace NAMESPACES
+                        with --live: only these; repeat
+  --top TOP             paths to show (1-200, default 20)
+  --fail-above FAIL_ABOVE
+                        exit 1 when a path scores above this (CI gate; max score 30)
+</pre><h2 id="posture-snapshot">kube-noob posture snapshot</h2><pre>usage: kube-noob posture snapshot [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                  [--format {text,json,yaml}] [-f FILE] [--live] [-n NAMESPACES]
+                                  [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                                  [--version PVERSION] [--exceptions EXCEPTIONS] -o OUTPUT
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  YAML file or directory; repeat for several
+  --live                read the cluster (read-only, never Secrets)
+  -n NAMESPACES, --namespace NAMESPACES
+                        with --live: only these; repeat
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.20) or Kubernetes (1.33) version
+  --exceptions EXCEPTIONS
+                        exception list: excepted findings are not counted open
+  -o OUTPUT, --output OUTPUT
+                        the snapshot file (JSON)
+</pre><h2 id="posture-diff">kube-noob posture diff</h2><pre>usage: kube-noob posture diff [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [--markdown MARKDOWN]
+                              old new
+
+positional arguments:
+  old                   the earlier snapshot
+  new                   the later snapshot
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --markdown MARKDOWN   also write the report as Markdown here
+</pre><h2 id="posture-report">kube-noob posture report</h2><pre>usage: kube-noob posture report [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] [-f FILE] [--live] [-n NAMESPACES]
+                                [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                                [--version PVERSION] [--exceptions EXCEPTIONS] [--state-dir STATE_DIR]
+                                [--keep KEEP]
+
+Keeps snapshots and reports in --state-dir (default &lt;dataDir&gt;/posture), the newest --keep of them. Example:
+kube-noob --cluster-enabled posture report --live
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  YAML file or directory; repeat for several
+  --live                read the cluster (read-only, never Secrets)
+  -n NAMESPACES, --namespace NAMESPACES
+                        with --live: only these; repeat
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --version PVERSION    OpenShift (4.20) or Kubernetes (1.33) version
+  --exceptions EXCEPTIONS
+                        exception list: excepted findings are not counted open
+  --state-dir STATE_DIR
+                        where snapshots and reports are kept
+  --keep KEEP           snapshots to keep (default posture.keep, 14)
+</pre><h2 id="watch">kube-noob watch</h2><pre>usage: kube-noob watch [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}] [-n NAMESPACES] [--once] [--interval INTERVAL]
+
+Polls pods, events, deployments and replicasets (get/list only, never Secrets), groups problems into
+incidents, explains each new one and records it in the local incident ledger. Example: kube-noob --cluster-
+enabled watch -n shop --once
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -n NAMESPACES, --namespace NAMESPACES
+                        repeat for several
+  --once                poll once and exit
+  --interval INTERVAL   seconds between polls (default watch.intervalSeconds)
+</pre><h2 id="incidents">kube-noob incidents</h2><pre>usage: kube-noob incidents [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                           [--format {text,json,yaml}]
+                           {list,show,confirm} ...
+
+positional arguments:
+  {list,show,confirm}
+    list                Open incidents (default), or --all
+    show                One incident in full
+    confirm             Remember the cause and fix that worked (summaries only)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="incidents-list">kube-noob incidents list</h2><pre>usage: kube-noob incidents list [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] [--all] [-n NAMESPACE]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --all                 include resolved incidents
+  -n NAMESPACE, --namespace NAMESPACE
+</pre><h2 id="incidents-show">kube-noob incidents show</h2><pre>usage: kube-noob incidents show [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}]
+                                incident_id
+
+positional arguments:
+  incident_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="incidents-confirm">kube-noob incidents confirm</h2><pre>usage: kube-noob incidents confirm [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                   [--format {text,json,yaml}] --cause CAUSE --fix FIX
+                                   incident_id
+
+positional arguments:
+  incident_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --cause CAUSE
+  --fix FIX
+</pre><h2 id="debug">kube-noob debug</h2><pre>usage: kube-noob debug [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}] -n NAMESPACE
+                       [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                       target
+
+positional arguments:
+  target                kind/name, e.g. deployment/orders-api
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -n NAMESPACE, --namespace NAMESPACE
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+</pre><h2 id="bundle">kube-noob bundle</h2><pre>usage: kube-noob bundle [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}] -n NAMESPACE [-o OUT]
+                        [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                        target
+
+positional arguments:
+  target                kind/name, e.g. deployment/orders-api
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -n NAMESPACE, --namespace NAMESPACE
+  -o OUT, --out OUT     output directory (default: ./kube-noob-bundle)
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+</pre><h2 id="search">kube-noob search</h2><pre>usage: kube-noob search [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}] [-n LIMIT] [--source SOURCE]
+                        query
+
+positional arguments:
+  query
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -n LIMIT, --limit LIMIT
+  --source SOURCE
+</pre><h2 id="rules">kube-noob rules</h2><pre>usage: kube-noob rules [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="explain">kube-noob explain</h2><pre>usage: kube-noob explain [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                         [--format {text,json,yaml}]
+                         rule_id
+
+positional arguments:
+  rule_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="learn">kube-noob learn</h2><pre>usage: kube-noob learn [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}]
+                       {tracks,lesson,exercise,submit,quiz,progress} ...
+
+positional arguments:
+  {tracks,lesson,exercise,submit,quiz,progress}
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="learn-tracks">kube-noob learn tracks</h2><pre>usage: kube-noob learn tracks [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [--learner LEARNER]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --learner LEARNER     Learner id for progress/credits
+</pre><h2 id="learn-lesson">kube-noob learn lesson</h2><pre>usage: kube-noob learn lesson [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [--learner LEARNER]
+                              lesson_id
+
+positional arguments:
+  lesson_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --learner LEARNER     Learner id for progress/credits
+</pre><h2 id="learn-exercise">kube-noob learn exercise</h2><pre>usage: kube-noob learn exercise [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] [--learner LEARNER]
+                                exercise_id
+
+positional arguments:
+  exercise_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --learner LEARNER     Learner id for progress/credits
+</pre><h2 id="learn-submit">kube-noob learn submit</h2><pre>usage: kube-noob learn submit [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [--learner LEARNER] -f FILE
+                              exercise_id
+
+positional arguments:
+  exercise_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --learner LEARNER     Learner id for progress/credits
+  -f FILE, --file FILE
+</pre><h2 id="learn-quiz">kube-noob learn quiz</h2><pre>usage: kube-noob learn quiz [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                            [--format {text,json,yaml}] [--learner LEARNER] [--choice CHOICE]
+                            question_id
+
+positional arguments:
+  question_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --learner LEARNER     Learner id for progress/credits
+  --choice CHOICE
+</pre><h2 id="learn-progress">kube-noob learn progress</h2><pre>usage: kube-noob learn progress [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] [--learner LEARNER]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --learner LEARNER     Learner id for progress/credits
+</pre><h2 id="learning">kube-noob learning</h2><pre>usage: kube-noob learning [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                          [--format {text,json,yaml}]
+                          {show,note,forget,profile} ...
+
+positional arguments:
+  {show,note,forget,profile}
+    show                Profile, recent notes and the most frequent playbooks/rules
+    note                Save a confirmed symptom -&gt; cause -&gt; fix (summaries only, no secrets)
+    forget              Delete a note by id (local-N)
+    profile             Set your platform, versions and team conventions
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="learning-show">kube-noob learning show</h2><pre>usage: kube-noob learning show [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="learning-note">kube-noob learning note</h2><pre>usage: kube-noob learning note [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] --symptom SYMPTOM --cause CAUSE --fix FIX
+                               [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--tag TAGS]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --symptom SYMPTOM
+  --cause CAUSE
+  --fix FIX
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --tag TAGS
+</pre><h2 id="learning-forget">kube-noob learning forget</h2><pre>usage: kube-noob learning forget [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                 [--format {text,json,yaml}]
+                                 note_id
+
+positional arguments:
+  note_id
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="learning-profile">kube-noob learning profile</h2><pre>usage: kube-noob learning profile [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                  [--format {text,json,yaml}]
+                                  [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                                  [--kubernetes X.Y] [--openshift X.Y] [--helm X.Y] [--rhacs X.Y]
+                                  [--rosa X.Y] [--convention CONVENTIONS]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --kubernetes X.Y      kubernetes version
+  --openshift X.Y       openshift version
+  --helm X.Y            helm version
+  --rhacs X.Y           rhacs version
+  --rosa X.Y            rosa version
+  --convention CONVENTIONS
+                        repeat for several
+</pre><h2 id="memory">kube-noob memory</h2><pre>usage: kube-noob memory [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}]
+                        {init,add,validate,match,outcome,stats,import,replay,migrate-learning} ...
+
+A memory repository holds entries/MEM-&lt;n&gt;.yaml, one per lesson. kube-noob reads it locally and never
+uploads, bundles or exports it. Example: kube-noob memory match &#x27;etcd leader changed&#x27; --dir ./memory
+
+positional arguments:
+  {init,add,validate,match,outcome,stats,import,replay,migrate-learning}
+    init                Scaffold a repository: README, schema, entries/, CI templates (keeps files)
+    add                 Write a proposed entry (never commits; review it in a pull request)
+    validate            Schema, duplicates, review dates, credentials and the fix verifier
+    match               Entries for an error, an alert payload or a symptom (approved only)
+    outcome             Record that an entry was applied, and how it went
+    stats               Entries and outcomes, optionally per cluster, signal or component
+    import              Turn resolved tickets from a ServiceNow or Jira export into proposed entries (people
+                        removed)
+    replay              Would memory have helped? Replay tickets in date order and report hits, misses and
+                        useful matches
+    migrate-learning    Turn confirmed learning notes into proposed entries (once)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="memory-init">kube-noob memory init</h2><pre>usage: kube-noob memory init [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}]
+                             dir
+
+positional arguments:
+  dir
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="memory-add">kube-noob memory add</h2><pre>usage: kube-noob memory add [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                            [--format {text,json,yaml}] --symptom SYMPTOM --cause CAUSE --fix FIX
+                            [--kind {fix,negative,runbook}] [--signal SIGNAL] [--command COMMANDS]
+                            [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--introduced X.Y[.Z]]
+                            [--fixed-in X.Y[.Z]] [--owner OWNERS] [--source SOURCES]
+                            dir
+
+positional arguments:
+  dir
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --symptom SYMPTOM
+  --cause CAUSE
+  --fix FIX
+  --kind {fix,negative,runbook}
+  --signal SIGNAL       kind:name, e.g. alert:etcdNoLeader (repeat)
+  --command COMMANDS    one command (repeat)
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --introduced X.Y[.Z]
+  --fixed-in X.Y[.Z]
+  --owner OWNERS        team or person (repeat)
+  --source SOURCES      https URL (repeat)
+</pre><h2 id="memory-validate">kube-noob memory validate</h2><pre>usage: kube-noob memory validate [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                 [--format {text,json,yaml}] [--strict]
+                                 dir
+
+positional arguments:
+  dir
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --strict              passed review dates are errors
+</pre><h2 id="memory-match">kube-noob memory match</h2><pre>usage: kube-noob memory match [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [-f FILE] [--dir DIRS] [--version PVERSION]
+                              [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}]
+                              [--operator OPERATOR] [--include-proposed] [--limit LIMIT]
+                              [text ...]
+
+positional arguments:
+  text                  the error or symptom, in quotes
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -f FILE, --file FILE  a file (e.g. an Alertmanager payload), or &#x27;-&#x27; for stdin
+  --dir DIRS            memory repository (repeat); default: memory.paths
+  --version PVERSION    your OpenShift version: entries fixed there show as retired
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --operator OPERATOR   name=version of an installed operator (repeat)
+  --include-proposed
+  --limit LIMIT
+</pre><h2 id="memory-outcome">kube-noob memory outcome</h2><pre>usage: kube-noob memory outcome [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] --result {resolved,partial,not-resolved}
+                                [--ticket TICKET] [--cluster CLUSTER] [--date YYYY-MM-DD]
+                                dir MEM-N
+
+positional arguments:
+  dir
+  MEM-N
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --result {resolved,partial,not-resolved}
+  --ticket TICKET       an opaque ticket reference, e.g. INC-4211
+  --cluster CLUSTER     a cluster label, e.g. prod-east
+  --date YYYY-MM-DD
+</pre><h2 id="memory-stats">kube-noob memory stats</h2><pre>usage: kube-noob memory stats [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [--by {cluster,signal,component}]
+                              dir
+
+positional arguments:
+  dir
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --by {cluster,signal,component}
+</pre><h2 id="memory-import">kube-noob memory import</h2><pre>usage: kube-noob memory import [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] --from
+                               {servicenow-json,servicenow-csv,jira-json,jira-csv} -f FILE
+                               [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--owner OWNER]
+                               [--cluster CLUSTER] [--dry-run]
+                               dir
+
+positional arguments:
+  dir
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --from {servicenow-json,servicenow-csv,jira-json,jira-csv}
+                        the export&#x27;s format (--format stays the output format)
+  -f FILE, --file FILE  the export file, or &#x27;-&#x27; for stdin
+  --platform {kubernetes,openshift,rosa-classic,rosa-hcp}
+  --owner OWNER
+  --cluster CLUSTER     a cluster label for every imported outcome, e.g. prod-east
+  --dry-run             show what would be written; write nothing
+</pre><h2 id="memory-replay">kube-noob memory replay</h2><pre>usage: kube-noob memory replay [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] --memory MEMORY --tickets TICKETS --from
+                               {servicenow-json,servicenow-csv,jira-json,jira-csv} [--labels LABELS]
+                               [--as-of-ticket-date] [--approved-only] [--out OUT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --memory MEMORY       the memory repository
+  --tickets TICKETS     the ticket export to replay
+  --from {servicenow-json,servicenow-csv,jira-json,jira-csv}
+                        the export&#x27;s format (--format stays the output format)
+  --labels LABELS       YAML: ticket ref -&gt; true/false (was the match useful?)
+  --as-of-ticket-date   only entries created before each ticket count
+  --approved-only       ignore proposed entries
+  --out OUT             directory for report.md and report.json
+</pre><h2 id="memory-migrate-learning">kube-noob memory migrate-learning</h2><pre>usage: kube-noob memory migrate-learning [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                         [--format {text,json,yaml}] [--owner OWNER]
+                                         dir
+
+positional arguments:
+  dir
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --owner OWNER
+</pre><h2 id="ask">kube-noob ask</h2><pre>usage: kube-noob ask [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+                     question
+
+positional arguments:
+  question
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="mcp">kube-noob mcp</h2><pre>usage: kube-noob mcp [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="serve">kube-noob serve</h2><pre>usage: kube-noob serve [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}] [--host HOST] [--port PORT] [--allow-unauthenticated]
+                       [--watch]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --host HOST
+  --port PORT
+  --allow-unauthenticated
+  --watch               also run the incident watch (watch.enabled)
+</pre><h2 id="corpus">kube-noob corpus</h2><pre>usage: kube-noob corpus [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}]
+                        {build,jira,jira-snapshot,jira-changes,jira-audit,jira-projects,history,advisories,known-issues,stats,verify,add-docs,import,seal,unseal,db-bundle,db-check}
+                        ...
+
+positional arguments:
+  {build,jira,jira-snapshot,jira-changes,jira-audit,jira-projects,history,advisories,known-issues,stats,verify,add-docs,import,seal,unseal,db-bundle,db-check}
+    build               Ingest public Git sources
+    jira                Keep a local copy of Red Hat&#x27;s public Jira tickets (every status), through its REST
+                        API
+    jira-snapshot       Pack the local Jira copy (tickets, sync state, change log) into one file other
+                        installs import
+    jira-changes        Reconcile: tickets fixed, closed, reopened or opened since a date, and the open
+                        tickets by project
+    jira-audit          What the local Jira copy holds: tickets, comments kept, cut or older tickets, key
+                        coverage, and a check that no people are left in it
+    jira-projects       List the projects on Red Hat&#x27;s public Jira, marking the default set
+    history             Release timelines from Git tags
+    advisories          Red Hat CSAF VEX statements (CC BY 4.0) for OpenShift, RHACS, ACM, layered products
+                        and RHEL 8/9
+    known-issues        Refresh reported OpenShift issues from the release notes (Git)
+    add-docs            Index your own runbooks (Markdown/AsciiDoc/text folder), offline
+    import              Import a corpus directory or .tgz (the corpus-refresh artifact, a Jira snapshot,
+                        kube-noob-db)
+    seal                Seal a Jira snapshot with your organisation&#x27;s key (AES-256-GCM, a key file of 16+
+                        characters)
+    unseal              Open a Jira snapshot with your organisation&#x27;s key (AES-256-GCM, a key file of 16+
+                        characters)
+    db-bundle           Pack what may be shared (redistributable docs, release history, known issues) into
+                        kube-noob-db.tgz
+    db-check            Check a kube-noob-db archive or folder: redistributable records on allowed licenses
+                        only, no Jira data, every file listed with its checksum (exit 1 on any problem)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="corpus-build">kube-noob corpus build</h2><pre>usage: kube-noob corpus build [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [--sources SOURCES]
+                              [--limit-per-source LIMIT_PER_SOURCE] [--online]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --sources SOURCES     comma-separated source ids or &#x27;all&#x27;
+  --limit-per-source LIMIT_PER_SOURCE
+  --online              Required: confirm network ingestion
+</pre><h2 id="corpus-jira">kube-noob corpus jira</h2><pre>usage: kube-noob corpus jira [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] [--projects PROJECTS] [--max-requests MAX_REQUESTS]
+                             [--online]
+
+Copy every ticket of the chosen projects, whatever its status, into the data folder and index it for known-
+issues, diagnose and the incident watch. Paced at one request per second or slower; --max-requests caps a
+run and the next run resumes. The copy is not redistributable and never leaves this machine.
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --projects PROJECTS   default (Kubernetes, OpenShift, ROSA, ACM, RHACS), all, or keys such as OCPBUGS,ROX
+  --max-requests MAX_REQUESTS
+                        request budget for this run (default jira.maxRequests)
+  --online
+</pre><h2 id="corpus-jira-snapshot">kube-noob corpus jira-snapshot</h2><pre>usage: kube-noob corpus jira-snapshot [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                      [--format {text,json,yaml}] [-o OUT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -o OUT, --out OUT     output file (keep it inside your organisation)
+</pre><h2 id="corpus-jira-changes">kube-noob corpus jira-changes</h2><pre>usage: kube-noob corpus jira-changes [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                     [--format {text,json,yaml}] [--since SINCE] [--project PROJECT]
+                                     [--kind KIND] [--limit LIMIT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --since SINCE         2d, 36h, 90m or a date such as 2026-10-25 (default 2d)
+  --project PROJECT     one project key, e.g. OCPBUGS
+  --kind KIND           fixed, not-a-bug, reopened, opened... (repeat)
+  --limit LIMIT
+</pre><h2 id="corpus-jira-audit">kube-noob corpus jira-audit</h2><pre>usage: kube-noob corpus jira-audit [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                   [--format {text,json,yaml}] [--project PROJECT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --project PROJECT     one project key, e.g. OCPBUGS
+</pre><h2 id="corpus-jira-projects">kube-noob corpus jira-projects</h2><pre>usage: kube-noob corpus jira-projects [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                      [--format {text,json,yaml}] [--online]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --online
+</pre><h2 id="corpus-history">kube-noob corpus history</h2><pre>usage: kube-noob corpus history [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                [--format {text,json,yaml}] [--online]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --online
+</pre><h2 id="corpus-advisories">kube-noob corpus advisories</h2><pre>usage: kube-noob corpus advisories [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                   [--format {text,json,yaml}] [--online] [--cves CVES] [--since SINCE]
+                                   [--from-archive FROM_ARCHIVE] [--max-requests MAX_REQUESTS] [--replace]
+
+Per CVE: severity, CVSS and each component&#x27;s status per product (fixed with the erratum, affected, not
+affected with the VEX justification, under investigation). Paced one request a second plus jitter. Examples:
+kube-noob corpus advisories --online --cves CVE-2023-44487; kube-noob corpus advisories --online --since
+2026-10-27; kube-noob corpus advisories --from-archive csaf_vex.tar.zst
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --online
+  --cves CVES           comma-separated CVE ids
+  --since SINCE         every CVE whose VEX changed after this date or time (from changes.csv)
+  --from-archive FROM_ARCHIVE
+                        a downloaded VEX archive (.tar.zst, .tar.gz or a folder), read offline
+  --max-requests MAX_REQUESTS
+  --replace             start the shard over instead of merging
+</pre><h2 id="corpus-known-issues">kube-noob corpus known-issues</h2><pre>usage: kube-noob corpus known-issues [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                     [--format {text,json,yaml}] [--minors MINORS] [--online]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --minors MINORS       comma-separated OpenShift minor releases
+  --online
+</pre><h2 id="corpus-stats">kube-noob corpus stats</h2><pre>usage: kube-noob corpus stats [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="corpus-verify">kube-noob corpus verify</h2><pre>usage: kube-noob corpus verify [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="corpus-add-docs">kube-noob corpus add-docs</h2><pre>usage: kube-noob corpus add-docs [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                 [--format {text,json,yaml}] --source SOURCE [--base-url BASE_URL]
+                                 path
+
+positional arguments:
+  path                  folder with .md, .adoc, .txt or .rst files (for example a cloned wiki)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --source SOURCE       short name, e.g. platform-runbooks
+  --base-url BASE_URL   link prefix for citations, e.g. https://git.example.com/runbooks/blob/main
+</pre><h2 id="corpus-import">kube-noob corpus import</h2><pre>usage: kube-noob corpus import [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] [--key-file KEY_FILE]
+                               path
+
+positional arguments:
+  path
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --key-file KEY_FILE   the key of a sealed snapshot (default: $KUBE_NOOB_SEED_KEY_FILE)
+</pre><h2 id="corpus-seal">kube-noob corpus seal</h2><pre>usage: kube-noob corpus seal [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] -o OUTPUT [--key-file KEY_FILE]
+                             path
+
+Example: openssl rand -base64 32 &gt; seed.key &amp;&amp; kube-noob corpus seal jira-snapshot.tgz -o jira-
+snapshot.tgz.enc --key-file seed.key
+
+positional arguments:
+  path
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -o OUTPUT, --output OUTPUT
+  --key-file KEY_FILE   default: $KUBE_NOOB_SEED_KEY_FILE
+</pre><h2 id="corpus-unseal">kube-noob corpus unseal</h2><pre>usage: kube-noob corpus unseal [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                               [--format {text,json,yaml}] -o OUTPUT [--key-file KEY_FILE]
+                               path
+
+Example: openssl rand -base64 32 &gt; seed.key &amp;&amp; kube-noob corpus seal jira-snapshot.tgz -o jira-
+snapshot.tgz.enc --key-file seed.key
+
+positional arguments:
+  path
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -o OUTPUT, --output OUTPUT
+  --key-file KEY_FILE   default: $KUBE_NOOB_SEED_KEY_FILE
+</pre><h2 id="corpus-db-bundle">kube-noob corpus db-bundle</h2><pre>usage: kube-noob corpus db-bundle [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                  [--format {text,json,yaml}] [-o OUTPUT]
+
+Shards marked not redistributable and every Jira shard are left out; the archive is checked before it is
+written. Example: kube-noob corpus db-bundle -o dist/kube-noob-db.tgz
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  -o OUTPUT, --output OUTPUT
+                        the archive to write
+</pre><h2 id="corpus-db-check">kube-noob corpus db-check</h2><pre>usage: kube-noob corpus db-check [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                                 [--format {text,json,yaml}]
+                                 path
+
+positional arguments:
+  path
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="train">kube-noob train</h2><pre>usage: kube-noob train [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                       [--format {text,json,yaml}]
+                       {export,grade,bench,tasks} ...
+
+positional arguments:
+  {export,grade,bench,tasks}
+    export              Export SFT + GRPO datasets
+    grade               Grade a completion against a benchmark task
+    bench               Run the benchmark through the configured LLM
+    tasks               List benchmark tasks
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="train-export">kube-noob train export</h2><pre>usage: kube-noob train export [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                              [--format {text,json,yaml}] [--out OUT] [--include-restricted]
+                              [--synthetic-limit SYNTHETIC_LIMIT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --out OUT
+  --include-restricted  Include non-redistributable corpus records (local/private training only)
+  --synthetic-limit SYNTHETIC_LIMIT
+</pre><h2 id="train-grade">kube-noob train grade</h2><pre>usage: kube-noob train grade [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] --task TASK -f FILE
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --task TASK
+  -f FILE, --file FILE
+</pre><h2 id="train-bench">kube-noob train bench</h2><pre>usage: kube-noob train bench [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}] [--tasks TASKS] [--no-tools] [--out OUT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --tasks TASKS         comma-separated task ids
+  --no-tools
+  --out OUT
+</pre><h2 id="train-tasks">kube-noob train tasks</h2><pre>usage: kube-noob train tasks [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                             [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="config">kube-noob config</h2><pre>usage: kube-noob config [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="doctor">kube-noob doctor</h2><pre>usage: kube-noob doctor [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                        [--format {text,json,yaml}]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+</pre><h2 id="selftest">kube-noob selftest</h2><pre>usage: kube-noob selftest [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
+                          [--format {text,json,yaml}]
+                          [--category {kubernetes,helm,openshift,rosa-hcp,rhacs,everyday}] [--cases CASES]
+                          [--gate GATE] [--out OUT]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --category {kubernetes,helm,openshift,rosa-hcp,rhacs,everyday}
+  --cases CASES         your own problems instead of the built-in battery: YAML, JSONL, CSV, or plain text
+                        (one per line, or blocks separated by ---)
+  --gate GATE           with --cases: fail (exit 1) when the pass rate is below this, 0-1
+  --out OUT             with --cases: write report.md and report.json to this folder
+</pre><h2 id="demo">kube-noob demo</h2><pre>usage: kube-noob demo [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled] [--format {text,json,yaml}]
+                      [--list]
+                      [scenario]
+
+positional arguments:
+  scenario              scenario name or &#x27;all&#x27; (see --list)
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       Path to kube-noob.yaml (default: lookup chain, see docs)
+  --web-enabled         Override webEnabled: true for this invocation
+  --cluster-enabled     Override cluster.enabled: true (read-only)
+  --format {text,json,yaml}
+  --list
+</pre></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

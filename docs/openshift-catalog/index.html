@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Getting kube-noob into OpenShift&#x27;s catalogs · kube-noob</title>
+<meta name="description" content="The fastest credible route is the community tier of the OpenShift Helm charts repository: the chart then appears in every cluster&#x27;s console Helm catalog…">
+<link rel="canonical" href="https://kube-noob.com/docs/openshift-catalog/">
+<meta property="og:title" content="Getting kube-noob into OpenShift&#x27;s catalogs · kube-noob">
+<meta property="og:description" content="The fastest credible route is the community tier of the OpenShift Helm charts repository: the chart then appears in every cluster&#x27;s console Helm catalog…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/openshift-catalog/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/" aria-current="page">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="getting-kube-noob-into-openshifts-catalogs">Getting kube-noob into OpenShift's catalogs</h1>
+<p>The fastest credible route is the community tier of the OpenShift Helm charts repository: the chart then appears in
+every cluster's console Helm catalog under the "Community" source. Researched 2026-10-27; sources at the end.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Who can submit</th>
+<th>Effort</th>
+<th>Where it shows</th>
+<th>Status for kube-noob</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenShift Helm charts, community</td>
+<td>Anyone listed in the chart's OWNERS file</td>
+<td>1 to 2 days plus a manual review</td>
+<td>Console Helm catalog, "Community"</td>
+<td>Ready: chart lints with defaults, has a README, schema and test; released as <code>.tgz</code> and OCI</td>
+</tr>
+<tr>
+<td>Artifact Hub</td>
+<td>Anyone</td>
+<td>Hours</td>
+<td>artifacthub.io (search, not the console)</td>
+<td>Ready once the OCI chart is published by a release</td>
+</tr>
+<tr>
+<td>Community operator (Software Catalog, OLM)</td>
+<td>Anyone, with DCO sign-off</td>
+<td>1 to 2 weeks (Helm-based operator, bundle, file-based catalog)</td>
+<td>Console Software Catalog</td>
+<td>Later: only if you want OLM-managed installs</td>
+</tr>
+<tr>
+<td>Red Hat certification (Partner Connect)</td>
+<td>Companies</td>
+<td>Weeks</td>
+<td>"Certified" badge</td>
+<td>Later: needs a company account</td>
+</tr>
+<tr>
+<td>OpenShift AI MCP catalog</td>
+<td>Curated by Red Hat; no public submission path found</td>
+<td>n/a</td>
+<td>OpenShift AI</td>
+<td>Watch; contact Red Hat when there is traction</td>
+</tr>
+<tr>
+<td>Red Hat Marketplace</td>
+<td>Closed on 1 April 2025</td>
+<td>n/a</td>
+<td>n/a</td>
+<td>Not an option</td>
+</tr>
+</tbody>
+</table></div>
+<p>OpenShift Lightspeed has no catalog: a cluster admin adds kube-noob in <code>OLSConfig.spec.mcpServers</code> (<a href="/docs/openshift/">openshift.md</a>).</p>
+<h2 id="submit-the-helm-chart-community">Submit the Helm chart (community)</h2>
+<ol>
+<li>Tag a release. The release workflow lints and packages the chart, pushes it to <code>oci://ghcr.io/aashishmahajan/charts</code>,
+   signs it, and attaches <code>kube-noob-&lt;version&gt;.tgz</code> to the GitHub release.</li>
+<li>Fork <code>openshift-helm-charts/charts</code> and open a first pull request that adds only
+   <code>charts/community/kube-noob/kube-noob/OWNERS</code>, a copy of
+   <a href="https://github.com/aashishmahajan/kube-noob/blob/main/deploy/openshift-catalog/OWNERS">deploy/openshift-catalog/OWNERS</a>. Sign off the commit (<code>git commit -s</code>).</li>
+<li>After it merges, open a second pull request that adds <code>charts/community/kube-noob/kube-noob/&lt;version&gt;/</code> with the
+   release's <code>kube-noob-&lt;version&gt;.tgz</code>. The pipeline runs chart-verifier with the community profile (helm-lint is the
+   one mandatory check) and then waits for a manual approval.</li>
+<li>Once merged, the chart is in the index the OpenShift console reads, under Helm charts, source "Community".</li>
+</ol>
+<p>Commands for steps 2 and 3 (GitHub CLI; replace the version in step 3 with the newest release):</p>
+<pre><code class="language-bash">gh repo fork openshift-helm-charts/charts --clone=false
+gh repo clone aashishmahajan/charts ~/openshift-helm-charts -- --depth 1
+cd ~/openshift-helm-charts
+git switch -c kube-noob-owners
+mkdir -p charts/community/kube-noob/kube-noob
+curl -fsSL https://raw.githubusercontent.com/aashishmahajan/kube-noob/main/deploy/openshift-catalog/OWNERS -o charts/community/kube-noob/kube-noob/OWNERS
+git add charts/community/kube-noob/kube-noob/OWNERS
+git commit -s -m &quot;Add OWNERS for the kube-noob community chart&quot;
+git push -u origin kube-noob-owners
+gh pr create --repo openshift-helm-charts/charts --head aashishmahajan:kube-noob-owners --title &quot;Add OWNERS for the kube-noob community chart&quot; --body &quot;Adds the OWNERS file for the kube-noob community chart (Apache-2.0, https://github.com/aashishmahajan/kube-noob). The chart follows in a separate pull request.&quot;
+</code></pre>
+<p>After the OWNERS pull request merges:</p>
+<pre><code class="language-bash">cd ~/openshift-helm-charts
+git switch main
+git pull --ff-only https://github.com/openshift-helm-charts/charts main
+git switch -c kube-noob-0.7.1
+mkdir -p charts/community/kube-noob/kube-noob/0.7.1
+gh release download v0.7.1 --repo aashishmahajan/kube-noob --pattern &quot;kube-noob-0.7.1.tgz&quot; --dir charts/community/kube-noob/kube-noob/0.7.1
+git add charts/community/kube-noob/kube-noob/0.7.1
+git commit -s -m &quot;Add kube-noob 0.7.1 community chart&quot;
+git push -u origin kube-noob-0.7.1
+gh pr create --repo openshift-helm-charts/charts --head aashishmahajan:kube-noob-0.7.1 --title &quot;Add kube-noob 0.7.1 community chart&quot; --body &quot;kube-noob 0.7.1: audit, debugging and learning tools for Kubernetes and OpenShift as an MCP server. Runs under restricted-v2 with NetworkPolicies; signed OCI copy at oci://ghcr.io/aashishmahajan/charts/kube-noob.&quot;
+</code></pre>
+<p>To check locally before submitting, run chart-verifier with the community profile on the packaged chart (command in
+the action items of the release checklist, <a href="/docs/release-readiness/">release-readiness.md</a>).</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li>OpenShift Helm charts submission guide: https://github.com/openshift-helm-charts/charts/blob/main/docs/README.md</li>
+<li>chart-verifier checks and profiles: https://github.com/redhat-certification/chart-verifier/blob/main/docs/helm-chart-checks.md</li>
+<li>Community charts already listed by individuals (index): https://github.com/openshift-helm-charts/charts/blob/gh-pages/index.yaml</li>
+<li>Helm charts in the console: https://docs.redhat.com/en/documentation/openshift_dedicated/4/html/applications/working-with-helm-charts</li>
+<li>Community operators pipeline: https://redhat-openshift-ecosystem.github.io/operator-pipelines/users/contributing-prerequisites/</li>
+<li>Red Hat Marketplace sunset: https://access.redhat.com/articles/7130828</li>
+<li>OpenShift AI MCP catalog: https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai</li>
+<li>Artifact Hub repositories: https://artifacthub.io/docs/topics/repositories/</li>
+</ul><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/openshift-catalog.md">docs/openshift-catalog.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Guidance traceability · kube-noob</title>
+<meta name="description" content="Every product rule is listed here with the automated checks that enforce it. tests/test_guidance.py fails if a referenced test or CI step disappears, so…">
+<link rel="canonical" href="https://kube-noob.com/docs/guidance/">
+<meta property="og:title" content="Guidance traceability · kube-noob">
+<meta property="og:description" content="Every product rule is listed here with the automated checks that enforce it. tests/test_guidance.py fails if a referenced test or CI step disappears, so…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/guidance/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/" aria-current="page">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="guidance-traceability">Guidance traceability</h1>
+<p>Every product rule is listed here with the automated checks that enforce it. <code>tests/test_guidance.py</code> fails if a
+referenced test or CI step disappears, so a rule cannot lose its check without this table changing in the same review.</p>
+<p>Reference formats: <code>tests/&lt;file&gt;.py::&lt;test&gt;</code> for a pytest test, and <code>ci:&lt;step or job name&gt;</code> for a GitHub Actions step
+or job.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Rule</th>
+<th>Enforced by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G01</td>
+<td>Offline by default: no web, no cluster, no telemetry unless enabled</td>
+<td><code>tests/test_config_net.py::test_defaults_are_offline</code>, <code>tests/test_debug.py::test_cluster_disabled_by_default</code>, <code>tests/test_server_agent_cli.py::test_toolkit_availability_gates</code></td>
+</tr>
+<tr>
+<td>G02</td>
+<td>Admin offline lock overrides <code>webEnabled</code>, blocks corpus downloads, allows only local models, and only tightens</td>
+<td><code>tests/test_offline_lock.py::test_lock_beats_web_enabled_everywhere</code>, <code>tests/test_offline_lock.py::test_lock_allows_only_local_models</code>, <code>tests/test_offline_lock.py::test_lock_only_tightens</code>, <code>ci:Chart guards (fail-closed NetworkPolicy, fsGroup only off-OpenShift, web flag wired to env)</code>, <code>tests/test_review_regressions.py::test_any_true_spelling_locks</code>, <code>tests/test_review_regressions.py::test_unreadable_system_config_fails_closed</code>, <code>tests/test_review_regressions.py::test_locked_model_client_never_leaves_loopback</code>, <code>tests/test_review_regressions.py::test_lock_locality_is_strict</code>, <code>tests/test_review_regressions.py::test_corpus_download_is_refused_by_the_lock_itself</code></td>
+</tr>
+<tr>
+<td>G03</td>
+<td>Web, when enabled: HTTPS GET only, allowlisted domains and redirects, text content only, size-capped, never written to disk or executed</td>
+<td><code>tests/test_offline_lock.py::test_web_reads_text_only_and_only_with_get</code>, <code>tests/test_config_net.py::test_domain_allowlist_applies_to_redirects</code>, <code>tests/test_config_net.py::test_web_blocked_when_disabled</code>, <code>tests/test_security_hardening.py::test_web_fetch_stops_at_max_bytes</code>, <code>tests/test_offline_lock.py::test_web_fetch_bounds_compressed_bodies_and_odd_charsets</code></td>
+</tr>
+<tr>
+<td>G04</td>
+<td>Posture is provable: <code>doctor</code> reports reach and fails on contradictions</td>
+<td><code>tests/test_offline_lock.py::test_doctor_reports_posture_and_flags_conflicts</code></td>
+</tr>
+<tr>
+<td>G05</td>
+<td>Cluster access is read-only, Secrets are never read, values are redacted</td>
+<td><code>tests/test_debug.py::test_secrets_never_allowed</code>, <code>tests/test_debug.py::test_redaction</code>, <code>tests/test_security_hardening.py::test_cluster_redaction_covers_values_args_and_list_wrappers</code>, <code>ci:Helm test (in-cluster readiness through the Service)</code></td>
+</tr>
+<tr>
+<td>G06</td>
+<td>Diagnose before change: read-only steps (get, describe, logs, bundle) first; exec and changes need approval</td>
+<td><code>tests/test_diagnose_first.py::test_classify_step</code>, <code>tests/test_diagnose_first.py::test_playbook_checks_never_mutate</code>, <code>tests/test_diagnose_first.py::test_diagnosis_orders_read_only_steps_first_and_gates_the_rest</code>, <code>tests/test_diagnose_first.py::test_bundle_writes_redacted_read_only_evidence</code>, <code>tests/test_review_regressions.py::test_classify_segments</code>, <code>tests/test_diagnose_first.py::test_diagnose_cli_takes_pasted_text_a_file_or_stdin</code></td>
+</tr>
+<tr>
+<td>G07</td>
+<td>Commands meant for copy-paste never carry shell comments (zsh would pass them as arguments)</td>
+<td><code>tests/test_diagnose_first.py::test_no_copyable_command_carries_a_shell_comment</code>, <code>tests/test_diagnose_first.py::test_split_comment</code>, <code>tests/test_review_regressions.py::test_every_playbook_command_is_paste_safe</code></td>
+</tr>
+<tr>
+<td>G08</td>
+<td>Specific root causes outrank generic symptoms</td>
+<td><code>tests/test_diagnose_first.py::test_specific_cause_outranks_generic_crashloop</code>, <code>tests/test_debug.py::test_diagnose_top_match</code>, <code>tests/test_diagnose_first.py::test_x509_rbac_and_platform_specific_steps</code></td>
+</tr>
+<tr>
+<td>G09</td>
+<td>Learning file: confirmed notes only, no secrets/logs/manifests, upgrade-safe, never exported</td>
+<td><code>tests/test_learning_file.py::test_confirmed_note_persists_and_is_searchable</code>, <code>tests/test_learning_file.py::test_rejects_credentials_manifests_and_raw_logs</code>, <code>tests/test_learning_file.py::test_older_file_loads_after_upgrade_and_keeps_unknown_keys</code>, <code>tests/test_learning_file.py::test_newer_or_corrupt_files_are_never_clobbered</code>, <code>tests/test_learning_file.py::test_mcp_note_requires_user_confirmation_and_never_exports</code>, <code>tests/test_learning_file.py::test_tools_count_patterns_not_content</code>, <code>tests/test_review_regressions.py::test_note_filter_rejects_secrets_manifests_and_logs</code>, <code>tests/test_review_regressions.py::test_concurrent_processes_never_lose_writes</code>, <code>tests/test_review_regressions.py::test_malformed_learning_file_is_contained</code>, <code>tests/test_review_regressions.py::test_two_corrupt_loads_keep_both_backups</code>, <code>tests/test_review_regressions.py::test_notes_reject_even_a_single_log_or_event_line</code></td>
+</tr>
+<tr>
+<td>G10</td>
+<td>Every design request runs the 7-step protocol</td>
+<td><code>tests/test_demos.py::test_protocol_runs_all_seven_steps_in_order</code>, <code>tests/test_generate.py::test_clarification_gate</code>, <code>tests/test_generate.py::test_protocol_takes_version_from_blueprint</code>, <code>tests/test_generate.py::test_protocol_takes_version_from_the_request_text</code></td>
+</tr>
+<tr>
+<td>G11</td>
+<td>Generated and fixed YAML is audited clean and accepted by a real API server</td>
+<td><code>tests/test_generate.py::test_generated_bundles_are_clean</code>, <code>tests/test_audit.py::test_fixer_resolves_blockers</code>, <code>ci:Server-side dry-run of generated manifests</code></td>
+</tr>
+<tr>
+<td>G12</td>
+<td>Answers cite credited sources; the reward is deterministic, resists gaming and credits a citation only when the cited chunk supports the sentence</td>
+<td><code>tests/test_reward_hardening.py::test_citation_to_the_right_doc_but_wrong_chunk_earns_no_credit</code>, <code>tests/test_knowledge_learn.py::test_citations_inside_knowledge_docs_resolve</code>, <code>tests/test_reward_hardening.py::test_qa_gaming_attempts_score_low</code>, <code>tests/test_reward_hardening.py::test_irrelevant_valid_citation_earns_no_credit</code>, <code>tests/test_evals_jira.py::test_uncited_answer_gets_no_credit_when_required</code>, <code>tests/test_knowledge_learn.py::test_citation_extraction</code></td>
+</tr>
+<tr>
+<td>G13</td>
+<td>Public ROX Jira (4.10+) is pulled politely and scrubbed of identities</td>
+<td><code>tests/test_evals_jira.py::test_pull_project_paginates_retries_and_scrubs</code>, <code>tests/test_evals_jira.py::test_classify_versions</code></td>
+</tr>
+<tr>
+<td>G14</td>
+<td>Local or frontier models plug in; failures are clean</td>
+<td><code>tests/test_coverage_paths.py::test_openai_compatible_provider</code>, <code>tests/test_security_hardening.py::test_unreachable_local_model_fails_cleanly</code>, <code>tests/test_server_agent_cli.py::test_agent_loop_with_tools</code></td>
+</tr>
+<tr>
+<td>G15</td>
+<td>Learners are graded offline by production rules</td>
+<td><code>tests/test_knowledge_learn.py::test_reference_solutions_pass</code>, <code>tests/test_knowledge_learn.py::test_starters_fail</code>, <code>tests/test_knowledge_learn.py::test_tutor_flow_and_credits</code></td>
+</tr>
+<tr>
+<td>G16</td>
+<td>At least 5 offline demos, each under 10 seconds, isolated from user data</td>
+<td><code>tests/test_demos.py::test_demo_list</code>, <code>tests/test_demos.py::test_each_demo_runs_offline_fast_and_isolated</code>, <code>tests/test_demos.py::test_examples_ship_in_the_wheel</code>, <code>tests/test_demos.py::test_every_scenario_has_a_recorded_tape</code>, <code>ci:Render demo GIFs</code>, <code>ci:Install wheel in a clean venv and smoke-test</code></td>
+</tr>
+<tr>
+<td>G17</td>
+<td>MCP surface is strict: unknown arguments rejected, HTTP needs a token, host checks, body limit</td>
+<td><code>tests/test_server_agent_cli.py::test_mcp_rejects_unknown_arguments</code>, <code>tests/test_server_agent_cli.py::test_http_app_auth_and_health</code>, <code>tests/test_server_agent_cli.py::test_http_host_checks</code>, <code>tests/test_server_agent_cli.py::test_http_body_limit_and_audit_log</code>, <code>ci:MCP end-to-end over HTTP</code></td>
+</tr>
+<tr>
+<td>G18</td>
+<td>Releases are consistent and publishable: one version everywhere, dists pass the publish action's twine</td>
+<td><code>tests/test_distribution.py::test_plugin_pins_the_release</code>, <code>tests/test_distribution.py::test_mcp_registry_metadata</code>, <code>tests/test_bump_version.py::test_bump_updates_every_reference</code>, <code>tests/test_distribution.py::test_image_build_context_has_every_wheel_input</code>, <code>ci:publishable</code></td>
+</tr>
+<tr>
+<td>G19</td>
+<td>Weekly risk review decides whether a patch release is needed</td>
+<td><code>tests/test_risk_review.py::test_decision_rule</code>, <code>tests/test_risk_review.py::test_knowledge_drift_compares_minor_or_patch_as_declared</code></td>
+</tr>
+<tr>
+<td>G20</td>
+<td>Docs stay focused: README under 600 words, use cases, learning and guidance linked</td>
+<td><code>tests/test_guidance.py::test_docs_are_concise_and_linked</code></td>
+</tr>
+<tr>
+<td>G21</td>
+<td>Users are oriented: <code>getting_started</code> prompt and role-based use cases</td>
+<td><code>tests/test_server_agent_cli.py::test_mcp_in_process</code>, <code>tests/test_guidance.py::test_docs_are_concise_and_linked</code></td>
+</tr>
+<tr>
+<td>G22</td>
+<td>The installed package keeps every guarantee end to end over MCP stdio: lock, posture, note filters, strict arguments, diagnose-first ranking, prompts</td>
+<td><code>ci:MCP stdio end-to-end under the offline lock (installed wheel)</code></td>
+</tr>
+<tr>
+<td>G23</td>
+<td>Answers stay right across Kubernetes, Helm, OpenShift 4.22, ROSA HCP, RHACS and everyday errors: a 61-question battery must pass in full</td>
+<td><code>tests/test_selftest.py::test_selftest_battery_passes_in_full</code>, <code>tests/test_selftest.py::test_selftest_cases_are_well_formed</code></td>
+</tr>
+<tr>
+<td>G24</td>
+<td>One product, four surfaces: MCP server, Claude plugin, CLI, OpenShift service/sidecar</td>
+<td><code>tests/test_distribution.py::test_ships_as_mcp_plugin_cli_and_openshift_service</code>, <code>tests/test_server_agent_cli.py::test_mcp_in_process</code>, <code>ci:Helm test (in-cluster readiness through the Service)</code>, <code>ci:Audit the sidecar example</code></td>
+</tr>
+<tr>
+<td>G25</td>
+<td>Bring your own runbooks: org docs are indexed offline, credentials masked, cited, never exported by default</td>
+<td><code>tests/test_org_docs.py::test_runbooks_are_indexed_masked_and_cited</code>, <code>tests/test_org_docs.py::test_add_docs_cli_works_under_the_offline_lock</code></td>
+</tr>
+<tr>
+<td>G26</td>
+<td>Cadences: weekly risk review; the Red Hat Jira main copy every day (or every 2 days with JIRA_EVERY_DAYS), continuing the previous encrypted copy and summarising what changed; the docs corpus weekly; ROX Jira corpus is 1000+ issues from 4.10 onward, credited</td>
+<td><code>tests/test_distribution.py::test_scheduled_cadences_and_rox_corpus_scope</code>, <code>tests/test_evals_jira.py::test_classify_versions</code></td>
+</tr>
+<tr>
+<td>G27</td>
+<td>The Claude plugin runs the bundled, readable stdio server with every dependency pinned by hash, installs no LLM SDK, sets no package-manager variable, reads no credential, keeps state out of the plugin root and fits the directory's limits (files under 256 KiB, readable text, under 512 files)</td>
+<td><code>tests/test_plugin.py::test_bundled_server_matches_the_source</code>, <code>tests/test_plugin.py::test_mcp_config_runs_the_bundled_source_from_the_lock</code>, <code>tests/test_plugin.py::test_lock_pins_every_dependency_with_registry_and_hashes</code>, <code>tests/test_plugin.py::test_plugin_installs_no_llm_sdk</code>, <code>tests/test_plugin.py::test_plugin_fits_the_directory_limits</code>, <code>tests/test_plugin.py::test_icon_is_small_and_carries_no_shell_like_text</code>, <code>tests/test_plugin.py::test_manifest_uses_only_fields_the_plugin_reference_defines</code>, <code>tests/test_plugin.py::test_bundle_reads_no_credentials_from_the_machine</code>, <code>tests/test_plugin.py::test_bundle_has_no_download_and_execute_pattern</code>, <code>tests/test_plugin.py::test_bundle_names_no_credential_variables</code>, <code>ci:Plugin server copy matches src</code>, <code>ci:Plugin lock matches its pyproject</code>, <code>ci:Plugin dependency vulnerability audit</code>, <code>ci:Plugin MCP server end to end (as .mcp.json runs it)</code></td>
+</tr>
+<tr>
+<td>G28</td>
+<td>Honest positioning: no AI inside; the client's model or the optional <code>kube-noob ask</code> does the talking; copy never calls kube-noob an AI, assistant or agent; a privacy policy lists every destination</td>
+<td><code>tests/test_guidance.py::test_positioning_says_no_ai_inside_and_never_claims_otherwise</code>, <code>tests/test_plugin.py::test_manifest_uses_only_fields_the_plugin_reference_defines</code>, <code>tests/test_guidance.py::test_privacy_policy_lists_every_destination</code></td>
+</tr>
+<tr>
+<td>G29</td>
+<td>Runs on OpenShift 4.20 and later under restricted-v2 and Pod Security restricted; egress is DNS only by default with an optional EgressFirewall; the sidecar is loopback-only; requests are sized from measurements and nothing from a request is retained</td>
+<td><code>tests/test_distribution.py::test_chart_egress_firewall_mirrors_the_web_allowlist</code>, <code>tests/test_distribution.py::test_sidecar_is_loopback_only_with_dns_only_egress</code>, <code>ci:Sidecar under Pod Security restricted (loopback only, transcript)</code>, <code>ci:Audit our own chart (OpenShift 4.20, 4.21, 4.22, Route, live cluster tools, EgressFirewall)</code>, <code>ci:Chart guards (fail-closed NetworkPolicy, fsGroup only off-OpenShift, web flag wired to env)</code>, <code>ci:Audit the sidecar example</code></td>
+</tr>
+<tr>
+<td>G30</td>
+<td>Installable with Homebrew on macOS and Linux from wheels pinned by hash</td>
+<td><code>tests/test_distribution.py::test_homebrew_formula_installs_hash_pinned_wheels</code>, <code>ci:Formula matches the PyPI release files</code>, <code>ci:Install and test the formula from a local tap</code></td>
+</tr>
+<tr>
+<td>G31</td>
+<td>Second red-team review: no caller content in logs, opaque crashes, auth before any body is read, no caller regex compiled, no shared note writes over HTTP, no download-and-run notes, isolated plugin interpreter, least-privilege RBAC and web egress</td>
+<td><code>tests/test_review_regressions.py::test_tool_failures_never_log_caller_content</code>, <code>tests/test_review_regressions.py::test_unexpected_errors_are_opaque_to_client_and_log</code>, <code>tests/test_review_regressions.py::test_requests_without_the_token_are_rejected_before_the_body_is_read</code>, <code>tests/test_review_regressions.py::test_inline_grade_patterns_are_literal_text</code>, <code>tests/test_review_regressions.py::test_shared_http_servers_offer_no_learning_writes</code>, <code>tests/test_review_regressions.py::test_notes_never_carry_download_and_run_commands</code>, <code>tests/test_plugin.py::test_mcp_config_runs_the_bundled_source_from_the_lock</code>, <code>tests/test_review_regressions.py::test_global_options_before_the_subcommand_are_honoured</code></td>
+</tr>
+<tr>
+<td>G32</td>
+<td>Says whether an issue is a reported OpenShift bug, with the issue link, fix version and release-notes source; never matches an everyday error to an unrelated bug; recall on the frozen eval stays at 0.8 or more with zero false matches, and signal terms only support a match the text's own rare words start; every answer states how current its knowledge is, live checks read the cluster version, and web results are marked external</td>
+<td><code>tests/test_known_issues.py::test_parser_reads_known_and_fixed_issues_and_links_the_fix</code>, <code>tests/test_known_issues.py::test_bundled_index_cites_every_issue_and_fits_the_plugin_limits</code>, <code>tests/test_known_issues.py::test_real_errors_match_the_reported_issue</code>, <code>tests/test_known_issues.py::test_generic_errors_never_match_a_reported_issue</code>, <code>tests/test_known_issues.py::test_version_filter_and_status_messages</code>, <code>tests/test_known_issues.py::test_every_mcp_result_carries_the_knowledge_date</code>, <code>tests/test_known_issues.py::test_web_results_are_labelled_external_and_after_the_cutoff</code>, <code>tests/test_known_issues.py::test_cluster_info_reads_openshift_and_flags_versions_newer_than_the_knowledge</code>, <code>tests/test_known_issue_recall.py::test_recall_and_precision_gate</code>, <code>tests/test_known_issue_recall.py::test_the_measured_etcd_gap_is_closed</code>, <code>tests/test_known_issue_recall.py::test_signal_terms_support_a_match_but_never_make_one_alone</code></td>
+</tr>
+<tr>
+<td>G33</td>
+<td>Explains why a request was denied, policy by policy (Kyverno, Gatekeeper, ValidatingAdmissionPolicy, Pod Security, SCC, RHACS, quota, LimitRange, RBAC), with read-only checks, the fix and the matching audit rules; never treats an everyday error as a denial; says whether a NetworkPolicy allows a connection, which rule decides it, and proposes an allow policy that admits exactly that traffic; text from logs and manifests never puts shell syntax or terminal escapes into a command or the terminal, and hostile input cannot make it slow</td>
+<td><code>tests/test_policy.py::test_kyverno_block_with_folded_lines_names_policy_rule_path_and_rule_ids</code>, <code>tests/test_policy.py::test_pod_security_patch_clears_the_same_audit_findings</code>, <code>tests/test_policy.py::test_scc_names_the_fields_restricted_v2_rejected_and_the_uid_range</code>, <code>tests/test_policy.py::test_rbac_grant_is_exactly_the_missing_permission_and_audits_clean</code>, <code>tests/test_policy.py::test_every_policy_step_is_read_only_paste_safe_and_redacted</code>, <code>tests/test_policy.py::test_everyday_errors_are_not_policy_denials</code>, <code>tests/test_policy.py::test_reachability_on_the_shop_example</code>, <code>tests/test_policy.py::test_the_proposed_policy_allows_exactly_that_traffic</code>, <code>tests/test_policy.py::test_live_reachability_reads_only_what_it_needs</code>, <code>tests/test_policy.py::test_hostile_names_never_reach_a_command_line</code>, <code>tests/test_policy.py::test_cli_drops_terminal_escapes</code>, <code>tests/test_policy.py::test_explain_stays_fast_on_hostile_input</code></td>
+</tr>
+<tr>
+<td>G34</td>
+<td>Audit findings name the NIST SP 800-53 Rev. 5 controls they are evidence about (every rule mapped, every control titled, the compliance guide in step with the code); crypto is SHA-256 and the system OpenSSL only, and <code>doctor</code> reports FIPS mode</td>
+<td><code>tests/test_controls.py::test_every_rule_maps_to_titled_800_53_controls</code>, <code>tests/test_controls.py::test_findings_and_reports_carry_controls</code>, <code>tests/test_controls.py::test_compliance_doc_lists_every_rule_with_its_controls</code>, <code>tests/test_controls.py::test_crypto_is_fips_friendly_and_reported</code></td>
+</tr>
+<tr>
+<td>G35</td>
+<td>The incident watch reads only pods, events, deployments and replicasets, attributes each problem to its workload, explains a new or recurring incident once, names what changed in the last rollout, resolves only after successful reads, brings back confirmed fixes on recurrence, and never stores log lines or Secret values</td>
+<td><code>tests/test_incidents.py::test_observe_attributes_every_signal_to_its_workload</code>, <code>tests/test_incidents.py::test_what_changed_names_the_rollout_and_the_diff</code>, <code>tests/test_incidents.py::test_poll_opens_explains_and_stores_nothing_sensitive</code>, <code>tests/test_incidents.py::test_recurrence_brings_back_the_confirmed_fix</code>, <code>tests/test_incidents.py::test_failed_reads_never_resolve_and_old_incidents_age_out</code>, <code>tests/test_incidents.py::test_tools_cli_and_service_wiring</code>, <code>ci:Incident watch finds and explains the crash loop and a Pod Security denial (read-only)</code></td>
+</tr>
+<tr>
+<td>G36</td>
+<td>Keeps a local copy of Red Hat's public Jira through its REST API only, one request per second or slower within a request budget, resuming without losing updates; says what became of a matching ticket (fixed and whether the cluster's version has it, open, not a bug, won't fix, duplicate) with the comment that explains it; never matches an everyday error; never stores reporter, assignee or author names and never ships the copy</td>
+<td><code>tests/test_tickets.py::test_a_fixed_bug_with_the_fix_and_workaround</code>, <code>tests/test_tickets.py::test_not_a_bug_says_so_with_the_reason</code>, <code>tests/test_tickets.py::test_generic_errors_stay_unmatched_even_when_some_tickets_paste_describe_output</code>, <code>tests/test_tickets.py::test_operator_versions_are_not_compared_with_openshift_versions</code>, <code>tests/test_tickets.py::test_sync_copies_every_status_then_only_changes</code>, <code>tests/test_tickets.py::test_each_project_measures_its_window_from_its_own_start</code>, <code>tests/test_tickets.py::test_a_budget_stops_cleanly_and_the_next_run_resumes</code>, <code>tests/test_tickets.py::test_retries_wait_at_least_the_crawl_delay</code>, <code>tests/test_tickets.py::test_the_sync_client_only_reads_from_the_jira_host</code>, <code>tests/test_tickets.py::test_hostile_records_and_odd_paths_never_break_answers</code>, <code>ci:The image answers from a local Red Hat Jira copy (SQLite FTS5 present)</code></td>
+</tr>
+<tr>
+<td>G37</td>
+<td>Capability tiers: everything beyond reading (probe, dry-run, external writes, gate forwarding) is off by default, shown by <code>doctor</code>, refused under the offline lock when it leaves the cluster, and each action needs a person's approval for that action, unexpired and used once; the read-only backends cannot write; tier Roles render only when enabled and kube-noob's own audit flags what they allow</td>
+<td><code>tests/test_tiers.py::test_every_tier_is_off_by_default</code>, <code>tests/test_tiers.py::test_enabled_tiers_and_their_contradictions</code>, <code>tests/test_tiers.py::test_a_writer_exists_only_when_its_tier_is_on</code>, <code>tests/test_tiers.py::test_approvals_are_bound_to_one_action_unexpired_and_single_use</code>, <code>tests/test_tiers.py::test_the_read_only_backends_cannot_write</code>, <code>tests/test_tiers.py::test_tool_list_is_unchanged_with_defaults_and_tier_tools_need_their_tier</code>, <code>tests/test_tiers.py::test_kube_noobs_own_audit_flags_what_tier_roles_allow</code>, <code>ci:Chart guards (fail-closed NetworkPolicy, fsGroup only off-OpenShift, web flag wired to env)</code></td>
+</tr>
+<tr>
+<td>G38</td>
+<td>Signals (alert names, event and ClusterOperator condition reasons, container reasons, admission rules, components, error templates) come only from structured fields or vocabularies checked against the upstream file that emits them; error templates drop times, addresses, ids and pod suffixes so the same error gets the same template; output is sorted and deterministic, and every input is bounded and fast on hostile text</td>
+<td><code>tests/test_signals.py::test_alertmanager_payload</code>, <code>tests/test_signal_catalogue.py::test_catalogue_schema</code>, <code>tests/test_signal_catalogue.py::test_openshift_and_upstream_names_both_exist_where_they_differ</code>, <code>tests/test_signals.py::test_events_list_keeps_warnings_and_known_reasons</code>, <code>tests/test_signals.py::test_cluster_operator_conditions</code>, <code>tests/test_signals.py::test_pod_status_reasons</code>, <code>tests/test_signals.py::test_error_templates_are_stable_across_variable_parts</code>, <code>tests/test_signals.py::test_output_is_deterministic_and_sorted</code>, <code>tests/test_signals.py::test_inputs_are_bounded_and_hostile_input_is_cheap</code>, <code>tests/test_policy.py::test_explain_stays_fast_on_hostile_input</code></td>
+</tr>
+<tr>
+<td>G39</td>
+<td>Signals rank playbooks once per playbook (a symptom never outranks its specific cause); diagnose, debug and bundle show the signals they read and policy explain shows admission signals; an Alertmanager payload is read as bounded JSON, known issues match each alert's line and summary only, and only an OpenShift 4 release label sets the version; <code>extract_signals</code> is read-only and cites each catalogue entry's source</td>
+<td><code>tests/test_signals_everywhere.py::test_an_etcd_alert_payload_ranks_the_etcd_playbook_first_with_known_issues_for_its_version</code>, <code>tests/test_signals_everywhere.py::test_an_explicit_version_wins_over_the_label_and_a_fixed_version_has_no_known_issue</code>, <code>tests/test_signals_everywhere.py::test_payload_reader_is_bounded_and_strips_control_characters</code>, <code>tests/test_signals_everywhere.py::test_only_an_openshift_release_label_sets_the_version</code>, <code>tests/test_signals_everywhere.py::test_signals_break_ties_between_playbooks_with_the_same_text_evidence</code>, <code>tests/test_diagnose_first.py::test_specific_cause_outranks_generic_crashloop</code>, <code>tests/test_signals_everywhere.py::test_debug_and_bundle_show_signals</code>, <code>tests/test_signals_everywhere.py::test_policy_explain_shows_admission_signals</code>, <code>tests/test_signals_everywhere.py::test_extract_signals_tool_is_read_only_strict_and_explains_what_it_found</code></td>
+</tr>
+<tr>
+<td>G40</td>
+<td>A memory entry is a reviewed summary, not a dump: prose rejects credentials, raw logs, event rows, stack traces, pipelines and manifests; each command is one line with no shell comment, carries the classifier's label (read-only or needs-approval) and never prints a Secret; a patch is manifests without Secrets or credentials; evidence is a reference only; the file is bounded, has one document, no duplicate keys and is named after its id; the shipped JSON Schema matches the model</td>
+<td><code>tests/test_memory_entry.py::test_bad_entries_are_rejected_with_a_reason</code>, <code>tests/test_memory_entry.py::test_commands_carry_the_classifiers_label_and_nothing_else</code>, <code>tests/test_memory_entry.py::test_patches_are_manifests_without_secrets</code>, <code>tests/test_memory_entry.py::test_yaml_level_attacks_are_refused</code>, <code>tests/test_memory_entry.py::test_the_file_name_must_match_the_id</code>, <code>tests/test_memory_entry.py::test_round_trip_is_exact_and_deterministic</code>, <code>tests/test_memory_entry.py::test_the_shipped_json_schema_matches_the_model_and_checks_shape</code></td>
+</tr>
+<tr>
+<td>G41</td>
+<td>Team memory is guarded and honest: <code>memory validate</code> fails on dangerous fixes (audit or red-team HIGH, privileged SCC, cluster-admin, hostPath, wildcard RBAC, in patches or changing commands) unless an unexpired risk acceptance names an owner and a reason, on duplicate symptoms and on credentials anywhere in a file; <code>memory match</code> shows approved entries only by default, negatives as tried and not working, entries fixed in the given version as retired, with their outcome counts, deterministically; <code>add</code> never commits and new ids are never shared</td>
+<td><code>tests/test_memory_repo.py::test_the_verifier_rejects_dangerous_fixes_unless_the_risk_is_accepted</code>, <code>tests/test_memory_repo.py::test_read_only_commands_that_mention_grants_are_fine</code>, <code>tests/test_memory_repo.py::test_duplicates_review_dates_layout_and_credentials_in_comments</code>, <code>tests/test_memory_repo.py::test_match_signals_first_with_outcomes_negatives_and_version</code>, <code>tests/test_memory_repo.py::test_match_on_words_needs_three_distinctive_words_and_proposed_stay_hidden</code>, <code>tests/test_memory_repo.py::test_match_is_deterministic_whatever_the_directory_order</code>, <code>tests/test_memory_repo.py::test_concurrent_adds_never_share_an_id</code>, <code>tests/test_memory_repo.py::test_init_scaffolds_and_never_overwrites</code></td>
+</tr>
+<tr>
+<td>G42</td>
+<td>Team memory is read where kube-noob runs and nowhere else: <code>memory.paths</code> feeds the CLI and both servers, <code>doctor</code> shows each repository and its counts; in the chart the repository is mounted read-only, the git source never takes credentials in its URL, clones with strict host keys from a deploy-key Secret, opens egress only to the git host's addresses and, under the offline lock, only from an in-cluster host</td>
+<td><code>tests/test_memory_runtime.py::test_paths_come_from_the_config_file_and_the_environment</code>, <code>tests/test_memory_runtime.py::test_doctor_lists_each_repository_with_counts_and_warns_about_bad_paths</code>, <code>tests/test_memory_runtime.py::test_chart_schema_accepts_the_sources_and_refuses_unsafe_git_settings</code>, <code>tests/test_memory_runtime.py::test_chart_templates_mount_memory_read_only_and_guard_the_git_source</code>, <code>ci:Chart guards (fail-closed NetworkPolicy, fsGroup only off-OpenShift, web flag wired to env)</code></td>
+</tr>
+<tr>
+<td>G43</td>
+<td>Answers cite the team's approved memory as <code>[mem:MEM-&lt;n&gt;]</code> and never a proposed entry unless asked; a memory entry is written over MCP only by a local stdio server, only into a configured repository and only after the user confirmed, and the HTTP server never writes</td>
+<td><code>tests/test_memory_answers.py::test_diagnose_and_known_issues_cite_approved_memory_only</code>, <code>tests/test_memory_answers.py::test_debug_and_bundle_carry_memory</code>, <code>tests/test_memory_answers.py::test_memory_match_tool_is_read_only_and_hides_proposed</code>, <code>tests/test_memory_answers.py::test_propose_shows_yaml_and_writes_only_after_confirmation_in_stdio</code>, <code>tests/test_memory_answers.py::test_the_http_server_never_writes_memory</code></td>
+</tr>
+<tr>
+<td>G44</td>
+<td>Imported tickets keep the fix and lose the people: no assignee, caller or reporter field is read; emails, account ids, @mentions, phone numbers, named people and credential-bearing sentences are removed; only resolved tickets with resolution notes become proposed entries, every other ticket is listed with its reason, and exports are bounded</td>
+<td><code>tests/test_memory_import.py::test_no_person_contact_detail_or_credential_survives</code>, <code>tests/test_memory_import.py::test_import_writes_proposed_entries_and_lists_every_skip</code>, <code>tests/test_memory_import.py::test_cleaning_removes_people_and_keeps_the_fix</code>, <code>tests/test_memory_import.py::test_bad_exports_are_refused_with_a_reason</code>, <code>tests/test_memory_import.py::test_hostile_rows_are_bounded</code></td>
+</tr>
+<tr>
+<td>G45</td>
+<td>The replay harness never grades with hindsight: tickets are matched on what was known when they were opened (title and description), never on their resolution, never against the entry they became, and with <code>--as-of-ticket-date</code> only against entries created before them; the gate counts useful matches, not any match</td>
+<td><code>tests/test_memory_replay.py::test_no_hindsight_with_as_of_ticket_date</code>, <code>tests/test_memory_replay.py::test_a_ticket_never_matches_the_entry_it_became</code>, <code>tests/test_memory_replay.py::test_the_known_hit_rate_and_the_gate</code></td>
+</tr>
+<tr>
+<td>G46</td>
+<td>The Jira main copy is a starting point nobody waits for, and it stays private: each sync records what was fixed, closed, reopened, given a fix version or opened (owner-only change log, capped), a new copy fetches the open tickets first, <code>corpus jira-snapshot</code> packs tickets, sync state and change log into one owner-only file that <code>corpus import</code> validates (checksums, same Jira) before copying anything and then resumes with the forward pass only, <code>serve</code> imports a seed once when it has no copy, reconciliation works under the offline lock, and the scheduled main copy is uploaded only encrypted</td>
+<td><code>tests/test_jira_main_copy.py::test_a_new_copy_records_no_changes_then_each_sync_records_what_moved</code>, <code>tests/test_jira_main_copy.py::test_a_fresh_copy_fetches_open_tickets_first</code>, <code>tests/test_jira_main_copy.py::test_snapshot_round_trip_resumes_with_only_the_forward_pass</code>, <code>tests/test_jira_main_copy.py::test_a_snapshot_from_another_jira_or_tampered_is_refused_before_anything_is_copied</code>, <code>tests/test_jira_main_copy.py::test_a_new_server_starts_from_the_seed_once</code>, <code>tests/test_jira_main_copy.py::test_cli_changes_work_under_the_offline_lock</code>, <code>tests/test_jira_main_copy.py::test_the_plugin_gets_reconciliation_without_the_jira_client</code>, <code>tests/test_distribution.py::test_scheduled_cadences_and_rox_corpus_scope</code>, <code>ci:Chart guards (fail-closed NetworkPolicy, fsGroup only off-OpenShift, web flag wired to env)</code></td>
+</tr>
+<tr>
+<td>G47</td>
+<td>Text from outside never steers the calling model unseen: every MCP result is cleaned of invisible Unicode, role and tool-call markers, instruction phrases and exfiltrating Markdown, flagged <code>untrusted</code> with defanged signals; detection 95% or better on the frozen eval with zero false positives on it and on everything kube-noob ships</td>
+<td><code>tests/test_sanitize.py::test_the_eval_gate</code>, <code>tests/test_sanitize.py::test_the_former_held_out_set</code>, <code>tests/test_sanitize.py::test_nothing_kube_noob_ships_is_flagged</code>, <code>tests/test_sanitize.py::test_every_mcp_result_is_cleaned</code>, <code>tests/test_sanitize.py::test_hostile_input_is_bounded</code></td>
+</tr>
+<tr>
+<td>G48</td>
+<td>A cause beats its symptom, with the user's names: when the evidence names the cause (kubelet's FailedToRetrieveImagePullSecret), that playbook ranks first, its causes, checks and fixes carry the secret, namespace and pod from the input, read-only checks never read a Secret, and fixes follow the platform; the same answer from the CLI, MCP and the live debug, and the audit catches it before deploy</td>
+<td><code>tests/test_pull_secret_namespace.py::test_events_name_the_cause_the_secret_and_the_namespace</code>, <code>tests/test_pull_secret_namespace.py::test_plain_kubernetes_gets_kubectl_and_no_openshift_fixes</code>, <code>tests/test_pull_secret_namespace.py::test_the_question_as_asked</code>, <code>tests/test_pull_secret_namespace.py::test_cli_and_mcp_give_the_same_answer</code>, <code>tests/test_pull_secret_namespace.py::test_live_debug_in_the_sidecar_reads_names_never_secrets</code>, <code>tests/test_pull_secret_namespace.py::test_audit_finds_the_secret_in_the_wrong_namespace_before_deploy</code></td>
+</tr>
+<tr>
+<td>G49</td>
+<td>The Jira copy is complete and keeps no people: every comment of every ticket (paged in when a search returns only the latest, inside the request budget, and a ticket is stored only whole), authors as per-ticket pseudonyms, their names and mentions replaced, emails, phones, account ids and profile links removed; older copies are refetched once</td>
+<td><code>tests/test_jira_full_text.py::test_every_comment_is_kept_and_no_person_is</code>, <code>tests/test_jira_full_text.py::test_a_budget_spent_during_comments_keeps_the_ticket_for_the_next_run</code>, <code>tests/test_jira_full_text.py::test_a_ticket_longer_than_the_cap_keeps_its_latest_comments_and_says_so</code>, <code>tests/test_jira_full_text.py::test_a_copy_made_before_refetches_its_tickets_once</code>, <code>tests/test_jira_full_text.py::test_hostile_people_never_reach_the_copy</code></td>
+</tr>
+<tr>
+<td>G50</td>
+<td>Anyone can test kube-noob on their own problems, offline: raw questions are answered and listed to label, labelled cases pass or fail with the reason, a gate on the pass rate, and bad files are refused with the case named</td>
+<td><code>tests/test_problem_eval.py::test_yaml_cases_pass_fail_and_unlabelled</code>, <code>tests/test_problem_eval.py::test_audit_cases_check_rules_both_ways</code>, <code>tests/test_problem_eval.py::test_every_file_format</code>, <code>tests/test_problem_eval.py::test_bad_files_are_refused_with_the_case_named</code>, <code>tests/test_problem_eval.py::test_cli_scorecard_gate_and_report_files</code></td>
+</tr>
+<tr>
+<td>G51</td>
+<td>Every fetch from a public source is jittered: requests by the crawl delay plus random jitter, the in-cluster sync's first run after a random delay and its interval spread, clones spaced by a random pause, the scheduled refresh at a random offset</td>
+<td><code>tests/test_pacing.py::test_start_delay_and_interval_spread</code>, <code>tests/test_pacing.py::test_background_jira_sync_waits_before_its_first_run</code>, <code>tests/test_pacing.py::test_clones_are_spaced_by_a_random_pause</code>, <code>tests/test_pacing.py::test_release_notes_clones_are_spaced</code>, <code>tests/test_pacing.py::test_the_scheduled_refresh_starts_at_a_random_offset</code>, <code>tests/test_pacing.py::test_the_jira_client_jitters_every_request</code></td>
+</tr>
+<tr>
+<td>G52</td>
+<td>The Jira copy can be audited by its owner, offline: counts, comment completeness, cut and older tickets, key coverage, sync state, and a self-check for person-shaped text that fails the daily refresh</td>
+<td><code>tests/test_jira_audit.py::test_the_report_counts_what_the_copy_holds</code>, <code>tests/test_jira_audit.py::test_missing_comments_older_format_and_leaks_are_reported</code>, <code>tests/test_jira_audit.py::test_cli_text_json_and_no_copy</code>, <code>tests/test_jira_audit.py::test_hostile_shards_are_bounded</code></td>
+</tr>
+<tr>
+<td>G53</td>
+<td>Anything pasted is named before it is analysed, every analyser that applies runs, and the answer says what was not analysed and why; input with no evidence gets the read-only commands that collect it; a paste whose last sentence asks is also a question; hostile input is bounded</td>
+<td><code>tests/test_insight.py::test_recogniser_precision_and_recall_gate</code>, <code>tests/test_insight.py::test_a_mixed_paste_answers_every_section_in_one_call</code>, <code>tests/test_insight.py::test_an_analyser_over_its_time_budget_is_reported_not_waited_for</code>, <code>tests/test_insight.py::test_events_route_to_diagnosis_and_never_pull_in_a_reported_issue</code>, <code>tests/test_insight.py::test_questions_get_documents_and_evidence_gathering_steps</code>, <code>tests/test_insight.py::test_pending_kinds_are_named_with_what_to_do_today</code>, <code>tests/test_insight.py::test_input_bounds_and_hostile_text</code>, <code>tests/test_insight.py::test_mcp_tool_listed_first_and_sanitised</code>, <code>tests/test_golden_gaps.py::test_a_question_after_a_template_snippet_is_still_a_question</code></td>
+</tr>
+<tr>
+<td>G54</td>
+<td>The public data image ships only what may be shared: redistributable records on allow-listed licenses, never Jira data, every file listed and checksummed; it is gated before and after it becomes an image, imported whole or not at all, and pinned by digest</td>
+<td><code>tests/test_db_bundle.py::test_the_bundle_ships_only_what_may_be_shared</code>, <code>tests/test_db_bundle.py::test_a_shard_marked_shareable_with_a_private_record_is_refused</code>, <code>tests/test_db_bundle.py::test_jira_data_and_unshareable_licenses_fail_the_gate</code>, <code>tests/test_db_bundle.py::test_links_traversal_and_bombs_are_refused</code>, <code>tests/test_db_bundle.py::test_import_is_whole_or_nothing_and_feeds_the_known_issue_index</code>, <code>tests/test_db_bundle.py::test_pods_import_a_newer_bundle_on_start_and_skip_an_older_one</code>, <code>tests/test_db_bundle.py::test_the_chart_pins_the_image_by_digest</code></td>
+</tr>
+<tr>
+<td>G55</td>
+<td>A private Jira seed opens only with the organisation's key from a Secret: any wrong key or altered file fails closed with a clear message and imports nothing, the key never sits in values, images or kube-noob's files, the build refuses a public repository or a copy with a person in it, and the sync schedule (or that sync is off) is stated at start</td>
+<td><code>tests/test_seal.py::test_every_tampering_fails_closed</code>, <code>tests/test_seal.py::test_a_sealed_seed_opens_with_the_right_key_only</code>, <code>tests/test_seal.py::test_cli_seal_import_and_serve</code>, <code>tests/test_seal.py::test_sync_on_states_its_jittered_schedule</code>, <code>tests/test_seal.py::test_chart_wires_the_key_from_a_secret_only</code></td>
+</tr>
+<tr>
+<td>G56</td>
+<td>Vulnerability data comes only from sources whose licence allows sharing (Red Hat VEX, CC BY 4.0), with attribution; the build stops on any other licence; fetching is paced, budgeted and read-only to one host</td>
+<td><code>tests/test_advisories.py::test_statements_per_product_with_fix_and_justification</code>, <code>tests/test_advisories.py::test_merge_replace_and_the_licence_gate</code>, <code>tests/test_advisories.py::test_fetching_is_paced_bounded_and_reads_changes</code>, <code>tests/test_advisories.py::test_the_client_reaches_one_host_over_https_only</code>, <code>tests/test_advisories.py::test_cli_archive_online_and_the_public_bundle</code></td>
+</tr>
+<tr>
+<td>G57</td>
+<td>Every red-team finding is fixed as a regression test before the queue moves on, and a set the fixes were tuned on is called a regression set, never a measure</td>
+<td><code>tests/test_red_team_rt1.py::test_an_rbac_subject_never_puts_shell_syntax_into_a_step</code>, <code>tests/test_red_team_rt1.py::test_recognising_two_megabytes_of_blank_lines_is_linear</code>, <code>tests/test_red_team_rt1.py::test_injection_regression_set</code>, <code>tests/test_red_team_rt1.py::test_people_in_odd_forms_do_not_survive_and_tools_do</code>, <code>tests/test_red_team_rt1.py::test_a_refused_import_leaves_nothing_and_strays_are_not_read</code>, <code>tests/test_red_team_rt1.py::test_held_out_recall_regression</code></td>
+</tr>
+<tr>
+<td>G58</td>
+<td>Every audit rule ships a good and a bad fixture; the suite fails when a rule has none, or when the audit does not flag the bad one and pass the good one</td>
+<td><code>tests/test_policy_generate.py::test_every_rule_ships_a_good_and_a_bad_fixture</code>, <code>tests/test_policy_generate.py::test_audit_flags_the_bad_fixture_and_not_the_good</code></td>
+</tr>
+<tr>
+<td>G59</td>
+<td>Admission policies generated from the rules refuse exactly what the audit reports for that object, never more; each names its rule, fix and source; every rule is generated or listed with the reason; audit mode by default; platform namespaces, operators and controller-owned children of calibrate rules are exempt</td>
+<td><code>tests/test_policy_generate.py::test_policy_equals_audit_on_random_objects</code>, <code>tests/test_policy_generate.py::test_policy_admits_good_and_refuses_bad</code>, <code>tests/test_policy_generate.py::test_every_rule_is_generated_or_has_a_reason</code>, <code>tests/test_policy_generate.py::test_documents_are_well_formed_for_both_engines_and_modes</code>, <code>tests/test_policy_generate.py::test_exemptions_platform_namespaces_operators_owned_objects_and_system_roles</code></td>
+</tr>
+<tr>
+<td>G60</td>
+<td>Attack paths start at an exposure and end at what a compromised pod could do, ranked by exposure x blast radius with each step's evidence and a fix; read-only, never a Secret read or echoed</td>
+<td><code>tests/test_attack_paths.py::test_the_planted_path_ranks_first_and_decoys_rank_lower_or_not_at_all</code>, <code>tests/test_attack_paths.py::test_rbac_capabilities_and_their_scope</code>, <code>tests/test_attack_paths.py::test_tokens_follow_pod_then_serviceaccount_automount</code>, <code>tests/test_attack_paths.py::test_live_scan_reads_the_allowlist_only_and_reports_what_it_could_not_read</code>, <code>tests/test_attack_paths.py::test_the_allowlist_reads_rbac_and_still_refuses_secrets</code></td>
+</tr>
+<tr>
+<td>G61</td>
+<td>An exception is owned, explained, scoped to named objects and expires; anything less is refused with the reason, an expired one fails the gate, and the same entry means the same thing in the audit and in the admission policy</td>
+<td><code>tests/test_exceptions.py::test_every_entry_gets_a_status_and_a_reason</code>, <code>tests/test_exceptions.py::test_audit_hides_covered_findings_and_fails_the_gate_on_bad_entries</code>, <code>tests/test_exceptions.py::test_scope_decides_what_an_exception_hides</code>, <code>tests/test_exceptions.py::test_exemption_cel_agrees_with_the_audit_on_random_objects</code>, <code>tests/test_exceptions.py::test_active_exceptions_become_exemptions_for_the_workload_and_what_it_makes</code></td>
+</tr>
+<tr>
+<td>G62</td>
+<td>The daily report says exactly what changed and which findings are new or fixed, by namespace and owner, from snapshots that hold hashes and names, never values</td>
+<td><code>tests/test_drift.py::test_two_snapshots_give_the_exact_expected_report</code>, <code>tests/test_drift.py::test_a_snapshot_holds_hashes_and_names_never_values</code>, <code>tests/test_drift.py::test_scaling_status_server_metadata_and_owned_objects_are_not_drift</code>, <code>tests/test_drift.py::test_the_daily_report_folder_keeps_the_newest_and_is_owner_only</code>, <code>tests/test_drift.py::test_live_snapshots_read_the_allowlist_only</code></td>
+</tr>
+<tr>
+<td>G63</td>
+<td>Every RHACS policy is mapped to kube-noob's rules or its difference is explained (overlap, related, gap, outside); an unknown criterion is reported, never guessed; disagreements and policies RHACS ships disabled are named; Central is read GET-only, to one host, jittered, with the token sent nowhere else</td>
+<td><code>tests/test_rhacs.py::test_every_default_policy_is_explained</code>, <code>tests/test_rhacs.py::test_every_cited_default_policy_exists_in_the_export</code>, <code>tests/test_rhacs.py::test_known_mappings_and_differences</code>, <code>tests/test_rhacs.py::test_unknown_criteria_are_unexplained_not_guessed</code>, <code>tests/test_rhacs.py::test_disagreement_and_disabled_defaults_are_listed</code>, <code>tests/test_rhacs.py::test_read_central</code>, <code>tests/test_rhacs.py::test_client_is_get_only_to_central</code>, <code>tests/test_rhacs.py::test_disabled_and_offline_lock</code></td>
+</tr>
+<tr>
+<td>G64</td>
+<td>A failed build log gives the failing step every time and the cause class 90% or better on 60 labelled logs in each CI system's format, with the error template, evidence, reported issues and the system's own fix; quoted lines are redacted and hostile logs bounded</td>
+<td><code>tests/test_build.py::test_labelled_logs_gate</code>, <code>tests/test_build.py::test_failing_step_per_system</code>, <code>tests/test_build.py::test_freestyle_jenkins_and_unknown_formats</code>, <code>tests/test_build.py::test_evidence_is_redacted_and_excerpted</code>, <code>tests/test_build.py::test_hostile_logs_are_bounded</code>, <code>tests/test_build.py::test_tool_cli_and_insight</code></td>
+</tr>
+<tr>
+<td>G65</td>
+<td>Every Containerfile check ships a good and a bad fixture; credentials are found in ENV, ARG, LABEL, RUN, copied files, the build context, and an image's layers (also when a later layer deleted them), config and history, and are reported by kind and place, never by value; image layouts are read by digest, verified, never extracted</td>
+<td><code>tests/test_build.py::test_every_check_has_a_good_and_a_bad_fixture</code>, <code>tests/test_build.py::test_parser_handles_continuations_heredocs_escapes_and_stages</code>, <code>tests/test_build.py::test_build_context_and_ignore_files</code>, <code>tests/test_build.py::test_a_planted_secret_in_a_layer_is_found_even_after_deletion</code>, <code>tests/test_build.py::test_layout_integrity_and_bounds</code>, <code>tests/test_build.py::test_secret_shapes_and_masks</code></td>
+</tr>
+<tr>
+<td>G66</td>
+<td>One CI gate over manifests, charts and Containerfiles fails at the chosen severity, names why, maps every finding to its file, line or chart template, says whether the admission policy would refuse it, and writes valid SARIF, a summary and code quality JSON; the same gate runs as a GitHub Action, a Tekton Task and a GitLab template, with inputs never interpolated into scripts</td>
+<td><code>tests/test_gate.py::test_the_good_bundle_passes_and_the_bad_one_fails</code>, <code>tests/test_gate.py::test_findings_point_at_their_file_and_line</code>, <code>tests/test_gate.py::test_rendered_chart_findings_point_at_the_template</code>, <code>tests/test_gate.py::test_admission_and_exceptions</code>, <code>tests/test_gate.py::test_sarif_codequality_and_markdown</code>, <code>tests/test_gate.py::test_directory_walks_skip_what_is_not_a_manifest</code>, <code>tests/test_gate.py::test_github_action_passes_inputs_through_the_environment</code>, <code>tests/test_gate.py::test_tekton_task_and_gitlab_template</code></td>
+</tr>
+<tr>
+<td>G67</td>
+<td>Build analytics give the exact flaky set and step times of a 200-run history (flaky = passed and failed on one commit, or rerun within a run), a real regression is not flaky, trends and weekly failure classes are stated with their definitions; JUnit cannot expand entities; the GitHub history reader is GET-only to one host, jittered, every attempt read</td>
+<td><code>tests/test_build_analytics.py::test_a_200_run_history_gives_the_exact_flaky_set_and_step_times</code>, <code>tests/test_build_analytics.py::test_junit_variants_and_hostile_xml</code>, <code>tests/test_build_analytics.py::test_run_folders_in_gh_cli_shape_and_bad_ones</code>, <code>tests/test_build_analytics.py::test_history_from_the_github_api</code>, <code>tests/test_build_analytics.py::test_history_refusals</code></td>
+</tr>
+<tr>
+<td>G68</td>
+<td>Scanner output in every format kube-noob reads (Trivy, Grype, CycloneDX from either, RHACS) gives the same finding per package, version, CVE and fix version; SBOMs give packages and are matched only against Red Hat VEX; parsers are bounded and refuse what they cannot read with the reason</td>
+<td><code>tests/test_vuln.py::test_every_scanner_format_gives_the_same_normalised_findings</code>, <code>tests/test_vuln.py::test_hostile_reports</code></td>
+</tr>
+<tr>
+<td>G69</td>
+<td>A finding drops out only when Red Hat VEX for the image's product says not affected (or fixed at or below the installed version, by rpm's comparison), and every dropped finding cites the statement, its justification and the document; RHEL 8 statements never apply to RHEL 9</td>
+<td><code>tests/test_vuln.py::test_vex_drops_the_12_not_affected_and_keeps_28_in_every_format</code>, <code>tests/test_vuln.py::test_vex_from_the_corpus_shard_and_product_scoping</code>, <code>tests/test_vuln.py::test_rpmvercmp_matches_rpms_own_vectors</code></td>
+</tr>
+<tr>
+<td>G70</td>
+<td>Findings rank by base x exposure x privileges x known exploitation, each with its attack path; an exposed, privileged, KEV-listed finding outranks an internal critical</td>
+<td><code>tests/test_vuln.py::test_the_exposed_privileged_kev_finding_ranks_first</code></td>
+</tr>
+<tr>
+<td>G71</td>
+<td>A threat model is deterministic and reviewed: each threat names its element, STRIDE category, status with evidence, the rules, admission policies and RHACS policies that mitigate it, and ATT&amp;CK ids with MITRE's attribution; Secrets are never read</td>
+<td><code>tests/test_vuln.py::test_threat_model_of_the_three_tier_app_is_the_reviewed_list</code>, <code>tests/test_vuln.py::test_threat_model_never_reads_secrets</code></td>
+</tr>
+<tr>
+<td>G72</td>
+<td>Red-team findings stay fixed: a module stream's statement applies to that stream only and conflicting statements keep the finding; different images (by digest, id, or tag and release) never share VEX scoping; a vendor's own RPM is outside Red Hat VEX; an unknown severity is graded by CVSS and a KEV finding counts as at least high; a report's own VEX needs <code>--trust-report-vex</code>; report text cannot add headings, links, images or table rows to the gate summary; malformed VEX is skipped, never a crash; reachability is linear in the input</td>
+<td><code>tests/test_vuln_redteam.py::test_fixed_in_another_module_stream_does_not_drop_the_finding</code>, <code>tests/test_vuln_redteam.py::test_different_images_are_not_merged</code>, <code>tests/test_vuln_redteam.py::test_vendor_rpm_is_not_dropped_by_red_hat_vex</code>, <code>tests/test_vuln_redteam.py::test_unknown_severity_fails_the_cli_and_the_gate</code>, <code>tests/test_vuln_redteam.py::test_report_vex_is_kept_by_default_and_trusted_on_request</code>, <code>tests/test_vuln_redteam.py::test_gate_summary_cannot_be_rewritten_by_a_report</code>, <code>tests/test_vuln_redteam.py::test_malformed_vex_is_skipped</code>, <code>tests/test_vuln_redteam.py::test_reach_looks_up_the_inventory_a_fixed_number_of_times</code></td>
+</tr>
+<tr>
+<td>G73</td>
+<td>The admission webhook warns by default and denies only rules the operator listed, and on an update only findings the old object did not have; it never mutates, fails open, skips system and owned objects, and answers at p99 under 50 ms; the chart's webhook matches the server (failurePolicy Ignore, the same skipped namespaces and kinds, lookups RBAC equal to what the cache reads)</td>
+<td><code>tests/test_admission.py::test_warn_mode_never_denies_fuzzed</code>, <code>tests/test_admission.py::test_enforce_denies_only_the_listed_rule</code>, <code>tests/test_admission.py::test_update_denies_only_new_findings_and_skips</code>, <code>tests/test_admission.py::test_p99_well_under_50_ms</code>, <code>tests/test_admission.py::test_chart_webhook_matches_the_server</code></td>
+</tr>
+<tr>
+<td>G74</td>
+<td>SARIF from Semgrep, Bandit, SpotBugs/FindSecBugs, ESLint and CodeQL is read in each tool's own shape; the same file, line and CWE from several tools is one finding; suppressed, fixed and non-failing results are excluded with the reason; lint is kept apart; the reader is bounded and never crashes on fuzzed input</td>
+<td><code>tests/test_code.py::test_every_tool_normalises_and_the_same_weakness_merges</code>, <code>tests/test_code.py::test_tool_shapes</code>, <code>tests/test_code.py::test_excluded_results_say_why</code>, <code>tests/test_code.py::test_fuzzed_sarif_never_crashes</code></td>
+</tr>
+<tr>
+<td>G75</td>
+<td>A code finding is followed through the Containerfiles into the images that ship it (copied or built, <code>.dockerignore</code> honoured) and ranked by the exposure and privileges of the workloads that run them; files no image ships are listed, not ranked, and never fail the gate</td>
+<td><code>tests/test_code.py::test_ranking_and_attack_paths</code>, <code>tests/test_code.py::test_ship_map</code>, <code>tests/test_code.py::test_gate_and_insight</code></td>
+</tr>
+<tr>
+<td>G76</td>
+<td>Every language-package vulnerability names the dependency file and line to change, through the lockfile the image copied or by name in the repository's dependency files</td>
+<td><code>tests/test_code.py::test_dependency_vulnerabilities_point_at_the_line</code>, <code>tests/test_code.py::test_dependency_file_patterns</code></td>
+</tr>
+<tr>
+<td>G77</td>
+<td>A must-gather is opened without extracting or running anything: traversal refuses the archive, links and devices are not followed, Secrets-named files are never read, nested archives are not opened, and every cap (files, bytes, file size, memory, depth) holds</td>
+<td><code>tests/test_mustgather.py::test_traversal_refuses_the_archive</code>, <code>tests/test_mustgather.py::test_secrets_are_never_read</code>, <code>tests/test_mustgather.py::test_link_and_device_members_are_skipped</code>, <code>tests/test_mustgather.py::test_bombs_and_caps</code></td>
+</tr>
+<tr>
+<td>G78</td>
+<td>Must-gather findings are ranked by kube-noob's severity: an unavailable cluster version or operator and a NotReady control-plane node are critical; a Degraded operator or pool, a NotReady worker, node pressure, a failed operator and a pod that cannot start are high; slow etcd, leader changes, OOM kills, Unschedulable pods and warning events on known failure reasons are medium. Each finding names its file and signals, suggests only read-only commands, and never puts an invalid name into one; hostile YAML is refused, never crashes the process</td>
+<td><code>tests/test_mustgather_analyse.py::test_ranking_coverage_signals_and_determinism</code>, <code>tests/test_mustgather_analyse.py::test_untrusted_names_and_text</code>, <code>tests/test_mustgather_analyse.py::test_hostile_yaml_is_refused_not_crashed</code>, <code>tests/test_mustgather_analyse.py::test_pods_events_etcd</code></td>
+</tr>
+<tr>
+<td>G79</td>
+<td>A code finding whose shipping cannot be known (a path outside the source root or no file of the repository, a Containerfile that could not be read as a build) gates like shipped code and says why; Containerfiles are read as BuildKit reads them (byte order mark, whitespace, heredocs, RUN --mount=type=bind, Go filepath.Match wildcards, <code>&lt;Containerfile&gt;.dockerignore</code>); every reader stays linear inside its bounds</td>
+<td><code>tests/test_code_redteam.py::test_rt6_unmappable_paths_fail_closed</code>, <code>tests/test_code_redteam.py::test_rt3_run_mount_bind_builds_the_image</code>, <code>tests/test_code_redteam.py::test_rt5_parser_matches_buildkit</code>, <code>tests/test_code_redteam.py::test_rt7_many_stages_are_linear</code>, <code>tests/test_code_redteam.py::test_rt8_merge_is_linear</code></td>
+</tr>
+<tr>
+<td>G80</td>
+<td>A must-gather report lists every finding with its evidence and read-only checks and the known bugs and team memory that match it for the detected version; the case draft fills in only facts from the must-gather and the indexes and leaves a [FILL IN] placeholder for everything a person must supply; both are redacted</td>
+<td><code>tests/test_mustgather_report.py::test_report_and_case_draft_match_the_goldens</code>, <code>tests/test_mustgather_report.py::test_case_draft_invents_nothing</code>, <code>tests/test_mustgather_report.py::test_redacted_and_untrusted</code>, <code>tests/test_mustgather_report.py::test_real_matchers</code></td>
+</tr>
+<tr>
+<td>G81</td>
+<td>A shared server reads must-gathers only inside <code>mustGather.allowedDir</code>, judged on the path with links resolved; without it the tool is not offered; the Claude plugin never offers it</td>
+<td><code>tests/test_mustgather_mcp.py::test_confined_to_the_allowed_dir</code>, <code>tests/test_mustgather_mcp.py::test_offered_locally_and_on_a_shared_server_only_with_an_allowed_dir</code>, <code>tests/test_mustgather_mcp.py::test_mcp_server_and_plugin</code></td>
+</tr>
+<tr>
+<td>G82</td>
+<td>A REST route runs exactly the MCP tool it names (same validation, sanitising, knowledgeAsOf and audit line), behind the same token, body limit and Host and Origin checks, accepts only JSON posts, exists only for offered tools, and the committed OpenAPI document equals the code</td>
+<td><code>tests/test_rest.py::test_every_route_answers_its_contract</code>, <code>tests/test_rest.py::test_the_committed_document_matches_the_code</code>, <code>tests/test_rest.py::test_errors</code>, <code>tests/test_rest.py::test_host_and_origin_checks</code>, <code>tests/test_rest.py::test_shared_server_routes_only_offered_tools</code></td>
+</tr>
+<tr>
+<td>G83</td>
+<td>With no platform given, an answer about OpenShift (release-note bugs, OpenShift and ROSA playbooks) needs the text to say it is OpenShift or ROSA; everyday words are never evidence; a document is offered only when it shares enough specific words with the question; the community-questions eval measures it</td>
+<td><code>tests/test_community_questions.py::test_release_notes_need_openshift_context_when_no_platform_is_given</code>, <code>tests/test_community_questions.py::test_openshift_playbooks_need_openshift_words</code>, <code>tests/test_community_questions.py::test_documents_must_share_more_than_an_incidental_word</code>, <code>tests/test_community_questions.py::test_everyday_words_are_not_evidence</code></td>
+</tr>
+<tr>
+<td>G84</td>
+<td>A graded verdict describes one answer: it carries over only while kube-noob gives the same answer kind and top finding for that row, a moved answer is re-graded, and the grades file holds ids and verdicts, never the question text</td>
+<td><code>tests/test_community_questions.py::test_the_eval_script_runs_on_a_small_csv</code>, <code>tests/test_community_questions.py::test_a_malformed_grades_file_stops_the_eval</code>, <code>tests/test_community_questions.py::test_the_committed_grades_file_is_well_formed</code></td>
+</tr>
+<tr>
+<td>G85</td>
+<td>A document answers a question only when it is about that question's world: an OpenShift- or ROSA-only doc needs OpenShift or ROSA in the question when no platform is given, a doc's <code>requires</code> groups must each appear, a question naming something the knowledge never saw needs three shared words, and shared words count over the whole section</td>
+<td><code>tests/test_community_questions.py::test_openshift_only_documents_need_openshift_words</code>, <code>tests/test_community_questions.py::test_narrow_documents_keep_to_their_subject</code>, <code>tests/test_community_questions.py::test_a_question_about_something_unknown_needs_more_shared_words</code>, <code>tests/test_community_questions.py::test_requires_front_matter_is_checked</code>, <code>tests/test_community_questions.py::test_new_knowledge_answers_everyday_how_tos</code>, <code>tests/test_golden_gaps.py::test_generic_words_do_not_bring_the_pod_storage_or_limits_documents</code>, <code>tests/test_golden_gaps.py::test_frequent_documents_need_a_word_of_their_subject</code></td>
+</tr>
+<tr>
+<td>G86</td>
+<td>A question that names another product is answered by a document only if the document mentions that product</td>
+<td><code>tests/test_community_questions.py::test_a_question_about_another_product_is_not_answered_by_a_doc_that_never_names_it</code>, <code>tests/test_golden_gaps.py::test_aws_security_hub_is_another_product</code>, <code>tests/test_golden_gaps_engines.py::test_other_container_security_products_get_no_documents</code></td>
+</tr>
+<tr>
+<td>G87</td>
+<td>Accuracy is measured against accepted answers where the owner has them, the answer text never leaves the run, and the lexical score is calibrated against independent grading before it is quoted</td>
+<td><code>tests/test_community_questions.py::test_answers_are_scored_without_being_written_out</code></td>
+</tr>
+<tr>
+<td>G88</td>
+<td>Tune on the train half, report on the test half, and retire a test row once it informed a change; per-technology results are measured, never estimated; a golden item that passes must keep passing and an out-of-scope golden item must stay unanswered</td>
+<td><code>tests/test_community_questions.py::test_test_rows_that_informed_a_change_are_retired_from_the_test_half</code>, <code>tests/test_golden.py::test_the_committed_golden_set_holds</code>, <code>tests/test_golden.py::test_scoring_counts_pass_abstain_and_miss</code>, <code>tests/test_golden.py::test_a_malformed_golden_item_stops_the_run</code></td>
+</tr>
+<tr>
+<td>G89</td>
+<td>A golden gap is closed only with content checked against the official page the grader named, cited in the document or playbook; once a golden item informed a change it is a regression test, and generalisation is reported on community rows it did not inform; a question about another product that shares a supported technology's words (Flux HelmRelease, Helmfile, Chart.js, AWS Lambda) gets no document</td>
+<td><code>tests/test_golden_gaps.py::test_an_unreachable_api_server_is_not_called_a_network_policy</code>, <code>tests/test_golden_gaps.py::test_helm_errors_with_their_own_playbooks</code>, <code>tests/test_golden_gaps.py::test_helm_usage_documents</code>, <code>tests/test_golden_gaps.py::test_other_products_that_share_helm_words_are_left_alone</code>, <code>tests/test_golden_gaps.py::test_qa6_documents_are_well_formed</code>, <code>tests/test_golden_gaps.py::test_helm_releases_missing_after_helm_2_point_at_namespaces</code>, <code>tests/test_golden_gaps.py::test_termination_message_and_limit_enforcement_have_sections</code>, <code>tests/test_golden_gaps.py::test_helm_adoption_and_multi_attach_name_the_documented_commands</code></td>
+</tr>
+<tr>
+<td>G90</td>
+<td>Content for a technology is drafted only from the official pages a grader cited, by a writer that never saw the golden questions, and every fact is checked against its source line before it ships; a document may declare the named products it works with (<code>worksWith</code>), short product names count only as whole words, and a webhook that could not be called is not a policy denial</td>
+<td><code>tests/test_golden_gaps_engines.py::test_policy_engine_documents</code>, <code>tests/test_golden_gaps_engines.py::test_openshift_gaps</code>, <code>tests/test_golden_gaps_engines.py::test_rosa_hcp_gaps</code>, <code>tests/test_golden_gaps_engines.py::test_rhacs_gaps</code>, <code>tests/test_golden_gaps_engines.py::test_a_document_can_say_which_named_products_it_works_with</code>, <code>tests/test_golden_gaps_engines.py::test_an_rhacs_webhook_that_could_not_be_called_is_not_a_denial</code>, <code>tests/test_golden_gaps_engines.py::test_rosa_hcp_and_classic_are_compared_in_one_section</code>, <code>tests/test_golden_gaps_engines.py::test_a_vap_rollout_question_gets_the_validation_actions_section</code></td>
+</tr>
+<tr>
+<td>G91</td>
+<td>The reported-issue matcher counts each piece of evidence once (a word and its plural, a compound and its parts, a prefixed name and its bare name), calls a word rare only when at most 2 sections of the bundled docs use it (a count, so new documents never make more words rare), and matches a prefixed name such as <code>service.beta.openshift.io/serving-cert-secret-name</code> when it is written bare</td>
+<td><code>tests/test_golden_gaps.py::test_the_bug_matcher_counts_each_word_once</code>, <code>tests/test_golden_gaps.py::test_new_documents_do_not_make_more_words_rare_for_the_bug_matcher</code>, <code>tests/test_golden_gaps.py::test_a_prefixed_name_also_counts_as_the_bare_name</code>, <code>tests/test_known_issues.py::test_real_errors_match_the_reported_issue</code></td>
+</tr>
+<tr>
+<td>G92</td>
+<td>A document section is what a heading starts, never a comment line inside a code block, so an answer carries its example, its rules and its check together; a fix to how documents are split is measured on the golden set and the community halves like any other change</td>
+<td><code>tests/test_golden_gaps.py::test_a_comment_inside_a_code_block_is_not_a_heading</code>, <code>tests/test_golden.py::test_the_committed_golden_set_holds</code></td>
+</tr>
+<tr>
+<td>G93</td>
+<td>A playbook built from public user reports says so: a cause seen only in reports is worded as reported, the document it links cites the reports and the official pages, its read-only steps never print a Secret's values, and its document answers only questions that name its error</td>
+<td><code>tests/test_golden_gaps.py::test_invalid_utf8_in_a_runtime_request_has_its_own_playbook</code></td>
+</tr>
+<tr>
+<td>G94</td>
+<td>An answer names the cause the input points at, with that cause's own fix and the read-only steps that confirm it first (cause-linked triage); an OpenShift- or ROSA-only cause needs the platform or the text to say so, and such text gets kubectl; cause choice is measured on a held-out labelled set and a cause that is named must stay named</td>
+<td><code>tests/test_cause_triage.py::test_the_owner_question_gets_the_other_namespace_cause_its_fix_and_its_steps</code>, <code>tests/test_cause_triage.py::test_an_openshift_internal_registry_question_gets_the_image_puller_cause</code>, <code>tests/test_cause_triage.py::test_image_pull_causes</code>, <code>tests/test_cause_triage.py::test_crashloop_causes_follow_the_evidence</code>, <code>tests/test_cause_triage.py::test_dns_blocked_by_a_network_policy_points_at_the_egress_rule</code>, <code>tests/test_cause_triage.py::test_structured_playbooks_are_consistent</code>, <code>tests/test_triage.py::test_the_committed_triage_set_holds</code></td>
+</tr>
+<tr>
+<td>G95</td>
+<td>A document is related reading for a pasted post, generic gather steps appear only for text about a cluster (or with a platform), and a typed conceptual question whose only playbook is a weak match gets the document that explains it first</td>
+<td><code>tests/test_cause_triage.py::test_documents_for_a_pasted_post_are_marked_related_reading</code>, <code>tests/test_cause_triage.py::test_gather_steps_only_for_text_about_a_cluster</code>, <code>tests/test_cause_triage.py::test_a_conceptual_question_gets_the_explaining_document_before_a_weak_playbook</code>, <code>tests/test_insight.py::test_pending_kinds_are_named_with_what_to_do_today</code></td>
+</tr>
+<tr>
+<td>G96</td>
+<td>A symptom in the user's own words names a playbook only when the phrase is specific to that failure (a Service with no endpoints, a pod that keeps restarting, a probe that keeps failing, a PVC that stays Pending, a default-deny policy, a pull secret that cannot be retrieved); phrases that feature requests, design questions, other runtimes or CNI and CSI bug reports also use (a probe mentioned in passing, "mount failed", SERVFAIL, pod-to-pod traffic, a bare "timed out waiting for the condition", a product's name such as StackRox) do not. A new signal is kept only when blinded independent graders find more community answers it changes better than worse, and cause patterns are tuned on a training set, never on the held-out set</td>
+<td><code>tests/test_cause_triage.py::test_symptoms_in_plain_words_name_the_playbook</code>, <code>tests/test_cause_triage.py::test_build_tool_and_api_words_do_not_name_dns_or_endpoints</code>, <code>tests/test_cause_triage.py::test_feature_requests_and_other_runtimes_do_not_name_a_playbook</code>, <code>tests/test_cause_triage.py::test_more_causes_follow_the_evidence</code>, <code>tests/test_triage.py::test_the_committed_triage_set_holds</code>, <code>tests/test_cause_triage.py::test_the_rhacs_name_alone_is_not_a_blocked_deployment</code></td>
+</tr>
+<tr>
+<td>G97</td>
+<td>Commands carry the names the input gives and never an English word: a pod name comes from <code>pod/&lt;name&gt;</code>, a quoted name or a generated name ("my pod keeps restarting" keeps <code>&lt;pod&gt;</code>), and Service steps use the Service name and selector from the paste (<code>kubectl get svc web</code>, <code>Selector:</code> lines, <code>{.spec.selector}</code> output); a selector with anything but label characters stays a placeholder</td>
+<td><code>tests/test_cause_triage.py::test_gather_steps_only_for_text_about_a_cluster</code>, <code>tests/test_cause_triage.py::test_service_steps_use_the_service_name_and_selector_from_the_paste</code></td>
+</tr>
+<tr>
+<td>G98</td>
+<td>Steps and guessed causes fit the infrastructure the post is about (RHEL, Red Hat or RHACS alone does not make a cluster OpenShift): a <code>rosa</code> step needs a ROSA platform or text that says ROSA, OpenShift text gets the openshift-dns steps and plain Kubernetes the kube-system CoreDNS steps, and with no evidence for any cause an AWS cause (EFS, EBS, security groups, cloud firewalls) is no guess for text about another cloud or self-run hardware; an init-container crash gets the init container's status and logs; a RHACS ticket that never says the cluster is OpenShift is not matched against OpenShift release notes</td>
+<td><code>tests/test_cause_triage.py::test_rosa_steps_need_rosa</code>, <code>tests/test_cause_triage.py::test_dns_steps_follow_the_platform</code>, <code>tests/test_cause_triage.py::test_without_evidence_an_aws_cause_is_no_guess_for_another_cloud</code>, <code>tests/test_cause_triage.py::test_an_init_container_crash_gets_init_container_steps</code>, <code>tests/test_cause_triage.py::test_rhel_or_rhacs_alone_does_not_make_the_cluster_openshift</code>, <code>tests/test_cause_triage.py::test_a_rhacs_ticket_that_never_says_openshift_gets_no_openshift_release_notes</code></td>
+</tr>
+<tr>
+<td>G99</td>
+<td>For a policy denial the explainer's change to the object comes first, unless the denying engine's own playbook matched and the question is about the policy itself (editing, bypassing or exempting it, its message, the options) or the explainer has no change to offer; then the playbook comes first and the explainer right after it; for Kyverno and Gatekeeper (no playbook of their own) a question about the policy itself gets the document section on the asked mechanism first</td>
+<td><code>tests/test_cause_triage.py::test_the_engines_playbook_comes_first_when_the_question_is_about_the_policy</code>, <code>tests/test_golden.py::test_the_committed_golden_set_holds</code>, <code>tests/test_cause_triage.py::test_a_question_about_exempting_from_a_kyverno_policy_gets_the_exception_doc_first</code></td>
+</tr>
+<tr>
+<td>G100</td>
+<td>A value read from untrusted input reaches a printed command only through a validator that ends with <code>\Z</code> (Python's <code>$</code> also matches before a final newline, which split a must-gather step into two shell lines); a validator anchored with <code>$</code> fails the build unless it is a one-line parser</td>
+<td><code>tests/test_security_hardening.py::test_validators_end_with_backslash_z_not_dollar</code>, <code>tests/test_mustgather_analyse.py::test_a_name_with_a_trailing_newline_gets_no_command</code></td>
+</tr>
+<tr>
+<td>G101</td>
+<td>An error quoted word for word from a known issue (seven words in a row, one of them rare) matches that issue even with fewer rare words than the usual floor, and the match says it is an exact quote; seven common words in a row are no quotation</td>
+<td><code>tests/test_known_issues.py::test_an_error_quoted_word_for_word_from_a_known_issue_matches_it</code></td>
+</tr>
+<tr>
+<td>G102</td>
+<td>Prose hints and reading follow the platform as steps do: with no playbook matched, plain Kubernetes is told to paste <code>kubectl</code> output and OpenShift <code>oc</code> output; plain Kubernetes and text about another cloud get no ROSA or OpenShift reading, and a fix that applies across clouds says so before naming one cloud's pieces</td>
+<td><code>tests/test_cause_triage.py::test_with_no_playbook_the_note_names_the_platforms_cli</code>, <code>tests/test_cause_triage.py::test_plain_kubernetes_and_other_clouds_get_no_rosa_or_openshift_reading_or_aws_only_fixes</code></td>
+</tr>
+<tr>
+<td>G103</td>
+<td>In a long pasted post (over 300 characters) the first word group a document requires (its subject: "gatekeeper", "rego", "helm", "chart") does not count toward the words the document must share with the post; a typed question or a short post counts every word. A new document ships only when blinded graders on real posts find it better more often than worse, and test rows that decide which documents ship are retired</td>
+<td><code>tests/test_insight.py::test_a_long_pasted_post_needs_more_than_the_documents_subject_words</code>, <code>tests/test_community_questions.py::test_narrow_documents_keep_to_their_subject</code>, <code>tests/test_golden.py::test_the_committed_golden_set_holds</code></td>
+</tr>
+<tr>
+<td>G104</td>
+<td>Every demo video, walkthrough and thumbnail is rendered in the bundled brand: fonts from <code>docs/brand/fonts</code> (SHA-256 checked) under their own family names so no installed font can stand in, colours, tagline, icon and kube-noob.com from <code>docs/brand/tokens.json</code>, the spoken call to action "Get it at kube-noob dot com" (never "link below"), and the tagline never next to the headline under test; a render stops if a brand font did not load, a resting mascot never overlaps a terminal or caption, no mascot or flame covers a label, nor is a caption drawn under a window; terminal text and shapes use token colours, never an rgb copy</td>
+<td><code>tests/test_brand.py::test_video_pages_take_fonts_and_colours_from_the_brand</code>, <code>tests/test_brand.py::test_brand_js_refuses_a_font_that_does_not_match_its_provenance</code>, <code>tests/test_brand.py::test_video_scripts_use_the_brand_call_to_action</code>, <code>tests/test_brand.py::test_tagline_never_sits_next_to_the_headline_under_test</code>, <code>tests/test_brand.py::test_bundled_fonts_match_their_provenance_and_are_noticed</code>, <code>ci:Video scripts, facts and layout rules on every frame, and stills (silent voice)</code></td>
+</tr>
+<tr>
+<td>G105</td>
+<td>A demo video never types a number: counts, scores, line numbers and terminal lines come from the code or the CI sidecar transcript when the video is built, a rule a script names is one the audit of the example finds, <code>videos.json</code> passes its schema before rendering, and a finished video's sound is measured against the brand spec (-16 LUFS within 0.5 LU, true peak at most -1.5 dBTP, audio as long as the picture); captions and the YouTube chapters come from the same render (no cue a lone word or under 0.8 s); a cut recording says so on screen; a transcript whose memory limit differs from the manifest, whose pod port was not closed or whose version is not the release's is refused; the text-to-video prompts say what the rendered videos say; every release gets its 4K masters, rendered from its own code</td>
+<td><code>tests/test_video_facts.py::test_scripts_type_no_counts_scores_or_line_numbers</code>, <code>tests/test_video_facts.py::test_rules_a_script_names_are_real_and_found_in_the_example</code>, <code>tests/test_video_facts.py::test_videos_json_passes_its_schema_and_the_schema_knows_every_scene_kind</code>, <code>tests/test_video_loudness.py::test_normalise_reaches_the_target_without_passing_the_true_peak_limit</code>, <code>tests/test_video_loudness.py::test_a_finished_file_out_of_spec_is_refused</code>, <code>tests/test_video_captions.py::test_description_chapters_are_the_real_scene_times</code>, <code>tests/test_video_captions.py::test_cues_fit_the_caption_box_and_cover_the_spoken_span</code>, <code>tests/test_video_workflows.py::test_every_release_renders_and_attaches_measured_4k_masters</code>, <code>tests/test_video_workflows.py::test_ci_checks_every_video_on_every_change_without_the_voice_model</code></td>
+</tr>
+<tr>
+<td>G106</td>
+<td>Known-CVE signatures: a rule that recognises the manifest shape of a published vulnerability (gitRepo volumes, Service externalIPs, ingress-nginx snippet and other risky annotations, a controller ConfigMap that enables them, a controller image below the fixed releases, '+' or '=' in a pod sysctl, a workingDir or Containerfile WORKDIR under /proc, a Localhost seccomp profile with no file) names the CVE ids and the fixed releases in its message, cites the Kubernetes CVE feed issue or the GitHub advisory with its licence and never a CVE its citations lack, ships good and bad fixtures and an admission policy whose release regex equals the release table, and the probe manifest that carried every signal unreported now reports each of them</td>
+<td><code>tests/test_cve_signatures.py::test_each_cve_rule_flags_its_bad_fixture_with_the_cve_ids_and_passes_the_good</code>, <code>tests/test_cve_signatures.py::test_every_cve_citation_has_a_url_and_a_licence</code>, <code>tests/test_cve_signatures.py::test_the_probe_manifest_reports_every_signal</code>, <code>tests/test_cve_signatures.py::test_gitrepo_message_follows_the_target_version</code>, <code>tests/test_cve_signatures.py::test_seccomp_localhost_needs_a_profile_file</code>, <code>tests/test_cve_signatures.py::test_sysctl_meta_characters_in_name_or_value</code>, <code>tests/test_cve_signatures.py::test_working_directory_under_proc_in_manifests_and_containerfiles</code>, <code>tests/test_cve_signatures.py::test_ingress_nginx_releases_against_the_fixed_versions</code>, <code>tests/test_cve_signatures.py::test_the_admission_regex_equals_the_release_table</code>, <code>tests/test_cve_signatures.py::test_risky_annotation_lists_match_the_annotations_risk_document</code>, <code>tests/test_build.py::test_every_check_has_a_good_and_a_bad_fixture</code>, <code>tests/test_policy_generate.py::test_audit_flags_the_bad_fixture_and_not_the_good</code>, <code>tests/test_policy_generate.py::test_policy_equals_audit_on_random_objects</code></td>
+</tr>
+<tr>
+<td>G107</td>
+<td>Gap review 2026-10 (<code>docs/evals/gap-review-2026-10.md</code>): a candidate rule ships only if the advisory or document it cites says what the rule checks, and the review records each candidate it leaves out with the reason. A Windows <code>subPath</code> or a local PersistentVolume path with shell syntax, a <code>../</code> in an NFS or SMB CSI <code>volumeHandle</code> or <code>subDir</code>, an <code>ImplementationSpecific</code> path on ingress-nginx and a role that writes ControllerRevisions name their CVE ids and fixed releases; credentials in a ConfigMap, a legacy ServiceAccount token Secret and a binding to everyone (<code>system:unauthenticated</code>, <code>system:anonymous</code>, <code>system:authenticated</code>, <code>system:serviceaccounts</code>) are refused at admission exactly as the audit flags them; a NetworkPolicy that selects no pod and an HPA target that sets <code>spec.replicas</code> are bundle checks; the generated manifests and charts leave <code>replicas</code> to the HPA; helm-audit names the Helm advisory for a symlinked <code>Chart.lock</code>, a chart name that is a path, an oversized schema and <code>getHostByName</code>, and says when <code>lookup</code>, a CRD in <code>templates/</code> or a plain-HTTP dependency make the audited render differ from the install</td>
+<td><code>tests/test_gap_review.py::test_each_cve_rule_names_its_cves_and_fixed_releases</code>, <code>tests/test_gap_review.py::test_every_new_rule_cites_a_licensed_source_and_every_cve_it_describes</code>, <code>tests/test_gap_review.py::test_subpath_with_shell_or_powershell_syntax</code>, <code>tests/test_gap_review.py::test_persistent_volume_local_path_and_csi_subdir_traversal</code>, <code>tests/test_gap_review.py::test_implementation_specific_paths_by_ingress_class_and_platform</code>, <code>tests/test_gap_review.py::test_controllerrevision_writes_carry_cve_2026_2270</code>, <code>tests/test_gap_review.py::test_configmap_credentials_and_their_look_alikes</code>, <code>tests/test_gap_review.py::test_legacy_token_secrets_are_refused_on_create_only</code>, <code>tests/test_gap_review.py::test_bindings_to_everyone</code>, <code>tests/test_gap_review.py::test_networkpolicy_that_selects_no_pod</code>, <code>tests/test_gap_review.py::test_hpa_target_that_sets_replicas_and_the_generators</code>, <code>tests/test_gap_review.py::test_generated_chart_leaves_replicas_to_the_hpa</code>, <code>tests/test_gap_review.py::test_helm_audit_flags_the_helm_advisories</code>, <code>tests/test_gap_review.py::test_red_team_and_threat_model_read_the_new_rules</code>, <code>tests/test_policy_generate.py::test_policy_equals_audit_on_random_objects</code></td>
+</tr>
+<tr>
+<td>G108</td>
+<td>The Agent Skill runs the plugin's tools through the same <code>tool_runner.call</code> as the MCP server (validation, <code>knowledgeAsOf</code>, instruction-shaped text cleaned and flagged), imports no MCP SDK or HTTP stack, forces the offline lock whatever the config or environment says, caps input at 5 MiB however it arrives, starts no program and opens no connection, keeps team memory off, cleans error messages like results and answers every failure as JSON; SKILL.md passes text the user gave through a file, never the command line, pins installs to the plugin's locked versions, and keeps to the Agent Skills rules (only <code>name</code> and <code>description</code>, a valid name that matches the folder, a description of at most 1,024 characters with no XML, under 500 lines), names only real tools, and <code>references/tools.md</code> equals the code; the built skill keeps to the plugin directory's limits and every release attaches its ZIP</td>
+<td><code>tests/test_skill.py::test_the_committed_skill_is_valid_and_its_reference_matches_the_code</code>, <code>tests/test_skill.py::test_tools_run_offline_without_the_mcp_sdk</code>, <code>tests/test_skill.py::test_the_built_skill_bundles_the_plugin_server_and_stays_within_the_limits</code>, <code>tests/test_skill.py::test_a_tool_answers_as_the_mcp_server_does</code>, <code>tests/test_skill.py::test_tools_start_no_program_and_open_no_connection</code>, <code>tests/test_skill.py::test_web_and_cluster_stay_off_whatever_the_user_config_says</code>, <code>tests/test_skill.py::test_text_shaped_like_instructions_is_flagged_as_in_the_mcp_server</code>, <code>tests/test_skill.py::test_bad_calls_fail_with_a_json_error_and_exit_2</code>, <code>tests/test_skill.py::test_the_zip_has_the_skill_folder_at_its_top_level</code>, <code>tests/test_skill.py::test_releases_attach_the_skill_zip</code>, <code>tests/test_skill.py::test_every_bundled_module_imports</code>, <code>tests/test_skill.py::test_the_input_cap_holds_for_pipes_and_devices</code>, <code>tests/test_skill.py::test_error_messages_are_cleaned_like_results</code>, <code>tests/test_skill.py::test_team_memory_stays_off_whatever_the_config_says</code>, <code>tests/test_skill.py::test_the_install_hint_pins_the_plugin_lock_versions</code>, <code>tests/test_skill.py::test_skill_md_never_puts_pasted_text_on_the_command_line</code>, <code>tests/test_sanitize.py::test_mcp_error_messages_are_cleaned_too</code>, <code>ci:Agent Skill is valid and its tool reference matches the code</code></td>
+</tr>
+<tr>
+<td>G109</td>
+<td>No workflow checks out a ref typed into its inputs: the videos workflow resolves the release tag and <code>pipeline_ref</code> to commits and refuses any that is not on the default branch before anything runs (a dispatched run writes to the default branch's cache scope), and the Homebrew workflow takes a <code>default_branch</code> switch instead of a ref; logs never print the arguments of a kubectl call that named Secrets</td>
+<td><code>tests/test_video_workflows.py::test_only_merged_code_renders_the_videos</code>, <code>tests/test_video_workflows.py::test_no_workflow_checks_out_a_ref_typed_into_its_inputs</code>, <code>ci:Resolve the tag and the pipeline to commits on the default branch</code></td>
+</tr>
+<tr>
+<td>G110</td>
+<td>Update risks are the update service's own: a risk is listed for an update exactly when its <code>to</code> is the target and its <code>from</code> matches the current version as Cincinnati matches it (an unanchored search over the version with its architecture suffix), a version that only shares a prefix with the range is not matched, <code>from</code> patterns are evaluated in linear time and refused outside a safe subset (then listed as not evaluated, never dropped), a PromQL rule is translated only when it is one of the known shapes with an allowed value and otherwise shown as written, every suggested command is read-only and paste-safe, the snapshot is commit-pinned, cited and dated in <code>doctor</code>, and output is deterministic</td>
+<td><code>tests/test_upgrade_risks.py::test_every_vendored_from_pattern_compiles_and_agrees_with_search_semantics</code>, <code>tests/test_upgrade_risks.py::test_unanchored_patterns_match_as_the_update_service_matches_them</code>, <code>tests/test_upgrade_risks.py::test_a_version_that_matches_from_only_partially_does_not_match</code>, <code>tests/test_upgrade_risks.py::test_hostile_from_patterns_are_refused_and_reported</code>, <code>tests/test_upgrade_risks.py::test_backtracking_bombs_are_linear</code>, <code>tests/test_upgrade_risks.py::test_promql_outside_the_known_shapes_is_shown_verbatim_never_translated</code>, <code>tests/test_upgrade_risks.py::test_a_mixed_edge_keeps_every_verdict_and_never_guesses_a_query</code>, <code>tests/test_upgrade_risks.py::test_every_suggested_command_is_read_only_and_paste_safe</code>, <code>tests/test_upgrade_risks.py::test_vendored_index_is_dated_pinned_cited_and_fits_the_plugin_limits</code>, <code>tests/test_upgrade_risks.py::test_output_is_deterministic_whatever_the_record_order</code></td>
+</tr>
+<tr>
+<td>G111</td>
+<td>Ceph health codes and the Rook and ODF alerts that watch them are explained read-only: every code and alert cites the Ceph doc section, source lines and alert rule it was checked against; steps are <code>oc</code> reads or allow-listed Ceph reads in the toolbox (needing approval), oc and openshift-storage on ODF, kubectl and rook-ceph on Rook; no catalogue text names a command that can lose data, and a code whose usual fix can lose data says to stop and involve storage support; parsing is bounded and deterministic, and Ceph's wording is never read as another product's phrase</td>
+<td><code>tests/test_ceph_health.py::test_no_catalogue_text_contains_a_destructive_command</code>, <code>tests/test_ceph_health.py::test_every_step_only_reads_and_never_prints_a_key</code>, <code>tests/test_ceph_health.py::test_escalation_says_stop_and_never_shows_a_destructive_step</code>, <code>tests/test_ceph_health.py::test_alert_that_says_contact_support_gets_evidence_and_an_explicit_escalation</code>, <code>tests/test_ceph_health.py::test_platform_split</code>, <code>tests/test_ceph_health.py::test_commands_carry_names_from_the_input_and_never_hostile_ones</code>, <code>tests/test_ceph_health.py::test_hostile_and_oversized_input_is_bounded_and_fast</code>, <code>tests/test_ceph_health.py::test_output_is_deterministic</code>, <code>tests/test_ceph_health.py::test_catalogue_is_well_formed_and_cited</code>, <code>tests/test_ceph_health.py::test_ceph_wording_is_not_read_as_an_etcd_phrase</code></td>
+</tr>
+<tr>
+<td>G112</td>
+<td>The safety contract is generated from the code (tools with read_only, open_world and tier; the cluster backend's verbs; the chart's RBAC rules; defaults; subprocesses; sanitiser handling), refuses to be written while an invariant is violated, and the build fails when the committed document differs</td>
+<td><code>tests/test_safety_contract.py::test_the_committed_contract_matches_the_code</code>, <code>tests/test_safety_contract.py::test_check_exits_1_when_the_document_is_stale_and_0_when_it_is_current</code>, <code>tests/test_safety_contract.py::test_the_script_refuses_to_write_or_pass_while_an_invariant_is_violated</code>, <code>tests/test_safety_contract.py::test_every_tool_is_in_the_contract</code></td>
+</tr>
+<tr>
+<td>G113</td>
+<td>Read-only is provable: no tool without a tier is <code>read_only=False</code> except named local-state writers; the cluster backend asks for get and list only; Secrets is never readable; exec, attach, portforward and proxy are unreachable; every write verb in the chart's RBAC sits behind a write tier's value that is off by default; no subprocess uses a shell</td>
+<td><code>tests/test_safety_contract.py::test_no_tool_without_a_tier_is_read_only_false_except_the_named_local_state_writers</code>, <code>tests/test_safety_contract.py::test_the_default_cluster_verbs_are_a_subset_of_get_list_watch</code>, <code>tests/test_safety_contract.py::test_secrets_is_never_a_readable_resource</code>, <code>tests/test_safety_contract.py::test_no_exec_attach_portforward_or_proxy_is_reachable_in_the_default_tier</code>, <code>tests/test_safety_contract.py::test_every_write_verb_in_the_chart_rbac_sits_behind_a_tier_value_that_is_off_by_default</code>, <code>tests/test_safety_contract.py::test_the_default_install_grants_no_role_at_all</code>, <code>tests/test_safety_contract.py::test_every_subprocess_is_an_argv_list_and_none_uses_a_shell</code></td>
+</tr>
+<tr>
+<td>G114</td>
+<td>The public scorecard is generated by running the code in a neutral environment (golden questions, held-out and training triage, self-test, counts), names every miss and misfire and the command behind each number, separates the golden score from the held-out one, and quotes the community-question tables unchanged; the build fails when it differs from the code</td>
+<td><code>tests/test_scorecard.py::test_the_committed_scorecard_matches_the_code</code>, <code>tests/test_scorecard.py::test_every_golden_miss_and_misfire_is_listed_with_what_is_missing</code>, <code>tests/test_scorecard.py::test_every_headline_number_names_the_command_that_produces_it</code>, <code>tests/test_scorecard.py::test_the_quoted_community_tables_are_verbatim_lines_of_the_linked_document</code>, <code>tests/test_scorecard.py::test_the_engine_runs_in_a_neutral_environment_and_restores_the_caller_s</code></td>
+</tr>
+<tr>
+<td>G115</td>
+<td>A legacy Kyverno policy is linted, never converted in place: every rule and field gets direct, inverted, manual or blocked with its path, line, target kind, reason and a documentation section pinned to a commit; blocked only where the docs give no CEL equivalent; a draft only when every field of the rule maps, labelled as a draft and paired with a kyverno test skeleton that runs the legacy rule and the draft on the same resources; pattern drafts follow Kyverno's own pattern engine; Secrets are not read, names cannot inject YAML into written files, and <code>-o</code> never overwrites</td>
+<td><code>tests/test_kyverno_migrate.py::test_every_finding_names_rule_path_target_reason_and_a_pinned_source</code>, <code>tests/test_kyverno_migrate.py::test_mapping_tables_cite_only_known_sources</code>, <code>tests/test_kyverno_migrate.py::test_undocumented_or_unsupported_features_are_blocked</code>, <code>tests/test_kyverno_migrate.py::test_label_pattern_is_direct_with_a_labelled_draft</code>, <code>tests/test_kyverno_migrate.py::test_kyverno_test_fixture_proves_the_draft_against_the_legacy_rule</code>, <code>tests/test_kyverno_migrate.py::test_pattern_and_condition_semantics_follow_kyverno_not_text</code>, <code>tests/test_kyverno_migrate.py::test_secrets_are_never_read_and_other_documents_are_listed</code>, <code>tests/test_kyverno_migrate.py::test_names_with_newlines_cannot_inject_yaml_into_written_files</code>, <code>tests/test_kyverno_migrate.py::test_cli_writes_drafts_and_fixtures_only_into_a_fresh_directory</code>, <code>tests/test_kyverno_migrate.py::test_the_module_is_offline_and_never_writes</code>, <code>tests/test_kyverno_migrate.py::test_mcp_tool_is_read_only_and_strict</code></td>
+</tr>
+<tr>
+<td>G116</td>
+<td>End-to-end and listing review 2026-10-29: a pod name is taken whole (the kubelet's <code>in pod NAME_NAMESPACE</code> line no longer cuts it at the last hyphen) and no shipped example yields a step with a cut name; a plugin skill names only tools the plugin offers (cluster and memory tools only for that case); the plugin bundle imports no HTTP client, socket or subprocess (no web client, REST routes or Helm rendering), so it makes no network calls of its own and starts no program; <code>plugin.json</code> carries the directory's listing links and an accurate network statement; REST offers update risks and the Kyverno migration lint</td>
+<td><code>tests/test_pull_secret_namespace.py::test_pod_names_are_whole</code>, <code>tests/test_pull_secret_namespace.py::test_the_crashloop_example_names_the_whole_pod_in_every_step</code>, <code>tests/test_pull_secret_namespace.py::test_no_example_gets_a_step_with_a_cut_name</code>, <code>tests/test_plugin.py::test_plugin_skills_name_only_tools_the_plugin_offers</code>, <code>tests/test_plugin.py::test_the_plugin_bundle_can_neither_connect_nor_start_a_program</code>, <code>tests/test_skill.py::test_tools_run_offline_without_the_mcp_sdk</code>, <code>tests/test_rest.py::test_every_route_answers_its_contract</code></td>
+</tr>
+<tr>
+<td>G117</td>
+<td>A typed, single-line question naming two exact <code>x.y.z</code> versions routes to the upgrade-risk verdict (trying both version orderings, since the phrasing may name the target first); a version missing its patch number is never guessed and is reported as skipped instead; a multi-line paste is never scanned for upgrade intent however many version-looking numbers it holds. Pasted text containing a legacy Kyverno <code>ClusterPolicy</code>/<code>Policy</code>/<code>ClusterCleanupPolicy</code>/<code>CleanupPolicy</code>/<code>PolicyException</code> routes to the CEL migration check. Neither path can crash <code>insight()</code>: each catches the tool's own validation error and falls back to a skip entry</td>
+<td><code>tests/test_insight.py::test_upgrade_questions_route_to_upgrade_risks</code>, <code>tests/test_insight.py::test_upgrade_question_without_a_patch_version_is_not_guessed</code>, <code>tests/test_insight.py::test_a_pasted_legacy_kyverno_policy_routes_to_the_cel_migration_check</code></td>
+</tr>
+<tr>
+<td>G118</td>
+<td>SAFE2: a shared HTTP server records no learner progress. <code>learn_lesson</code>, <code>learn_submit</code> and <code>learn_quiz</code> take a <code>learner</code> id, and the server has one static bearer token, so that id comes from the caller and binds to no identity: any caller could write and read any other's tally, and concurrent answers lost each other. The three tools are offered on a shared server and grade, mark and teach identically, but keep nothing and say so in the result; <code>learn_progress</code> returns no tally there rather than one anybody could have written. Local stdio use is unchanged, and a local tally is now read and written under a lock, so two clients open at once cannot drop a credit. The shared filter is the <code>read_only</code> flag each tool carries, not a list of names, so a write tool added later is excluded by construction rather than exposed by default</td>
+<td><code>tests/test_knowledge_learn.py::test_a_shared_server_grades_the_same_way_and_records_nothing</code>, <code>tests/test_red_team_rt5.py::test_a_shared_server_offers_nothing_that_writes</code>, <code>tests/test_red_team_rt5.py::test_a_shared_progress_read_does_not_hand_over_someone_elses_tally</code>, <code>tests/test_red_team_rt5.py::test_concurrent_answers_on_the_local_server_do_not_lose_each_other</code></td>
+</tr>
+<tr>
+<td>G119</td>
+<td>The Helm chart's read <code>Role</code>/<code>ClusterRole</code> grants exactly <code>get, list</code> on every resource (no <code>watch</code>): an unused permission, since the cluster backend never requests <code>watch</code> (G113 proves that separately)</td>
+<td><code>tests/test_safety_contract.py::test_the_chart_grants_no_watch_the_backend_never_uses</code></td>
+</tr>
+<tr>
+<td>G120</td>
+<td>An admission denial from Kyverno's CEL policy types (<code>ValidatingPolicy</code>, <code>MutatingPolicy</code>, <code>ImageValidatingPolicy</code>, and their <code>Namespaced*</code> variants) is named by its real CRD (<code>policies.kyverno.io</code>), not the legacy <code>ClusterPolicy</code>; <code>ImageValidatingPolicy</code> denials get signing/attestation fixes, not the generic one; <code>MutatingPolicy</code> denials extract the resource from Kyverno's own "Resource: ns/name, Kind: K, Errors: [...]" wrapper and explain that the policy's own CEL expression failed, not the object. <code>DeletingPolicy</code> is out of scope: it has no admission webhook (cron-scheduled cleanup only), so it produces no denial to explain</td>
+<td><code>tests/test_policy.py::test_a_validatingpolicy_denial_gets_the_cel_crd_not_the_legacy_one</code>, <code>tests/test_policy.py::test_an_imagevalidatingpolicy_denial_gets_signing_fixes_not_the_generic_one</code>, <code>tests/test_policy.py::test_a_namespaced_imagevalidatingpolicy_webhook_name_is_recognised</code>, <code>tests/test_policy.py::test_a_mutatingpolicy_denial_names_its_resource_and_explains_what_a_mutate_failure_means</code>, <code>tests/test_policy.py::test_a_mutatingpolicy_denial_with_two_failing_policies_splits_into_two</code>, <code>tests/test_policy.py::test_a_deletingpolicy_has_no_admission_webhook_so_nothing_to_explain</code>, <code>tests/test_policy.py::test_an_unmodelled_cel_webhook_name_still_falls_back_instead_of_crashing</code></td>
+</tr>
+<tr>
+<td>G121</td>
+<td>Bundled YAML is written so that every conformant parser reads it the same way: no colon inside an unquoted scalar in a flow collection, and no <code>key: value</code> pair sitting directly in a <code>[ ]</code> sequence. Both are ambiguous, and PyYAML's own scanner accepts what a stricter libyaml refuses, so a file that parses in CI can break a shipped install. The check reads the scanner's tokens rather than trusting whichever parser is installed, and covers <code>.yaml</code>, <code>.yml</code> and the front matter of knowledge documents, in <code>src/</code>, the plugin copy and <code>examples/</code>. The Ceph catalogue, which <code>diagnose</code> and <code>known_issues</code> both load, falls back to PyYAML's scanner rather than raising if libyaml ever objects</td>
+<td><code>tests/test_distribution.py::test_bundled_yaml_parses_under_every_yaml_parser</code>, <code>tests/test_ceph_health.py::test_ceph_status_summaries_map_to_codes</code></td>
+</tr>
+<tr>
+<td>G122</td>
+<td>The Claude plugin asks the user for nothing and reads nothing out of their environment: it declares no <code>userConfig</code> option, starts the server with the web, the cluster and the model off (so <code>apiKeyEnv</code>, <code>rhacs.tokenEnv</code> and <code>ci.githubTokenEnv</code> are unreachable), and <code>scripts/sync_plugin_server.py</code> leaves <code>kube_noob.mustgather</code> out of the copy, so the one tool that reads the user's own files is not there to be configured. A blank environment variable counts as unset rather than as a setting of "", so a shell that exports one unconditionally cannot stop the server starting</td>
+<td><code>tests/test_distribution.py::test_the_plugin_asks_the_user_for_nothing_and_reads_nothing_from_their_machine</code>, <code>tests/test_plugin.py::test_mcp_config_runs_the_bundled_source_from_the_lock</code>, <code>tests/test_mustgather_mcp.py::test_a_blank_variable_is_an_unset_one_not_a_refused_start</code></td>
+</tr>
+<tr>
+<td>G123</td>
+<td>Pasted JSON is refused on its bracket count before it is parsed, so the refusal does not depend on the interpreter: <code>json.loads</code> raises <code>RecursionError</code> up to CPython 3.13 but relies on the C stack from 3.14, where a deep paste overflows the WebAssembly stack as a fatal <code>RangeError</code> and took <code>diagnose</code> and <code>known_issues</code> down in the browser. An operator's must-gather file that only one of the two YAML parsers accepts is read by that one, instead of being recorded as unparsed and quietly dropping a finding past a <code>--fail-on</code> gate</td>
+<td><code>tests/test_red_team_rt1.py::test_deep_json_is_refused_by_counting_brackets_not_by_recursing</code>, <code>tests/test_red_team_rt1.py::test_deeply_nested_jsonl_cases_are_refused_cleanly</code>, <code>tests/test_mustgather_analyse.py::test_a_file_only_one_yaml_parser_accepts_is_still_read</code></td>
+</tr>
+<tr>
+<td>G124</td>
+<td>A must-gather analysis says what it could not see, and a gate can refuse to read a blind run as a clean one: <code>completeness</code> reports the analysers that had data, the files that could not be read and whether the evidence is whole; the text output says so in words; and <code>--require-complete</code> exits 5, distinct from 1 (findings at or above <code>--fail-on</code>) and from 2, 3 and 4 (config, clarification, refused input). Without the flag nothing changes, so no existing gate shifts under anyone</td>
+<td><code>tests/test_mustgather_analyse.py::test_a_blind_run_is_not_reported_as_a_clean_one</code></td>
+</tr>
+<tr>
+<td>G125</td>
+<td>The API key the model client sends is only ever the one named for that provider: <code>apiKeyEnv</code> when set, else the provider's own default, and only <code>anthropic</code> has one. An <code>openai-compatible</code> endpoint - any gateway the user named - therefore never receives <code>ANTHROPIC_API_KEY</code> by default, and <code>apiKeyEnv</code> may only name a <code>*_API_KEY</code> variable, so a configuration file cannot point the model client at <code>KUBE_NOOB_HTTP_TOKEN</code> (the MCP server's own bearer token, held by the same process). Error bodies from an endpoint are redacted before they are quoted, so a gateway that echoes the <code>Authorization</code> header in a 400 cannot put the key into stderr, logs or CI output; <code>ANTHROPIC_BASE_URL</code> from the environment is held to the same clear-text rule as <code>llm.baseUrl</code>; and a 200 whose body is not the documented shape, or a redirect loop, ends in a message rather than a traceback</td>
+<td><code>tests/test_red_team_apikey.py::test_the_anthropic_key_is_never_the_default_for_another_endpoint</code>, <code>tests/test_red_team_apikey.py::test_an_echoed_key_is_redacted_from_the_error</code>, <code>tests/test_red_team_apikey.py::test_apikeyenv_may_not_name_a_non_key_variable</code>, <code>tests/test_red_team_apikey.py::test_the_cleartext_guard_covers_the_endpoint_from_the_environment</code>, <code>tests/test_red_team_apikey.py::test_an_unexpected_response_shape_is_an_error_not_a_traceback</code>, <code>tests/test_red_team_apikey.py::test_a_redirect_loop_is_an_error_not_a_traceback</code></td>
+</tr>
+<tr>
+<td>G126</td>
+<td>A directory of manifests is read one file at a time, so a file nobody can read is named and counted rather than deciding the outcome for every other file: <code>audit -f DIR</code> and <code>gate -f DIR</code> used to concatenate the whole tree before anything parsed it, so one file that was not UTF-8 or not YAML aborted the audit of the rest and reported a line of the combined text, which is no line of any file the user can open. Unreadable files now exit 5, distinct from 1 (findings at or above <code>--fail-on</code>), because a <code>gate</code> that crashed on a NUL byte used to leave 1 and a pipeline read that as policy violations; <code>--skip-unreadable</code> audits the rest and lists them under <code>unreadable</code> in the report, and <code>--fail-on</code> still bites on the files that were read</td>
+<td><code>tests/test_red_team_rt3.py::test_a_crash_never_wears_the_exit_code_of_a_policy_failure</code>, <code>tests/test_red_team_rt3.py::test_an_unreadable_file_is_named_not_located_in_a_concatenation</code>, <code>tests/test_red_team_rt3.py::test_one_bad_file_does_not_hide_the_findings_in_the_good_ones</code>, <code>tests/test_red_team_rt3.py::test_skip_unreadable_still_fails_on_severity</code>, <code>tests/test_red_team_rt3.py::test_a_clean_directory_is_unchanged</code></td>
+</tr>
+<tr>
+<td>G127</td>
+<td>A reachability verdict evaluates all three network policy tiers, because the two cluster-scoped ones do not narrow the answer, they change it: an <code>AdminNetworkPolicy</code> <code>Deny</code> blocks traffic every NetworkPolicy in the namespace allows, an <code>Allow</code> permits traffic every NetworkPolicy denies, and a <code>BaselineAdminNetworkPolicy</code> decides the traffic no NetworkPolicy selects. Order is ANP (by <code>priority</code> ascending, then rule order, first match wins; <code>Pass</code> ends the tier), then NetworkPolicy -- whose answer is final where it selects the pod -- then BANP, whose no-match is an allow. A manifest the API server would itself refuse (a priority outside 0-1000, a BANP not named <code>default</code>, an action that is not one of the API's) is reported as a mistake rather than evaluated or guessed at, an <code>Allow</code>/<code>Deny</code> above OVN-Kubernetes's priority 99 says that the cluster ignores it, and a <code>nodes</code> or <code>networks</code> peer says it is not evaluated offline. The live check reads both tiers once, cluster-scoped, and a cluster without the CRDs is a note rather than a failure</td>
+<td><code>tests/test_netpol_anp.py::test_an_admin_deny_beats_a_networkpolicy_that_allows_everything</code>, <code>tests/test_netpol_anp.py::test_an_admin_allow_beats_a_networkpolicy_that_denies_everything</code>, <code>tests/test_netpol_anp.py::test_pass_hands_the_decision_back_to_the_namespace</code>, <code>tests/test_netpol_anp.py::test_the_lowest_priority_number_decides</code>, <code>tests/test_netpol_anp.py::test_the_baseline_decides_only_what_no_networkpolicy_selects</code>, <code>tests/test_netpol_anp.py::test_a_baseline_not_named_default_is_reported_not_applied</code>, <code>tests/test_netpol_anp.py::test_an_unknown_action_is_reported_and_not_guessed</code>, <code>tests/test_netpol_anp.py::test_the_live_check_reads_the_admin_tiers_too</code>, <code>tests/test_netpol_anp.py::test_a_cluster_that_has_no_admin_tier_api_is_not_an_error</code>, <code>tests/test_netpol_anp.py::test_it_does_not_propose_a_change_that_the_admin_tier_would_still_block</code>, <code>tests/test_safety_contract.py::test_the_chart_read_rules_mirror_the_backends_allowlist</code></td>
+</tr>
+<tr>
+<td>G128</td>
+<td>The HTTP server's guards run before the work they protect and on the bytes the work actually reads: a body on <code>/healthz</code> or <code>/readyz</code> is refused with 405 before it is buffered (those are the only paths an unauthenticated caller reaches, and buffering there let anything that could open the port take the pod to its memory limit); the body limit is 1.5 MiB rather than 8 MiB, since every tool argument is capped at 1,000,000 characters so a larger body can never be valid, and each buffered body is copied again and bracket-scanned in pure Python; the JSON nesting guard counts the one decoded string the parser is given, because <code>json.loads</code> sniffs UTF-16 and UTF-32 and a backslash before a NUL byte desynchronised a guard that read a UTF-8 decoding of the same bytes; two <code>Authorization</code> headers are refused rather than resolved last-wins; and the content-free audit line truncates argument names, which arrive unvalidated from the caller on the REST path</td>
+<td><code>tests/test_red_team_rt4.py::test_an_unauthenticated_caller_cannot_make_the_server_buffer_a_body</code>, <code>tests/test_red_team_rt4.py::test_the_body_limit_is_not_larger_than_a_valid_request</code>, <code>tests/test_red_team_rt4.py::test_the_guard_counted_a_different_string_from_the_one_the_parser_read</code>, <code>tests/test_red_team_rt4.py::test_the_nesting_guard_reads_the_same_bytes_the_parser_does</code>, <code>tests/test_red_team_rt4.py::test_a_valid_utf16_body_is_still_understood</code>, <code>tests/test_red_team_rt4.py::test_a_duplicate_authorization_header_is_refused</code>, <code>tests/test_red_team_rt4.py::test_the_audit_line_does_not_log_what_the_caller_chose_to_send</code></td>
+</tr>
+<tr>
+<td>G129</td>
+<td>The knowledge index is cached on the content that feeds it, not on the file that holds it: <code>learning.json</code> contributes the team's confirmed notes as searchable chunks, but almost every tool call rewrites it to bump a counter, so keying the cache on its size and mtime rebuilt the whole index on nearly every request -- about fourteen times slower on the shared HTTP server. The key covers the notes themselves, so a new note is searchable at once, a counter costs nothing, and a file that cannot be read as notes falls back to its stat rather than serving a stale index</td>
+<td><code>tests/test_red_team_rt4.py::test_the_knowledge_store_is_not_rebuilt_because_a_counter_moved</code></td>
+</tr>
+<tr>
+<td>G130</td>
+<td>A burst of connections that send nothing starves the HTTP server's pool -- uvicorn counts connections towards <code>limit_concurrency</code> and nothing reclaims one that never sent a request, so every request including the kubelet's probes answers 503 until they close (measured: 70 idle sockets, still 503 after 16s). kube-noob cannot close that in process, so what it owns stays consistent instead: buffered-body memory is the concurrency limit times the body limit and has to leave the container room to run (64 x 1.5 MiB against 512Mi, where it used to be 64 x 8 MiB -- exactly the ceiling the kernel kills at); the liveness probe is four times more forgiving than readiness, so sustained overload sheds traffic rather than restarting a pod whose restart frees no connection; and SECURITY.md says the port belongs behind a proxy that enforces a header-read timeout</td>
+<td><code>tests/test_red_team_rt6.py::test_the_concurrency_limit_and_the_body_limit_stay_consistent</code>, <code>tests/test_red_team_rt6.py::test_overload_sheds_traffic_rather_than_restarting_the_pod</code>, <code>tests/test_red_team_rt6.py::test_the_security_policy_states_the_limitation</code></td>
+</tr>
+</tbody>
+</table></div><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/guidance.md">docs/guidance.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

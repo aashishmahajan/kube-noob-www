@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Roadmap: the ground truth for Kubernetes and OpenShift operations · kube-noob</title>
+<meta name="description" content="Goal: a platform team deploys kube-noob once. Every developer and SRE then gets answers that are safe, cited and read-only first, about their own…">
+<link rel="canonical" href="https://kube-noob.com/docs/roadmap/">
+<meta property="og:title" content="Roadmap: the ground truth for Kubernetes and OpenShift operations · kube-noob">
+<meta property="og:description" content="Goal: a platform team deploys kube-noob once. Every developer and SRE then gets answers that are safe, cited and read-only first, about their own…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/roadmap/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/" aria-current="page">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="roadmap-the-ground-truth-for-kubernetes-and-openshift-operations">Roadmap: the ground truth for Kubernetes and OpenShift operations</h1>
+<p>Goal: a platform team deploys kube-noob once. Every developer and SRE then gets answers that are safe, cited and
+read-only first, about their own clusters, their own runbooks and their own past fixes, so the platform team's ticket
+queue shrinks. kube-noob has no AI inside: Claude, OpenShift Lightspeed or any MCP client does the talking, and the
+CLI works with no model at all. Updated 2026-10-28, after 0.5.0.</p>
+<h2 id="principles">Principles</h2>
+<ul>
+<li><strong>Models are the commodity layer.</strong> kube-noob competes on what a model cannot supply: the team's own confirmed
+  fixes, deterministic checks, evidence in seconds, and what the network actually did.</li>
+<li><strong>The verifier never acts.</strong> Probes, server-side dry-runs, ticket writes and the gate are separate tiers, off by
+  default, each action approved by a person.</li>
+<li><strong>Ship fetchers, not data.</strong> Red Hat Jira tickets, customer tickets and team memory stay where they were fetched;
+  they are never bundled, published or exported to datasets.</li>
+<li><strong>Signals over prose.</strong> Alert names, event reasons, condition reasons and error templates are the join key between
+  an error, a known issue and a past fix; text search is the fallback.</li>
+<li><strong>Land where AI is banned.</strong> Disconnected and regulated OpenShift first; every feature also works on ROSA, EKS, AKS,
+  GKE and upstream Kubernetes.</li>
+</ul>
+<p>North star: time from an alert or a must-gather to an evidence pack, offline. Target: 60 seconds. Also tracked:
+memory hit rate and tickets answered without escalation.</p>
+<h2 id="who-it-serves">Who it serves</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Who</th>
+<th>Job to be done</th>
+<th>What they use today</th>
+<th>What kube-noob changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>App developer</td>
+<td>When my deploy fails on the shared cluster, find out why without opening a ticket</td>
+<td>Slack the platform team, search the wiki, paste logs into a public chatbot</td>
+<td><code>diagnose</code> and the Lightspeed or Claude tools give the cause and read-only steps, in the company's terms</td>
+</tr>
+<tr>
+<td>SRE / on-call</td>
+<td>Get from symptom to evidence fast, without making it worse</td>
+<td>Personal notes, tribal knowledge</td>
+<td>Playbooks that read before they change, a redacted evidence <code>bundle</code>, confirmed team notes</td>
+</tr>
+<tr>
+<td>Platform team</td>
+<td>Stop answering the same 20 questions; enforce conventions before deploy</td>
+<td>Docs nobody reads, admission policies that only say "no"</td>
+<td>Org runbooks indexed and cited, audit in CI, a weekly "top issues" signal</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>Allow AI assistants without data leaving the boundary</td>
+<td>Ban them</td>
+<td>No model inside kube-noob, offline lock, <code>doctor</code>, no egress, signed images, nothing exported</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="status">Status</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status</th>
+<th>Release</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Offline lock, <code>doctor</code>, web GET-only and text-only</td>
+<td>Done</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td>Diagnose-first playbooks, redacted bundle, paste-safe commands</td>
+<td>Done</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td>Upgrade-safe learning file; your own runbooks via <code>corpus add-docs</code></td>
+<td>Done</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td><code>selftest</code> (61 questions), demos, use cases, guidance traceability</td>
+<td>Done</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td>"No AI inside" stated and enforced by a test; no model configured by default</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>Claude plugin runs bundled source with a hash-pinned <code>uv.lock</code></td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>PRIVACY.md with every destination; retention, egress and sizing documented</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>Two independent red-team reviews, all findings fixed with regression tests</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>CI on Kubernetes 1.33 to 1.37 (OpenShift 4.20, 4.21, 4.22, next); sidecar under Pod Security restricted</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>Chart: generated token, namespace-scoped RBAC, optional EgressFirewall, signed OCI chart</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>Homebrew (Apple silicon, Linux); <code>diagnose</code> takes pasted text</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>Claude plugin passes the plugin directory's checks (one policy hold: dependencies download at install)</td>
+<td>Done</td>
+<td>0.2.2</td>
+</tr>
+<tr>
+<td>Release writes the Homebrew formula; CI installs it the way users do (tap, <code>brew install kube-noob</code>)</td>
+<td>Done</td>
+<td>0.2.3</td>
+</tr>
+<tr>
+<td>Reported issues: errors matched to the OpenShift 4.20 to 4.22 release notes with link, fix version and workaround</td>
+<td>Done</td>
+<td>0.3.0</td>
+</tr>
+<tr>
+<td>Every answer states the knowledge date; live checks read the cluster version; web results marked external</td>
+<td>Done</td>
+<td>0.3.0</td>
+</tr>
+<tr>
+<td>Red Hat Jira copy: every ticket (any status) of the OpenShift, ROSA, ACM and RHACS projects, synced through the REST API at one request per second; known-issue answers say what became of the ticket (fixed in which release, open, not a bug, won't fix, duplicate) with the workaround from the comments</td>
+<td>Done</td>
+<td>0.5.0</td>
+</tr>
+<tr>
+<td>Incident watch: always-on, read-only detection in the service or terminal; each incident explained once, with what changed before it and the fix the team confirmed for earlier occurrences</td>
+<td>Done</td>
+<td>0.4.0</td>
+</tr>
+<tr>
+<td>Audit findings name their NIST SP 800-53 Rev. 5 controls; <code>doctor</code> reports FIPS mode; FedRAMP High deployment guide</td>
+<td>Done</td>
+<td>0.3.1</td>
+</tr>
+<tr>
+<td>Policy debugging: Kyverno, Gatekeeper, ValidatingAdmissionPolicy, Pod Security, SCC, RHACS, quota, LimitRange and RBAC denials explained with the fix; NetworkPolicy reachability (offline or live, read-only) with the smallest allow policy</td>
+<td>Done</td>
+<td>0.3.1</td>
+</tr>
+<tr>
+<td>OpenShift Helm catalog (community) submission</td>
+<td>Not started: needs the owner's fork and pull requests (<a href="/docs/openshift-catalog/">openshift-catalog.md</a>)</td>
+<td>after 0.2.2</td>
+</tr>
+<tr>
+<td>Admission under a real <code>restricted-v2</code> SCC in CI</td>
+<td>At risk: needs an OpenShift cluster for CI</td>
+<td>Next</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="the-program-milestones-in-build-order">The program (milestones in build order)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>What ships</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1 Signal-keyed matching</td>
+<td>Signal extraction (alerts, event and condition reasons, error templates), a verified signal catalogue, known-issue matching on signals with a recall gate</td>
+<td>Plain words miss bugs the release notes describe differently (an etcd leader-change question misses OCPBUGS-73881)</td>
+</tr>
+<tr>
+<td>M2 Fixes-as-code memory</td>
+<td>Reviewed YAML entries in the team's Git, <code>kube-noob memory</code> (validate as the poisoning guard, match, outcomes, stats), memory in every answer</td>
+<td>The team's own confirmed fixes are the moat no model can copy</td>
+</tr>
+<tr>
+<td>M3 Ticket seeding and replay</td>
+<td>Offline ServiceNow and Jira importers, <code>memory replay</code> with a 30% useful-match gate</td>
+<td>Tests the riskiest assumption on real tickets before more is built on it</td>
+</tr>
+<tr>
+<td>M4 Must-gather pre-flight</td>
+<td>Safe ingest, analysers, report and case draft, a custom must-gather image</td>
+<td>The fastest path to evidence on a disconnected cluster</td>
+</tr>
+<tr>
+<td>M5 Evidence breadth</td>
+<td>Operator release notes, installed-operator inventory, Kubernetes and RHACS known issues, Jira matches filtered by what the cluster runs</td>
+<td>Most escalations are about operators, not the core</td>
+</tr>
+<tr>
+<td>M6 Network truth</td>
+<td>Flow readers (OVN ACL log, Hubble, Network Observability), a pcap analyser, probe and capture plans, <code>net verify</code></td>
+<td>"Policy says allowed, packets say dropped"</td>
+</tr>
+<tr>
+<td>M7 Verifier hardening</td>
+<td>Prompt-injection sanitiser, server-side dry-run (tier D), blast radius</td>
+<td>Text from clusters and tickets reaches models; checks must hold under attack</td>
+</tr>
+<tr>
+<td>M8 Integrations without AI</td>
+<td>Alertmanager receiver, SARIF and CI surfaces, Argo CD, chat commands, console plugin, REST API, <code>oc kube-noob</code>, runbook links, <code>report</code> and <code>/metrics</code></td>
+<td>Reach people where they already work</td>
+</tr>
+<tr>
+<td>M9 Proactive</td>
+<td>Upgrade pre-mortem, offline what-if</td>
+<td>Prevent the ticket instead of answering it</td>
+</tr>
+<tr>
+<td>M10 Optional AI layer</td>
+<td>Egress log, pre-send preview, admin model controls, provider docs, bench with and without tools</td>
+<td>For teams that bring their own key: see exactly what leaves</td>
+</tr>
+<tr>
+<td>M11 kube-noob gate</td>
+<td>An MCP proxy: kube-noob gate checks agent tool calls, holds writes for approval and keeps a tamper-evident log</td>
+<td>The verifier position, without ever acting itself</td>
+</tr>
+<tr>
+<td>M12 Governance</td>
+<td>Identity in audit records, OSCAL, read as caller, a signed air-gap corpus pack</td>
+<td>What regulated buyers need; candidates for an enterprise edition (<a href="/docs/editions/">editions.md</a>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Frozen (kept and tested, no new features): learner tracks and credits, brand videos. The grader and
+<code>kube-noob train bench</code> stay as an evaluation product: they score any model or MCP client against the same tasks.
+The trained-model track is cut: kube-noob stays model-free and makes every model better through its tools.</p>
+<p>Set aside: embeddings (unless an evaluation shows signals plus BM25 fail), a hosted SaaS (conflicts with the
+no-egress promise), Backstage beyond a design doc, and live outage signals from social or status feeds (conflicts with
+the offline default).</p>
+<h2 id="riskiest-assumptions-and-the-cheapest-test">Riskiest assumptions and the cheapest test</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Assumption</th>
+<th>Cheapest test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Team memory gets reused often enough to matter</td>
+<td><code>kube-noob memory replay</code> on one team's last 50 resolved tickets and the 4 weeks after: at least 30% useful matches</td>
+</tr>
+<tr>
+<td>Platform teams will let an OSS tool server into the cluster</td>
+<td>Show <code>doctor</code>, PRIVACY.md and SECURITY.md to two OpenShift admins; ask what blocks approval and whether they would enable probes and dry-runs</td>
+</tr>
+<tr>
+<td>Developers will ask it before opening a ticket</td>
+<td>Turn on the Lightspeed integration for one team; compare ticket counts for the top 5 categories over 4 weeks</td>
+</tr>
+<tr>
+<td>Read-as-caller is possible without new infrastructure</td>
+<td>Prototype with oauth-proxy's <code>--pass-access-token</code> on a test cluster</td>
+</tr>
+<tr>
+<td>"No AI inside" reads as a strength, not a gap</td>
+<td>Post two headlines a week apart ("No AI inside. Works with yours." and "The ground truth your AI SRE checks against") and compare click-through to the repository</td>
+</tr>
+</tbody>
+</table></div><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/roadmap.md">docs/roadmap.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

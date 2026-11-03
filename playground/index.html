@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Playground · kube-noob</title>
+<meta name="description" content="Run kube-noob&#x27;s audit, diagnose, known-issue and policy tools in your browser. Nothing is uploaded.">
+<link rel="canonical" href="https://kube-noob.com/playground/">
+<meta property="og:title" content="Playground · kube-noob">
+<meta property="og:description" content="Run kube-noob&#x27;s audit, diagnose, known-issue and policy tools in your browser. Nothing is uploaded.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/playground/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+<script type="module" src="/assets/playground.js"></script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/" aria-current="page">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+
+<div class="prose" style="max-width:900px"><span class="eyebrow">Playground</span>
+<h1>kube-noob, running in your browser</h1>
+<p class="lead">These are kube-noob's real tools (the same code as the CLI and the MCP server), running in this tab on
+Pyodide, a build of Python for WebAssembly. No model, no backend, no account: what you paste never leaves your device.
+The first run downloads the runtime (about 18 MB) from this site, once.</p></div>
+
+<p class="status" id="kn-status" aria-live="polite"></p>
+<div class="tabs" id="kn-tabs" role="tablist" aria-label="Tools"></div>
+<div class="tool-panel" id="kn-panel"></div>
+<script type="application/json" id="kn-examples">{"audit": "# A Deployment that \"works on my laptop\" and fails or is unsafe on OpenShift / ROSA HCP.\n# Try: kube-noob audit -f examples/insecure-deployment.yaml --platform openshift\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: orders-api\n  namespace: shop\nspec:\n  replicas: 1\n  selector:\n    matchLabels: {app: orders-api}\n  template:\n    metadata:\n      labels: {app: orders-api}\n    spec:\n      containers:\n        - name: api\n          image: quay.io/example/orders-api:latest\n          ports:\n            - containerPort: 80\n          env:\n            - name: DB_PASSWORD\n              value: changeme\n          securityContext:\n            runAsUser: 1000\n            allowPrivilegeEscalation: true\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: orders-api\n  namespace: shop\nspec:\n  selector: {app: orders}\n  ports:\n    - port: 80\n      targetPort: 80\n", "diagnose": "Name:             orders-api-7c4b9d6f5-x2lqp\nNamespace:        shop\nContainers:\n  api:\n    State:          Waiting\n      Reason:       CrashLoopBackOff\n    Last State:     Terminated\n      Reason:       OOMKilled\n      Exit Code:    137\n    Restart Count:  6\n    Limits:\n      memory:  128Mi\nEvents:\n  Type     Reason     Age                From     Message\n  ----     ------     ----               ----     -------\n  Warning  BackOff    30s (x25 over 6m)  kubelet  Back-off restarting failed container api in pod orders-api-7c4b9d6f5-x2lqp_shop\n", "known": "could not find any suitable subnets for creating the ELB", "denied": "LAST SEEN   TYPE      REASON             OBJECT                              MESSAGE\n2m          Warning   FailedCreate       replicaset/orders-api-6d9f7c9b8d    Error creating: pods \"orders-api-6d9f7c9b8d-\" is forbidden: unable to validate against any security context constraint: [provider \"anonymuid\": Forbidden: not usable by user or serviceaccount, spec.containers[0].securityContext.runAsUser: Invalid value: 1000: must be in the ranges: [1000680000, 1000689999], provider \"restricted-v2\": Forbidden: not usable by user or serviceaccount]\nNamespace: shop\n", "reach": "apiVersion: v1\nkind: Namespace\nmetadata:\n  name: shop\n  labels:\n    team: shop\n---\napiVersion: v1\nkind: Namespace\nmetadata:\n  name: web\n  labels:\n    team: web\n---\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: frontend\n  namespace: web\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: frontend\n  template:\n    metadata:\n      labels:\n        app: frontend\n    spec:\n      containers:\n        - name: web\n          image: registry.example.com/shop/frontend:1.4.2\n          ports:\n            - name: http\n              containerPort: 8080\n---\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: orders-api\n  namespace: shop\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: orders-api\n  template:\n    metadata:\n      labels:\n        app: orders-api\n    spec:\n      containers:\n        - name: api\n          image: registry.example.com/shop/orders-api:2.7.0\n          ports:\n            - name: http\n              containerPort: 8080\n---\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: payments\n  namespace: shop\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: payments\n  template:\n    metadata:\n      labels:\n        app: payments\n    spec:\n      containers:\n        - name: payments\n          image: registry.example.com/shop/payments:3.1.0\n          ports:\n            - name: grpc\n              containerPort: 9090\n---\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: default-deny\n  namespace: shop\nspec:\n  podSelector: {}\n  policyTypes:\n    - Ingress\n    - Egress\n---\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: allow-frontend\n  namespace: shop\nspec:\n  podSelector:\n    matchLabels:\n      app: orders-api\n  policyTypes:\n    - Ingress\n  ingress:\n    - from:\n        - namespaceSelector:\n            matchLabels:\n              team: web\n          podSelector:\n            matchLabels:\n              app: frontend\n      ports:\n        - protocol: TCP\n          port: http\n---\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: orders-egress\n  namespace: shop\nspec:\n  podSelector:\n    matchLabels:\n      app: orders-api\n  policyTypes:\n    - Egress\n  egress:\n    - to:\n        - podSelector:\n            matchLabels:\n              app: payments\n      ports:\n        - protocol: TCP\n          port: 9090\n    - to:\n        - namespaceSelector:\n            matchLabels:\n              kubernetes.io/metadata.name: openshift-dns\n      ports:\n        - protocol: UDP\n          port: 5353\n        - protocol: TCP\n          port: 5353\n", "meta": {"rules": 77, "runtimeMB": 18}}</script>
+
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

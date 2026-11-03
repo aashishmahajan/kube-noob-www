@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+  <title id="t">kube-noob</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E2A47"/>
+      <stop offset="1" stop-color="#071422"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#43E97B"/>
+      <stop offset="0.55" stop-color="#22B8CF"/>
+      <stop offset="1" stop-color="#2F6FED"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#9CCBFF"/>
+    </linearGradient>
+    <linearGradient id="fin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#43E97B"/>
+      <stop offset="1" stop-color="#16A3A3"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE45C"/>
+      <stop offset="0.5" stop-color="#FF9F1C"/>
+      <stop offset="1" stop-color="#FF4D2E"/>
+    </linearGradient>
+    <radialGradient id="visor" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#1F4E7A"/>
+      <stop offset="1" stop-color="#0A1A2C"/>
+    </radialGradient>
+  </defs>
+
+  <!-- app-icon tile -->
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="18" y="18" width="476" height="476" rx="96" fill="none" stroke="url(#ring)" stroke-width="14"/>
+
+  <!-- stars -->
+  <circle cx="404" cy="372" r="7" fill="#43E97B"/>
+  <circle cx="428" cy="176" r="4" fill="#9CCBFF"/>
+  <circle cx="118" cy="122" r="5" fill="#9CCBFF"/>
+
+  <!-- rocket, flying up-right -->
+  <g transform="rotate(45 256 256)">
+    <!-- flame -->
+    <path d="M256 352 C 226 392 232 432 256 470 C 280 432 286 392 256 352 Z" fill="url(#flame)"/>
+    <path d="M256 362 C 244 388 246 414 256 436 C 266 414 268 388 256 362 Z" fill="#FFF3B0"/>
+    <!-- fins -->
+    <path d="M196 290 L 150 352 L 150 372 L 206 340 Z" fill="url(#fin)"/>
+    <path d="M316 290 L 362 352 L 362 372 L 306 340 Z" fill="url(#fin)"/>
+    <!-- body -->
+    <path d="M256 64 C 316 112 330 196 322 300 C 320 330 306 352 256 352 C 206 352 192 330 190 300 C 182 196 196 112 256 64 Z"
+          fill="url(#body)"/>
+    <!-- nose cone -->
+    <path d="M256 64 C 286 88 304 116 312 146 L 200 146 C 208 116 226 88 256 64 Z" fill="#2F6FED"/>
+    <!-- porthole with astronaut "noob" face -->
+    <circle cx="256" cy="222" r="50" fill="#0E2A47"/>
+    <circle cx="256" cy="222" r="42" fill="url(#visor)"/>
+    <circle cx="240" cy="214" r="7" fill="#FFFFFF"/>
+    <circle cx="272" cy="214" r="7" fill="#FFFFFF"/>
+    <path d="M238 236 Q 256 252 274 236" fill="none" stroke="#43E97B" stroke-width="6" stroke-linecap="round"/>
+    <path d="M228 198 Q 240 186 256 186" fill="none" stroke="#9CCBFF" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  </g>
+
+  <!-- launch cloud -->
+  <g fill="#E8F4FF">
+    <circle cx="112" cy="420" r="34"/>
+    <circle cx="150" cy="436" r="26"/>
+    <circle cx="84" cy="440" r="22"/>
+  </g>
+</svg>

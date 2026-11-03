@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Bring your own AI · kube-noob</title>
+<meta name="description" content="Claude with kube-noob&#x27;s tools running in your browser, using your own API key.">
+<link rel="canonical" href="https://kube-noob.com/ask/">
+<meta property="og:title" content="Bring your own AI · kube-noob">
+<meta property="og:description" content="Claude with kube-noob&#x27;s tools running in your browser, using your own API key.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/ask/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+<script type="module" src="/assets/agent.js"></script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/" aria-current="page">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+
+<div class="prose" style="max-width:900px"><span class="eyebrow">Bring your own AI</span>
+<h1>Your Claude, kube-noob's tools, in your browser</h1>
+<p class="lead">kube-noob has no AI inside; this page lets you bring yours. You paste your own Anthropic API key, Claude
+does the talking, and whenever it needs a fact it calls kube-noob's tools, which run here in this tab. This site has no
+backend: it never receives your key or your questions. They go from your browser straight to
+<code>api.anthropic.com</code>, billed to your key.</p></div>
+
+<div class="note"><b>Before you paste a key:</b> create a separate key for this page, in a workspace with a monthly
+spend limit, and never reuse a key that production systems or teammates depend on. Revoke it in the
+<a href="https://platform.claude.com/" rel="noopener">Claude Console</a> when you are done. The key is kept in memory
+for this page, or in this tab's session storage only if you tick the box (cleared when the tab closes); it is never
+written to local storage, cookies or logs.</div>
+<form id="ask-form" autocomplete="off">
+  <div class="row">
+    <div><label for="ask-key">Anthropic API key</label><input id="ask-key" type="password" placeholder="sk-ant-..."
+      spellcheck="false" autocomplete="off"></div>
+    <div><label for="ask-model">Model</label><select id="ask-model">
+      <option value="claude-opus-5-5" selected>Claude Opus 5.5</option>
+      <option value="claude-sonnet-5-5">Claude Sonnet 5.5</option>
+      <option value="claude-haiku-5-5">Claude Haiku 5.5</option></select></div>
+    <div><label for="ask-effort">Effort</label><select id="ask-effort">
+      <option value="low">low</option><option value="medium" selected>medium</option>
+      <option value="high">high</option></select></div>
+  </div>
+  <p><label style="display:inline;font-weight:400"><input type="checkbox" id="ask-remember"> Keep the key for this tab
+  </label> · <button class="icon-btn" type="button" id="ask-forget">Forget key and conversation</button></p>
+  <div class="chat" id="ask-chat" aria-live="polite"></div>
+  <label for="ask-input">Your question (paste YAML, events or errors too)</label>
+  <textarea id="ask-input" style="min-height:140px" spellcheck="false"></textarea>
+  <p><button class="btn primary" id="ask-send" type="submit">Ask</button></p>
+  <p class="status" id="ask-status" aria-live="polite"></p>
+</form>
+<p>Try:</p><div class="cta"><button class="btn" type="button" data-ask="My pod is stuck in CrashLoopBackOff with exit code 137 on OpenShift 4.21. What should I check first?">My pod is stuck in CrashLoopBackOff with exit code 137 on Op...</button><button class="btn" type="button" data-ask="Audit this and tell me what blocks it on OpenShift 4.22: a Deployment running nginx:latest as root with hostNetwork true.">Audit this and tell me what blocks it on OpenShift 4.22: a D...</button><button class="btn" type="button" data-ask="Is &#x27;could not find any suitable subnets for creating the ELB&#x27; a known bug on OpenShift 4.20.8?">Is &#x27;could not find any suitable subnets for creating the ELB...</button><button class="btn" type="button" data-ask="Explain rule KN-S013 and the NIST controls it maps to.">Explain rule KN-S013 and the NIST controls it maps to....</button></div>
+<p class="status">Refused requests fall back to another Claude model automatically (server-side fallback). Tool calls
+and their results are shown under each answer.</p>
+
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

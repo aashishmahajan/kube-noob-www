@@ -150,12 +150,16 @@ Claude on Google Vertex AI with Assured Workloads, or a model you host inside th
 <li>Per-user identity in the service: authorization is one shared token unless you add the OAuth proxy, and audit
   records do not carry the caller's identity yet.</li>
 <li>Machine-readable output for assessors (OSCAL assessment results) and the FedRAMP 20x Key Security Indicator
-  mapping.</li>
+  mapping. When that mapping ships it will name the release it was built from and carry the retirement list:
+  <code>FRMR.KSI.key-security-indicators.json</code> is at release 25.11C (published 2025-12-01), 20x is at Phase 2 Pilot,
+  and seven indicators are now marked <code>retired: true</code> -- KSI-CMT-05, KSI-MLA-03, KSI-MLA-04, KSI-MLA-06,
+  KSI-SVC-03, KSI-TPR-01 and KSI-TPR-02. The eleven families are unchanged. Evidence offered against a withdrawn
+  indicator is worse than no evidence, so a mapping without that list is not shippable.</li>
 <li>FIPS mode is checked by <code>doctor</code> but not exercised in CI (no FIPS-mode runner).</li>
 <li>No 3PAO assessment, Iron Bank listing, DISA STIG review of the image, or CISA secure software development
   attestation has been done.</li>
 </ul>
-<h2 id="the-77-audit-rules-and-their-controls">The 77 audit rules and their controls</h2>
+<h2 id="the-78-audit-rules-and-their-controls">The 78 audit rules and their controls</h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -434,6 +438,11 @@ Claude on Google Vertex AI with Assured Workloads, or a model you host inside th
 <td>KN-S028</td>
 <td>RBAC binding grants a role to everyone</td>
 <td>AC-14, AC-3, AC-6</td>
+</tr>
+<tr>
+<td>KN-S029</td>
+<td>Probe or lifecycle handler with a host</td>
+<td>SC-7, CM-7</td>
 </tr>
 <tr>
 <td>KN-ST001</td>

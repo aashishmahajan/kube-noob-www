@@ -175,7 +175,7 @@ or job.</p>
 </tr>
 <tr>
 <td>G26</td>
-<td>Cadences: weekly risk review; the Red Hat Jira main copy every day (or every 2 days with JIRA_EVERY_DAYS), continuing the previous encrypted copy and summarising what changed; the docs corpus weekly; ROX Jira corpus is 1000+ issues from 4.10 onward, credited</td>
+<td>Cadences: weekly risk review; the Red Hat Jira main copy every other day by default (daily with JIRA_EVERY_DAYS=1), continuing the previous encrypted copy and failing instead of replacing it when that copy does not decrypt; the docs corpus weekly; ROX Jira corpus is 1000+ issues from 4.10 onward, credited</td>
 <td><code>tests/test_distribution.py::test_scheduled_cadences_and_rox_corpus_scope</code>, <code>tests/test_evals_jira.py::test_classify_versions</code></td>
 </tr>
 <tr>
@@ -697,6 +697,276 @@ or job.</p>
 <td>G130</td>
 <td>A burst of connections that send nothing starves the HTTP server's pool -- uvicorn counts connections towards <code>limit_concurrency</code> and nothing reclaims one that never sent a request, so every request including the kubelet's probes answers 503 until they close (measured: 70 idle sockets, still 503 after 16s). kube-noob cannot close that in process, so what it owns stays consistent instead: buffered-body memory is the concurrency limit times the body limit and has to leave the container room to run (64 x 1.5 MiB against 512Mi, where it used to be 64 x 8 MiB -- exactly the ceiling the kernel kills at); the liveness probe is four times more forgiving than readiness, so sustained overload sheds traffic rather than restarting a pod whose restart frees no connection; and SECURITY.md says the port belongs behind a proxy that enforces a header-read timeout</td>
 <td><code>tests/test_red_team_rt6.py::test_the_concurrency_limit_and_the_body_limit_stay_consistent</code>, <code>tests/test_red_team_rt6.py::test_overload_sheds_traffic_rather_than_restarting_the_pod</code>, <code>tests/test_red_team_rt6.py::test_the_security_policy_states_the_limitation</code></td>
+</tr>
+<tr>
+<td>G131</td>
+<td>The release job attaches its assets whether or not the release already exists. <code>gh release create</code> is an error on an existing release, and a maintainer creating one by hand -- to write their own notes, or because a tag push looked like it did nothing -- is ordinary: on v0.7.1 it failed <code>github-release</code> and skipped <code>videos</code> and <code>site</code> behind it, so the release carried no wheel, no chart and no videos, and kube-noob.com was never told the version had changed, while PyPI, the chart repository, the MCP registry and Homebrew had all published. The step branches on <code>gh release view</code> and uploads with <code>--clobber</code>, so a re-run replaces an asset instead of failing on it</td>
+<td><code>tests/test_distribution.py::test_the_release_job_survives_a_release_the_maintainer_made_first</code></td>
+</tr>
+<tr>
+<td>G132</td>
+<td>The plugin declares exactly the dependencies the bundled server imports, checked both ways: a module imported but not declared is an ImportError on the user's first call, because uv runs the server <code>--frozen --exact --isolated</code> and nothing ambient fills the gap; a dependency declared but never imported is a package the user installs for nothing and a reviewer has to account for. The plugin had declared <code>httpx</code> and <code>uvicorn</code>, which belong to the web client and the HTTP service and ship in neither, and left <code>anyio</code>, <code>mcp-types</code> and <code>pydantic-core</code> to arrive through another package's requirements although it imports all three directly. Dropping the two removed <code>httpx</code>, <code>httpcore</code> and <code>certifi</code> from the resolved tree, so the installed set holds no HTTP client at all. The launcher stays the vendored one and the README says why, rather than promising a switch to a published package that was reverted before the release</td>
+<td><code>tests/test_plugin.py::test_the_plugin_declares_what_it_imports_and_imports_what_it_declares</code>, <code>tests/test_plugin.py::test_lock_pins_every_dependency_with_registry_and_hashes</code>, <code>tests/test_plugin.py::test_mcp_config_runs_the_bundled_source_from_the_lock</code></td>
+</tr>
+<tr>
+<td>G133</td>
+<td>The audit refuses what it cannot audit instead of scoring it. Given a Helm values file it used to read the whole document as one unnamed object, report that <code>apiVersion</code> was missing, and return a score -- 90 out of 100 for a file whose images were <code>:latest</code> and whose <code>securityContext</code> and <code>resources</code> were empty. A score says the rules were applied, so a score on a file the rules never saw is a wrong answer rather than a thin one. With no document carrying both <code>apiVersion</code> and <code>kind</code>, <code>audit</code>, <code>validate</code> and <code>redteam</code> exit 2 and name what the file looks like and the command that would make it auditable; one Kubernetes document anywhere in the input is enough to proceed, so a values block pasted above a manifest does not refuse the manifest</td>
+<td><code>tests/test_red_team_rt7.py::test_a_file_that_is_not_a_manifest_is_not_scored</code>, <code>tests/test_red_team_rt7.py::test_it_names_what_the_file_looks_like</code>, <code>tests/test_red_team_rt7.py::test_a_manifest_beside_a_values_file_still_audits</code>, <code>tests/test_red_team_rt7.py::test_the_toolkit_says_the_same_thing_as_the_cli</code></td>
+</tr>
+<tr>
+<td>G134</td>
+<td>kube-noob's knowledge answers questions about kube-noob. The corpus held nothing about the tool itself, so a client asked for its CI story got Kyverno and RHACS documents, wrote <code>kube-noob audit -f rendered.yaml  # check the CLI's --help for the flag</code>, and never mentioned <code>gate</code> -- the command built for that job. <code>kube-noob-cli.md</code> carries <code>gate</code> and its CI outputs, the exit codes, the <code>ExceptionList</code> schema, what the audit does and does not read, and the command table; tests hold its exit codes to the CLI and run its exception example through the real loader, so it cannot drift into teaching the wrong thing with a citation attached</td>
+<td><code>tests/test_red_team_rt7.py::test_a_client_can_find_out_what_kube_noob_itself_can_do</code>, <code>tests/test_red_team_rt7.py::test_the_document_tells_the_truth_about_the_exit_codes</code>, <code>tests/test_red_team_rt7.py::test_the_exception_example_in_the_document_actually_loads</code></td>
+</tr>
+<tr>
+<td>G135</td>
+<td>The package points at the website and the README leads with what only kube-noob does. Nothing linked kube-noob.com -- not <code>project.urls</code>, not the README, not the plugin manifest, not the chart -- so the demos, recordings and browsable rules were reachable only by already knowing the address, while the README opened with a five-bullet feature list that buried the two questions no other tool answers: which tier of <code>AdminNetworkPolicy</code>/<code>NetworkPolicy</code>/<code>BaselineAdminNetworkPolicy</code> governs a connection, and which of six admission systems denied a pod. Both now open the README with a runnable command each, against an example that ships</td>
+<td><code>tests/test_distribution.py::test_the_package_points_at_the_website</code>, <code>tests/test_guidance.py::test_docs_are_concise_and_linked</code>, <code>tests/test_guidance.py::test_readme_numbers_match_the_code</code></td>
+</tr>
+<tr>
+<td>G136</td>
+<td>Documentation does not promise an artefact that has never been published. <code>docs/use-cases.md</code> told readers the public <code>kube-noob-db</code> image is "rebuilt daily" and gave them cosign and helm commands for it, while the <code>db-image</code> workflow has failed on every scheduled run since it was added and has published nothing. A reader spends their time before they find out, so the page now says it is not published, and gives the two commands that do exist (<code>corpus db-bundle</code>, <code>corpus db-check</code>) for building one themselves</td>
+<td><code>tests/test_distribution.py::test_nothing_promises_an_artefact_that_has_never_published</code></td>
+</tr>
+<tr>
+<td>G137</td>
+<td>A health signal reports on the thing a person cares about, not on something next to it. Two did not: <code>route.enabled: true</code> with no <code>route.host</code> let OpenShift generate a hostname the chart cannot predict and so never puts in <code>server.allowedHosts</code>, giving <strong>421 Invalid Host header</strong> on every MCP call while both probes and <code>helm test</code> stayed green -- the chart now refuses to render and says how to get the domain; and <code>kube-noob doctor</code> printed <code>posture: OK</code> with a provider configured, no SDK installed and no key set, while its own help promises "exit 1 on conflicts" -- it now names the missing SDK or the unset variable and exits 1. The check lives in <code>cli.py</code> rather than <code>posture.py</code> because the latter ships in the plugin, which must name no credential variable for a reviewer. The guard then found the same defect in our own CI, which had been rendering the Route with no host since it was added</td>
+<td><code>tests/test_red_team_rt8.py::test_no_exposure_can_create_a_hostname_the_server_will_refuse</code>, <code>tests/test_red_team_rt8.py::test_the_route_guard_says_what_to_do</code>, <code>tests/test_red_team_rt8.py::test_doctor_does_not_call_a_model_path_healthy_that_cannot_run</code>, <code>tests/test_red_team_rt8.py::test_doctor_is_quiet_when_no_model_is_configured</code>, <code>tests/test_red_team_rt8.py::test_our_own_workflows_do_not_render_the_configuration_the_chart_refuses</code></td>
+</tr>
+<tr>
+<td>G138</td>
+<td>A command in the README is a promise, so every path it passes must either ship or read as the reader's own. <code>kube-noob policy explain -f denial.txt</code> shipped no <code>denial.txt</code>, so the first command a stranger copied answered <code>error: no such file</code>. It now points at <code>examples/denial-multi.txt</code>, where five admission systems reject one Deployment in one paste, and <code>-f k8s/</code> became <code>-f your-manifests/</code>. A claim about a command is the same promise: the README said both policy commands exit non-zero for CI, and only <code>reach</code> does -- correct the claim, not the code, when the code is right</td>
+<td><code>tests/test_guidance.py::test_every_file_the_readme_tells_a_stranger_to_run_exists</code></td>
+</tr>
+<tr>
+<td>G139</td>
+<td>When an input contains something that outranks what was evaluated, the answer names it and the proposed fix says so. <code>ClusterNetworkPolicy</code> (<code>policy.networking.k8s.io/v1alpha2</code>, the API still under active development; the v1alpha1 ANP/BANP pair kube-noob evaluates are upstream's "no longer actively developed") was not a kind kube-noob knew, so a cluster-scoped Admin-tier Deny vanished from the answer and <code>policy reach</code> proposed a NetworkPolicy the admin tier overrides. Unknown-but-outranking is not the same as absent</td>
+<td><code>tests/test_netpol_cnp_guard.py::test_a_clusternetworkpolicy_is_named_not_dropped</code>, <code>tests/test_netpol_cnp_guard.py::test_a_namespace_scoped_fix_is_caveated_when_a_cluster_scoped_policy_was_not_evaluated</code>, <code>tests/test_netpol_cnp_guard.py::test_the_caveat_is_printed_where_the_fix_is_read</code>, <code>tests/test_netpol_cnp_guard.py::test_no_caveat_when_nothing_cluster_scoped_is_in_the_input</code></td>
+</tr>
+<tr>
+<td>G140</td>
+<td>What a public repository publishes is permanent: a fork or an archive keeps it after the commit that removes it. An instruction names a placeholder rather than a real address, and a private working file stays out of git rather than relying on nobody reading it. <code>docs/openshift-release.md</code> carried the maintainer's address inside a <code>git config</code> command, and <code>.claude/loop/</code> published the unreleased backlog. Commit metadata is the exception: rewriting published history costs more than the exposure</td>
+<td><code>tests/test_distribution.py::test_no_real_address_is_published_in_the_repository</code>, <code>tests/test_distribution.py::test_the_private_build_queue_is_not_published</code></td>
+</tr>
+<tr>
+<td>G141</td>
+<td>A job that cannot do its work fails. Warning and exiting 0 because a secret is missing puts the news in an annotation nobody opens and the word SUCCESS where a person looks, which is how a release finished green having never told the website about itself. A guard may exit 0 only when the run still does the work another way, and it has to say which way. Comparisons that decide pass or fail compare values, not strings: <code>site-sync</code> used equality, so a site AHEAD of the latest release read as a failed deploy</td>
+<td><code>tests/test_workflow_honesty.py::test_no_job_exits_zero_because_a_secret_it_needs_is_missing</code>, <code>tests/test_workflow_honesty.py::test_the_drift_check_does_not_call_a_site_that_is_ahead_a_failure</code></td>
+</tr>
+<tr>
+<td>G142</td>
+<td>A prose claim about a machine-readable file is read against that file by a test, or it drifts and then it is a lie someone can check. The plugin README said the installed tree had no HTTP client and no web server and "cannot reach the network", while the <code>uv.lock</code> beside it shipped <code>httpx2</code>, <code>httpcore2</code>, <code>h11</code>, <code>uvicorn</code> and <code>sse-starlette</code> -- published on the site and sent to a reviewer who can open the lock. State what the bundled code does, which is checkable, not what the dependency tree lacks</td>
+<td><code>tests/test_plugin_readme_truth.py::test_the_readme_states_the_real_number_of_locked_packages</code>, <code>tests/test_plugin_readme_truth.py::test_the_readme_does_not_deny_a_dependency_the_lock_file_contains</code>, <code>tests/test_plugin_readme_truth.py::test_every_package_the_readme_names_is_in_the_lock</code></td>
+</tr>
+<tr>
+<td>G143</td>
+<td>A fix is checked against the thing it set out to fix, not against the mechanism it changed. <code>doctor</code> gained a conflict list and an exit code and still printed <code>posture: OK</code>, because the status field was computed earlier; the test asserted the list and the code, so it passed. Assert the signal a person reads</td>
+<td><code>tests/test_red_team_rt8.py::test_the_posture_header_says_conflict_when_there_is_one</code>, <code>tests/test_red_team_rt8.py::test_the_posture_header_is_rendered_from_the_same_status</code></td>
+</tr>
+<tr>
+<td>G144</td>
+<td>A new check must not refuse a configuration the code documents as supported. <code>openai-compatible</code> with no <code>apiKeyEnv</code> deliberately sends no Authorization header and is the only provider the offline lock allows; flagging a missing key variable without asking whether the provider has a default one broke it</td>
+<td><code>tests/test_red_team_rt8.py::test_a_provider_with_no_default_key_variable_is_not_a_conflict</code>, <code>tests/test_red_team_rt8.py::test_a_provider_whose_key_variable_is_named_but_unset_is_still_a_conflict</code></td>
+</tr>
+<tr>
+<td>G145</td>
+<td>Silencing an alarm is not fixing it. The drift check was returning a false positive on a site that was ahead; passing every non-release ref removed the false positive and the alarm with it, exactly while the site sat on a branch. Narrow the condition, then prove the alarm still fires</td>
+<td><code>tests/test_workflow_honesty.py::test_the_drift_check_still_alarms_while_the_site_is_built_from_a_branch</code>, <code>tests/test_workflow_honesty.py::test_the_secret_that_gates_an_hour_of_work_is_checked_before_the_hour</code></td>
+</tr>
+<tr>
+<td>G146</td>
+<td>A guard added on one input path is not added until every path has it. The <code>ClusterNetworkPolicy</code> caveat covered pasted manifests while the live cluster read, which an operator trusts more, still dropped the kind in silence</td>
+<td><code>tests/test_netpol_cnp_guard.py::test_the_live_cluster_check_reads_clusternetworkpolicies_too</code>, <code>tests/test_netpol_cnp_guard.py::test_a_cluster_without_the_current_api_is_not_an_error</code>, <code>tests/test_netpol_cnp_guard.py::test_the_caveat_names_the_cluster_s_own_command</code></td>
+</tr>
+<tr>
+<td>G147</td>
+<td>A test that polices a rule is itself a claim, and it is checked by trying to evade it. The missing-secret scanner matched a single exact spelling and missed 13 of 14 equivalents; the address scan read fewer than half the tracked files and skipped the two that ship to PyPI and to the plugin directory</td>
+<td><code>tests/test_workflow_honesty.py::test_no_job_exits_zero_because_a_secret_it_needs_is_missing</code>, <code>tests/test_distribution.py::test_no_real_address_is_published_in_the_repository</code>, <code>tests/test_plugin_readme_truth.py::test_the_readme_does_not_claim_every_entry_is_hashed</code></td>
+</tr>
+<tr>
+<td>G149</td>
+<td>A defence that depends on the interpreter raising something is not a defence. <code>json.loads</code> was left to stop its own recursion, which held until Python 3.14 stopped applying <code>sys.getrecursionlimit()</code> to it: the same nesting bomb then parsed on a CI runner and raised in a smaller container, so no caller could be written against a depth. Bound the input yourself, at a number you choose, before handing it to the thing that recurses</td>
+<td><code>tests/test_json_depth_guard.py::test_a_ticket_export_nested_past_the_limit_is_refused_rather_than_read_as_empty</code>, <code>tests/test_json_depth_guard.py::test_no_module_gains_a_raw_json_or_yaml_loader</code>, <code>tests/test_json_depth_guard.py::test_a_scanner_report_nested_past_the_limit_is_refused_as_too_deep</code></td>
+</tr>
+<tr>
+<td>G150</td>
+<td>A sweep is only as wide as its pattern, and the regression test built from the same pattern inherits its blind spot. A <code>json.loads</code> sweep keyed on three variable names reached 18 of 71 call sites, and the test left behind could see one. Count the population first, from a pattern that cannot miss, and let the test freeze that count</td>
+<td><code>tests/test_json_depth_guard.py::test_no_module_gains_a_raw_json_or_yaml_loader</code>, <code>tests/test_json_depth_guard.py::test_the_bounded_loaders_are_actually_used_by_the_parsers_that_take_untrusted_input</code></td>
+</tr>
+<tr>
+<td>G151</td>
+<td>"It reads a file" is a claim about the caller, not the function. Four <code>parse(data)</code> helpers were given the loose depth ceiling as file readers while their production callers were MCP tool arguments, so a pasted 503-deep document was accepted. Default a limit to the strict case and make the lenient caller ask</td>
+<td><code>tests/test_json_depth_guard.py::test_a_string_argument_gets_the_tight_ceiling_and_a_file_read_the_loose_one</code>, <code>tests/test_json_depth_guard.py::test_the_shared_server_refuses_a_deep_rhacs_policy_export</code></td>
+</tr>
+<tr>
+<td>G152</td>
+<td>Catching the library's error class is not catching the failure. <code>except yaml.YAMLError</code> misses <code>RecursionError</code> because <code>yaml.YAMLError</code> is not a <code>ValueError</code>, so a deep document ended the command; and <code>yaml.CSafeLoader</code> does not raise at all, it segfaults the process on CPython 3.13. Bound the input before the library touches it</td>
+<td><code>tests/test_json_depth_guard.py::test_a_deep_exception_list_is_refused_rather_than_crashing_the_tool</code>, <code>tests/test_json_depth_guard.py::test_gate_reports_a_deep_manifest_instead_of_crashing</code>, <code>tests/test_json_depth_guard.py::test_a_deep_json_array_inside_a_pasted_containerfile_does_not_escape</code></td>
+</tr>
+<tr>
+<td>G148</td>
+<td>A tie broken by the order the input happened to arrive in is a coin toss dressed as a verdict. Two <code>AdminNetworkPolicy</code> objects at one priority were decided by document order, so the same two manifests gave <code>denied</code> in one file order and <code>allowed</code> in the other, while the API defines neither. Where a tier has no determinate answer, say so and propose nothing</td>
+<td><code>tests/test_netpol_anp.py::test_two_policies_at_one_priority_whose_rules_disagree_are_not_determined</code>, <code>tests/test_netpol_anp.py::test_two_policies_at_one_priority_that_agree_still_decide</code>, <code>tests/test_netpol_anp.py::test_the_reach_command_prints_and_exits_on_an_undetermined_verdict</code></td>
+</tr>
+<tr>
+<td>G153</td>
+<td>Absence has two causes and a diff must not pick the flattering one. Objects missing from a new snapshot were reported as removed and their findings as fixed, so revoking RBAC on a resource published as a security improvement. Where a reader records what it could not read, that record has to reach the comparison and the rendered output, not just a log line</td>
+<td><code>tests/test_drift_coverage.py::test_a_finding_on_an_unreadable_object_is_not_reported_as_fixed</code>, <code>tests/test_drift_coverage.py::test_a_genuinely_deleted_object_is_still_reported_as_removed</code>, <code>tests/test_drift_coverage.py::test_the_report_says_out_loud_that_it_could_not_read_everything</code></td>
+</tr>
+<tr>
+<td>G154</td>
+<td><code>all([])</code> is <code>True</code>, so every "are they all acceptable?" check passes an empty collection. An empty corpus shard was marked redistributable and published. Ask whether the collection is non-empty first, in the same expression</td>
+<td><code>tests/test_corpus_zero_records.py::test_an_empty_shard_is_not_marked_redistributable</code>, <code>tests/test_corpus_zero_records.py::test_the_bundle_refuses_zero_records_even_if_the_manifest_claims_otherwise</code></td>
+</tr>
+<tr>
+<td>G155</td>
+<td>Zero is a successful-looking number. A per-source record count of <code>0</code> satisfied <code>isinstance(v, int)</code> and exited 0, and an <code>os.replace</code> of the shard then destroyed the records it was replacing. A result that means the work did not happen must not share a type, or an exit code, with a result that means it did</td>
+<td><code>tests/test_corpus_zero_records.py::test_a_zero_record_refresh_does_not_destroy_the_shard_it_replaces</code>, <code>tests/test_corpus_zero_records.py::test_a_source_that_yields_nothing_makes_corpus_build_exit_nonzero</code></td>
+</tr>
+<tr>
+<td>G156</td>
+<td><code>cmd \| tee file</code> reports <code>tee</code>'s exit status. GitHub's default shell is <code>bash -e</code> without <code>pipefail</code>, so eight steps across the corpus workflows -- including the one that packs the published database bundle -- could not fail when their command did. Set <code>set -euo pipefail</code> in any step that pipes</td>
+<td><code>tests/test_workflow_honesty.py::test_every_piped_step_sets_pipefail</code></td>
+</tr>
+<tr>
+<td>G157</td>
+<td>An empty "what did not run" section is a stronger claim than no section at all: it says nothing was skipped. <code>gate</code>'s list covered the two absent-report cases and not the two biggest, so a run that audited no manifests printed "gate passed" above an empty one</td>
+<td><code>tests/test_false_clean.py::test_the_gate_says_the_manifest_audit_did_not_run_when_it_had_nothing_to_audit</code>, <code>tests/test_false_clean.py::test_the_gate_still_lists_nothing_when_everything_ran</code></td>
+</tr>
+<tr>
+<td>G158</td>
+<td>A spec a checker cannot understand must be refused, never scored. A misspelled operator made <code>_check_value</code> return <code>None</code>, which <code>_assert</code> read as "present" and passed -- a free pass on a gating, weight-2.0 assertion, which also disengaged the score clamp</td>
+<td><code>tests/test_false_clean.py::test_an_assertion_with_no_recognised_operator_is_refused_not_passed</code>, <code>tests/test_false_clean.py::test_the_shipped_benchmark_assertions_all_carry_a_recognised_operator</code></td>
+</tr>
+<tr>
+<td>G159</td>
+<td>A redactor must be at least as strong as the detector that gates on it, and the two must share one pattern. The Jira scrubber required a prefix while the privacy audit matched bare ids, so one ticket failed the weekly refresh every week instead of being redacted</td>
+<td><code>tests/test_false_clean.py::test_the_jira_scrubber_is_at_least_as_strong_as_the_detector_that_gates_it</code>, <code>tests/test_false_clean.py::test_the_scrubber_leaves_ordinary_text_alone</code></td>
+</tr>
+<tr>
+<td>G160</td>
+<td>A limit the reader enforces and the writer does not is a limit that fails late. <code>MAX_MEMBER</code> lived only in the extractor, so the bundler packed archives nothing could import and reported success. One predicate, one call site</td>
+<td><code>tests/test_false_clean.py::test_the_bundle_checks_its_own_size_caps_instead_of_leaving_them_to_the_reader</code></td>
+</tr>
+<tr>
+<td>G161</td>
+<td>An empty collection must not be the flattering answer. <code>all([])</code> is <code>True</code>, <code>not []</code> is <code>True</code>, and <code>1.0 if not must else ...</code> rewards a spec that lists nothing, so three scorers passed a task that asserted nothing. Refuse the empty spec, and sweep the fixtures so the next one is caught when it is written</td>
+<td><code>tests/test_empty_collection_guards.py::test_a_qa_task_with_nothing_to_mention_says_it_checked_no_claims</code>, <code>tests/test_empty_collection_guards.py::test_an_evaluation_with_no_outcomes_is_not_passed</code>, <code>tests/test_empty_collection_guards.py::test_no_shipped_fixture_asserts_nothing</code></td>
+</tr>
+<tr>
+<td>G162</td>
+<td>A guard in the writer does not protect the reader. The check against an empty corpus went into <code>db_bundle.build</code>, so kube-noob could not publish one -- but <code>db-check</code>, which is what a user runs on a bundle they downloaded, still reported clean and exited 0 on it. Put the check where the claim is made</td>
+<td><code>tests/test_empty_collection_guards.py::test_db_check_refuses_a_bundle_manifest_that_declares_no_shards</code></td>
+</tr>
+<tr>
+<td>G163</td>
+<td>"ready" is a stronger word than "no findings". <code>run_protocol</code> set <code>status = "ready" if not blockers else "blocked"</code>, so a run with no documents -- where no rule ran at all -- reported ready. A verdict word must be earned by something having been evaluated, not by an absence</td>
+<td><code>tests/test_empty_collection_guards.py::test_the_protocol_does_not_call_a_run_ready_when_it_audited_nothing</code></td>
+</tr>
+<tr>
+<td>G164</td>
+<td>A test scoped to the file where a wrong claim was found does not stop the claim living elsewhere. G136 removed "rebuilt daily" from <code>docs/use-cases.md</code> and the test it added read only that file, so the same sentence stayed in the chart's <code>values.yaml</code> and the site kept republishing it. Scope the sweep to every tracked file and allowlist the exceptions by name</td>
+<td><code>tests/test_distribution.py::test_nothing_promises_an_artefact_that_has_never_published</code></td>
+</tr>
+<tr>
+<td>G165</td>
+<td>An MCP result is spent out of the caller's context window, so bytes that carry nothing are a cost like any other. <code>audit_manifests</code> repeated each rule's <code>title</code>, <code>severity</code>, <code>stage</code>, <code>category</code>, <code>remediation</code>, <code>citations</code>, <code>stackroxPolicies</code> and <code>controls</code> on every finding it produced -- 105 findings over 19 rules on <code>examples/</code>, so each constant appeared about five times and 54% of the result was copies. Hoist the per-rule constants into one <code>ruleInfo</code> map keyed by rule id and keep an exact inverse, so the saving is a hoist rather than a guess about what the caller does not need</td>
+<td><code>tests/test_compact_output.py::test_compacting_is_lossless</code></td>
+</tr>
+<tr>
+<td>G166</td>
+<td>A flag that changes the emitted shape must not change the verdict a gate reads. Compaction moves <code>severity</code> off the findings, so an exit code computed from the emitted report instead of the audit would have turned every failing <code>audit --compact</code> green. Compact the copy that is printed; compute the gate from the report</td>
+<td><code>tests/test_compact_output.py::test_audit_compact_on_the_cli_changes_the_shape_but_not_the_verdict</code></td>
+</tr>
+<tr>
+<td>G167</td>
+<td>Writing a result to the file a caller named and also inlining it spends the context twice, and leaves the result <em>larger</em> with <code>-o</code> than without it. <code>policy generate -o FILE</code> returned the whole 358 KB rendered policy set in the JSON as well as writing it, 385 965 bytes against 385 866. A caller that names a file has said where it wants the bytes: send the path and the size instead</td>
+<td><code>tests/test_compact_output.py::test_asking_for_a_file_does_not_also_inline_the_whole_policy_set</code></td>
+</tr>
+<tr>
+<td>G168</td>
+<td>Filtering the evidence before the summary is computed deletes the summary. <code>Toolkit.audit</code> set <code>r.findings = kept</code> and then called <code>as_dict()</code>, which builds <code>controlSummary</code> from that same list -- so excepting a finding removed its control from the compliance record, and a control somebody had signed off on read exactly like one nothing had evaluated. An accepted exception is evidence about a control, not the absence of it: keep the control named and count the excepted evidence apart</td>
+<td><code>tests/test_exception_control_evidence.py::test_an_exception_keeps_the_control_in_the_summary</code></td>
+</tr>
+<tr>
+<td>G169</td>
+<td>A saving applied to one of two lists is not a saving. <code>compact_report</code> hoisted the per-rule constants out of <code>findings</code> and left the <code>excepted</code> list alone, so every caller with an exceptions file -- which is every CI caller -- got hoisted findings beside un-hoisted ones in the same report, and <code>expand_report</code> restored only half of it. The round-trip test missed it because its fixture called <code>analyze(...).as_dict()</code> directly and so never had an <code>excepted</code> key: test the shape through the entry point a caller actually uses</td>
+<td><code>tests/test_compact_output.py::test_the_excepted_findings_are_compacted_too</code></td>
+</tr>
+<tr>
+<td>G170</td>
+<td>Do not report the size of what you rendered as the size of what you wrote. <code>policy generate -o</code> returned <code>len(text.encode("utf-8"))</code> while writing with <code>write_text</code>, which translates newlines on Windows, so the count was wrong on one platform only and no Linux test could see it. Write the bytes you counted</td>
+<td><code>tests/test_compact_output.py::test_asking_for_a_file_does_not_also_inline_the_whole_policy_set</code></td>
+</tr>
+<tr>
+<td>G171</td>
+<td>A table with a reading date answers questions past that date as if it had read them. <code>REMOVED_APIS</code> was read at Kubernetes 1.37, and for a 1.38 target <code>api_history</code> returned <code>removedInTarget: []</code> and <code>validate</code> produced no removed-API finding -- the same answer a genuinely clean version gets. Data has a ceiling; name it in the data (<code>CHECKED_THROUGH</code>) and carry it into any answer past it, rather than leaving the caller to infer coverage from an empty list</td>
+<td><code>tests/test_version_coverage.py::test_a_report_targeting_an_unchecked_version_says_what_it_did_not_check</code></td>
+</tr>
+<tr>
+<td>G172</td>
+<td>Disclosing what you could not read does not excuse a verdict that ignores it. <code>policy reach</code> named <code>ClusterNetworkPolicy</code> under <code>notEvaluated</code> and caveated the proposed fix, then returned <code>verdict: allowed</code> and exit 0 -- so a CI gate merged on an answer a cluster-scoped <code>Deny</code> reverses, and the disclosure sat in a list no pipeline reads. When something you cannot evaluate outranks what you can, the verdict is unknown, not the answer your partial view produced</td>
+<td><code>tests/test_cluster_scoped_undetermined.py::test_the_cli_exit_code_stops_a_gate_instead_of_passing_it</code></td>
+</tr>
+<tr>
+<td>G173</td>
+<td>Fixing a size problem on the surface that has an escape hatch leaves the one that does not. <code>policy generate -o FILE</code> stopped inlining 358 KB of YAML, but <code>PolicyGenerateIn</code> has no <code>output</code> field and an MCP caller has no filesystem, so the tool still returned 380,670 bytes -- about 95,000 tokens, more than most callers hold. Cap the inline result at a size taken from measurements, refuse rather than truncate (half a policy set applies some rules and drops the rest), and name in the refusal the parameters that make the request smaller</td>
+<td><code>tests/test_mcp_result_cap.py::test_narrowing_as_the_refusal_advises_actually_works</code></td>
+</tr>
+<tr>
+<td>G174</td>
+<td>A test written against an invented input passes and proves nothing. The Pod Security check added by KEP-4940 is named <code>probeHost</code>; the first guess at it was "restricted probe hosts", and a denial fixture written from that guess exercised the generic fall-through convincingly while a regex built on it would have matched no real denial. Read the upstream definition for any string you are going to match, and pin it in a test</td>
+<td><code>tests/test_probe_host.py::test_the_check_name_is_the_one_the_kep_defines</code></td>
+</tr>
+<tr>
+<td>G175</td>
+<td>A commit that changes only what a rule <em>says</em> still needs a test, or the claim is unprotected. KN-N008 gained the KEP-5707 deprecation -- a new citation and a rewritten description -- and shipped with no test touched, so the whole suite stayed green at the same count. Any later edit could have dropped the citation and the sentence silently. Assert the claim, then mutate the source to watch the assertion fail before trusting it</td>
+<td><code>tests/test_external_ips_deprecation.py::test_the_rule_cites_the_kep_that_removes_the_field</code></td>
+</tr>
+<tr>
+<td>G176</td>
+<td>The weekly review leaves the current week open and closes the weeks it supersedes. One issue a week, opened and never closed, turns the open-issue list into a calendar: 2026-W44 ("no action needed this week") sat open from 27 October while W45 replaced it, and by December six such reports would have buried any week that did need attention</td>
+<td><code>tests/test_workflow_honesty.py::test_the_weekly_risk_review_closes_the_week_it_supersedes</code></td>
+</tr>
+<tr>
+<td>G177</td>
+<td>A caveat belongs in the surface that is acted on. G172 moved the verdict and the exit code and put the reason in <code>undeterminedBy</code> and <code>summary</code>, both JSON keys -- so the terminal printed <code>UNDETERMINED</code> over two lines reading <code>allowed</code> with nothing saying why, and the one read-only check that could resolve it (<code>get clusternetworkpolicy</code>) was absent while two that could not were listed. Fixing a disclosure in one surface does not fix it in the other</td>
+<td><code>tests/test_cluster_scoped_undetermined.py::test_the_terminal_says_why_the_verdict_is_undetermined</code>, <code>tests/test_cluster_scoped_undetermined.py::test_the_check_list_tells_the_operator_to_look_at_the_policy_that_decides</code></td>
+</tr>
+<tr>
+<td>G178</td>
+<td>A test that matches the wrong span of text passes and protects nothing. The first version of the check-list assertion partitioned on the heading, which also swallowed the trailing <code>not evaluated:</code> line -- and that line did name the policy, so the test went green against output that still could not resolve the verdict. Assert against the exact lines the claim is about, and watch the assertion fail before trusting it</td>
+<td><code>tests/test_cluster_scoped_undetermined.py::test_the_check_list_tells_the_operator_to_look_at_the_policy_that_decides</code></td>
+</tr>
+<tr>
+<td>G179</td>
+<td>A gate that fails closed still has to say enough to act on. <code>corpus-refresh</code> has refused every run since 2026-10-31 with "123 person-shaped findings: ['CNV-95960: spelled-out email', ...]" -- the ticket and the kind, and nothing else, so telling a real leak from a false positive needed the encrypted copy and the passphrase. Printing the match would write personal data into a public log, so each finding now carries the field it came from and a character-class shape with no content kept (<code>A at A.A</code>)</td>
+<td><code>tests/test_jira_audit_diagnosable.py::test_a_finding_says_which_field_it_came_from</code>, <code>tests/test_jira_audit_diagnosable.py::test_the_shape_keeps_no_literal_characters</code></td>
+</tr>
+<tr>
+<td>G180</td>
+<td>Concatenating two separately sanitised fields to scan them manufactures findings in neither. The privacy audit scanned <code>text + " " + title</code>, so a pattern could match across the join -- "escalated to Commenter A at" and "example.com upgrade notes" are each clean and read as a spelled-out email when joined. Scan each field on its own</td>
+<td><code>tests/test_jira_audit_diagnosable.py::test_a_pattern_cannot_match_across_the_join_between_two_fields</code></td>
+</tr>
+<tr>
+<td>G181</td>
+<td>Two constants that answer the same question must be held together by a test, not by whoever remembers both. <code>catalog.CHECKED_THROUGH</code> (the minor the removed-API table was read at) and <code>scripts/risk_baseline.json</code>'s <code>kubernetes</code> (the minor the weekly review calls current) were both 1.37 by coincidence of being edited on the same day; raising one alone gives a drift report that contradicts the data. Kubernetes 1.38 lands 16 December 2026 and both move in one commit</td>
+<td><code>tests/test_version_coverage.py::test_the_removal_ceiling_and_the_drift_baseline_agree</code></td>
+</tr>
+<tr>
+<td>G182</td>
+<td>The Red Hat Jira copy is idempotent and is not replaced by a smaller one. The forward pass fetches <code>ORDER BY updated DESC</code> and a budget stop resumes the same JQL from the page it had not applied; a sync that would shrink a shard is refused; a scheduled run that cannot decrypt the previous copy fails and leaves that artifact as the main copy. Ticket text stays off the public site: query it locally with <code>kube-noob ticket</code> after <code>corpus import</code></td>
+<td><code>tests/test_tickets.py::test_a_forward_budget_resumes_newest_first_without_shrinking_the_copy</code>, <code>tests/test_tickets.py::test_sync_copies_every_status_then_only_changes</code>, <code>tests/test_distribution.py::test_scheduled_cadences_and_rox_corpus_scope</code></td>
+</tr>
+<tr>
+<td>G183</td>
+<td>An AdminNetworkPolicy peer that cannot be checked does not let a later rule allow the traffic, and a forbidden read of that tier is not a NetworkPolicy answer. <code>networks</code> is matched against an address the caller named, and against <code>0.0.0.0/0</code> or <code>::/0</code> when the other side is a pod. A narrower CIDR against a pod whose IP is not in the input, or a <code>nodes</code> peer that might be the address, is <code>undetermined</code> and exit 1. Priority above 99 is not evaluated, because OVN-Kubernetes raises <code>ANPWithUnsupportedPriority</code> and the policy has no effect. A 404 on the tier stays a NetworkPolicy answer; a 403 does not</td>
+<td><code>tests/test_netpol_anp.py::test_a_cidr_that_might_cover_a_pod_ip_does_not_let_a_later_rule_allow</code>, <code>tests/test_netpol_anp.py::test_a_forbidden_read_of_the_admin_tier_is_not_a_networkpolicy_answer</code>, <code>tests/test_netpol_anp.py::test_a_priority_ovn_does_not_implement_does_not_decide</code></td>
+</tr>
+<tr>
+<td>G184</td>
+<td>A guard on pasted manifests is not a guard on the cluster. <code>CiliumClusterwideNetworkPolicy</code> and Calico <code>GlobalNetworkPolicy</code> made a file answer <code>undetermined</code> and a live answer <code>allowed</code>, because <code>inventory_from_cluster</code> never listed them. The live read uses the published CRD, not a guessed group: Cilium v1.18.3 <code>cilium.io/v2</code> plural <code>ciliumclusterwidenetworkpolicies</code> (short name <code>ccnp</code>), Calico v3.30.3 <code>crd.projectcalico.org/v1</code> plural <code>globalnetworkpolicies</code> (no short name). A 404 stays a NetworkPolicy answer. A 403 does not. The first printed check is the get for that object. A namespace <code>CiliumNetworkPolicy</code> is not added beside it</td>
+<td><code>tests/test_netpol_anp.py::test_the_live_allowlist_uses_the_published_crd</code>, <code>tests/test_netpol_anp.py::test_a_live_cluster_policy_is_not_a_false_allow</code>, <code>tests/test_netpol_anp.py::test_a_cluster_without_that_crd_keeps_the_networkpolicy_answer</code>, <code>tests/test_netpol_anp.py::test_a_forbidden_read_of_a_cluster_policy_is_not_installed</code>, <code>tests/test_netpol_anp.py::test_the_check_that_resolves_an_unread_cluster_policy_is_the_first_one</code>, <code>tests/test_netpol_anp.py::test_a_live_cluster_policy_does_not_let_a_namespace_deny_stand_as_the_answer</code></td>
 </tr>
 </tbody>
 </table></div><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/guidance.md">docs/guidance.md</a></p></article></div>

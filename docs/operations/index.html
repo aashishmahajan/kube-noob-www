@@ -46,8 +46,13 @@
 </thead>
 <tbody>
 <tr>
-<td>Sunday 05:17</td>
-<td>Corpus refresh (Git sources, release history, ROX Jira)</td>
+<td>Daily 05:17 UTC, every other day by default</td>
+<td>Red Hat Jira main copy. <code>JIRA_EVERY_DAYS=1</code> runs it daily. A run that cannot decrypt the previous copy fails and does not replace it</td>
+<td><code>corpus-refresh.yml</code></td>
+</tr>
+<tr>
+<td>Sunday 03:41 UTC</td>
+<td>Corpus refresh also ingests Git docs and release history</td>
 <td><code>corpus-refresh.yml</code></td>
 </tr>
 <tr>
@@ -78,7 +83,36 @@
 </tbody>
 </table></div>
 <p>The risk review opens or updates one GitHub issue per ISO week titled <code>Weekly risk review &lt;year&gt;-W&lt;week&gt;</code> with the
-label <code>risk-review</code>, plus <code>release-needed</code> when a patch release is recommended.</p>
+label <code>risk-review</code>, plus <code>release-needed</code> when a patch release is recommended. It then closes every other open
+<code>risk-review</code> issue as superseded, so the open list holds the current week only: an open issue is a claim that
+something wants doing, and a report that has been replaced is not making that claim. The run fails rather than
+closing anything if it cannot establish this week's issue number, because closing on an unknown number would
+close the week it had just written.</p>
+<h3 id="the-red-hat-jira-copy-where-it-lives">The Red Hat Jira copy: where it lives</h3>
+<p>Ticket text is not on kube-noob.com and is not in the public <code>kube-noob-db</code> image. Red Hat's issue content is not redistributable. The website's known-issues pages are the release-note bugs, which are a different, smaller set.</p>
+<p>The main copy is the encrypted artifact <code>jira-main-copy-encrypted</code> from the last successful <code>corpus-refresh</code> run. Import it locally (the passphrase is the <code>CORPUS_PASSPHRASE</code> Actions secret, not something to paste into a chat):</p>
+<pre><code class="language-bash"># after decrypting the artifact to jira-snapshot.tgz with that passphrase
+kube-noob corpus import jira-snapshot.tgz
+kube-noob ticket OCPBUGS-1234
+kube-noob corpus jira-changes --since 2d
+</code></pre>
+<p>A sync only adds or refreshes tickets. It will not write a shard smaller than the one it loaded. The scheduled pull runs every other day, newest updates first (<code>ORDER BY updated DESC</code>). Set the repository variable <code>JIRA_EVERY_DAYS</code> to <code>1</code> for a daily pull. Do not rotate <code>CORPUS_PASSPHRASE</code> until the current artifact has been re-encrypted with the new value: a mismatch now fails the workflow instead of discarding the copy, and <code>fresh=true</code> is the only way to start over on purpose.</p>
+<h2 id="when-the-corpus-refresh-refuses-the-copy">When the corpus refresh refuses the copy</h2>
+<p>The privacy audit exits 1 rather than keep a copy that still has person-shaped text in it, which is the right
+way round. Each finding now reads <code>&lt;TICKET&gt; &lt;field&gt;: &lt;kind&gt; &lt;shape&gt;</code>, where the shape is the match with its
+content removed -- <code>spelled-out email A at A.A</code>, <code>account id 9A9A9A9</code> -- so a failure can be triaged from the CI
+log without decrypting the copy and without the log carrying anyone's details.</p>
+<p>Two known false-positive shapes, both from patterns that are deliberately broad because missing real personal
+data is worse than over-matching:</p>
+<ul>
+<li><code>account id 9A9A9A9</code> on a <code>sha256:</code> image digest. <code>BARE_ACCOUNT_ID</code> matches any 24-character hex run starting
+  with <code>5</code>, which a digest fragment satisfies. The anonymiser replaces it with <code>&lt;account&gt;</code>, so the ticket text
+  loses a digest; it is not a leak. Do not narrow the pattern to fix the cosmetics.</li>
+<li><code>spelled-out email A at A.A</code> on text like "ping Commenter A at quay.io", which is what a labelled commenter
+  name followed by a hostname looks like. <code>anonymise</code> scrubs again after labelling for exactly this reason, so a
+  surviving one means the text reached the audit by another path.</li>
+</ul>
+<p>A finding whose shape is neither of those is a real leak: fix the anonymiser, do not raise the gate.</p>
 <h2 id="risk-vectors-and-the-release-rule">Risk vectors and the release rule</h2>
 <div class="table-wrap"><table>
 <thead>
@@ -141,6 +175,25 @@ and its review shows the commit it last checked. Work done on another branch rea
 merged to <code>main</code> and someone presses "Check for new commits" (or sets up push updates) in the plugin portal. A version
 that is bumped on <code>main</code> but never tagged never reaches PyPI, the image or the MCP Registry: 0.5.0 (073fe80) was
 bumped on <code>main</code> and not tagged, so PyPI stopped at 0.4.0.</p>
+<h2 id="when-a-release-job-fails-after-the-others-have-published">When a release job fails after the others have published</h2>
+<p>The jobs publish to five places and only the last of them is the GitHub release, so a failure there leaves PyPI,
+the chart repository, the MCP Registry and Homebrew holding the version while the release carries nothing. This
+happened on v0.7.1.</p>
+<p><strong>Do not delete the release and do not delete or re-push the tag.</strong> Deleting the release destroys the assets the
+run already built, and <code>videos</code> and <code>site</code> with them; re-pushing the tag re-runs <code>publish-pypi</code>, which fails
+because PyPI versions are immutable, and <code>github-release</code> never runs because it waits on that job.</p>
+<p>Re-run the one job instead. It re-runs its dependents (<code>videos</code>, <code>site</code>) and nothing upstream, and it takes the
+artifacts from the original run, which are retained for 90 days:</p>
+<pre><code class="language-bash">gh api &quot;repos/&lt;owner&gt;/&lt;repo&gt;/actions/runs/&lt;run id&gt;/attempts/&lt;n&gt;/jobs?per_page=50&quot; \
+  --jq '.jobs[] | select(.name == &quot;github-release&quot;) | .id'
+gh api -X POST &quot;repos/&lt;owner&gt;/&lt;repo&gt;/actions/jobs/&lt;job id&gt;/rerun&quot;
+</code></pre>
+<p>The videos can also be re-rendered and re-attached on their own, against a release that already exists, which is
+what <code>videos.yml</code>'s <code>workflow_dispatch</code> is for:</p>
+<pre><code class="language-bash">gh workflow run videos.yml --repo &lt;owner&gt;/&lt;repo&gt; -f tag=v&lt;version&gt;
+</code></pre>
+<p>If the artifacts have expired, build the wheel, chart, GIFs and skill ZIP from the tag and upload them with
+<code>gh release upload</code>; the release step is idempotent, so running the job again after that is safe.</p>
 <h2 id="rollback">Rollback</h2>
 <ul>
 <li>PyPI versions are immutable. Yank the bad version (<code>pypi.org/manage/project/kube-noob/releases/</code>), fix forward, and

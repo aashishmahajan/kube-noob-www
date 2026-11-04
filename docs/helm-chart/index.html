@@ -162,7 +162,7 @@ Clients connect to <code>http://&lt;release&gt;-kube-noob.&lt;namespace&gt;.svc:
 <tr>
 <td><code>route.enabled</code></td>
 <td><code>false</code></td>
-<td>OpenShift Route with edge TLS</td>
+<td>OpenShift Route with edge TLS. Needs <code>route.host</code>: a Route with no host gets a generated <code>&lt;name&gt;-&lt;namespace&gt;.&lt;apps-domain&gt;</code> hostname, which the chart cannot put in <code>server.allowedHosts</code>, so every MCP call would answer <strong>421 Invalid Host header</strong> while both probes stayed green. The chart refuses to render without it. <code>oc get ingresses.config/cluster -o jsonpath={.spec.domain}</code> gives the domain</td>
 </tr>
 <tr>
 <td><code>resources</code></td>

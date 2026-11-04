@@ -38,7 +38,7 @@
 <p>Goal: a platform team deploys kube-noob once. Every developer and SRE then gets answers that are safe, cited and
 read-only first, about their own clusters, their own runbooks and their own past fixes, so the platform team's ticket
 queue shrinks. kube-noob has no AI inside: Claude, OpenShift Lightspeed or any MCP client does the talking, and the
-CLI works with no model at all. Updated 2026-10-28, after 0.5.0.</p>
+CLI works with no model at all. Updated 2026-11-03, after 0.7.1.</p>
 <h2 id="principles">Principles</h2>
 <ul>
 <li><strong>Models are the commodity layer.</strong> kube-noob competes on what a model cannot supply: the team's own confirmed
@@ -51,6 +51,15 @@ CLI works with no model at all. Updated 2026-10-28, after 0.5.0.</p>
   an error, a known issue and a past fix; text search is the fallback.</li>
 <li><strong>Land where AI is banned.</strong> Disconnected and regulated OpenShift first; every feature also works on ROSA, EKS, AKS,
   GKE and upstream Kubernetes.</li>
+<li><strong>A disclosure is not a decision.</strong> Every defect found in the 2026-11-03 review had one shape: the information
+  was present and the decision ignored it. <code>controlSummary</code> was computed from a list the exception filter had
+  already emptied; <code>policy reach</code> named <code>ClusterNetworkPolicy</code> under <code>notEvaluated</code> and returned <code>allowed</code> with
+  exit 0; <code>REMOVED_APIS</code> answered "nothing removed" for versions nobody had read; compaction hoisted one finding
+  list and left the other; <code>policy_generate</code> returned 95,000 tokens to a caller that cannot hold them; the weekly
+  review left every superseded week open. In each case a careful human reading the whole output would have seen
+  the caveat, and the gate, the pipeline or the model consuming it would not. So a caveat belongs in the verdict,
+  the exit code or the shape -- the part that is acted on -- and a note beside it is at best a courtesy. When the
+  two disagree, the note is the bug.</li>
 </ul>
 <p>North star: time from an alert or a must-gather to an evidence pack, offline. Target: 60 seconds. Also tracked:
 memory hit rate and tickets answered without escalation.</p>
@@ -89,9 +98,16 @@ memory hit rate and tickets answered without escalation.</p>
 <td>Ban them</td>
 <td>No model inside kube-noob, offline lock, <code>doctor</code>, no egress, signed images, nothing exported</td>
 </tr>
+<tr>
+<td>Compliance / GRC</td>
+<td>Produce evidence an assessor accepts, from a disconnected cluster</td>
+<td>Screenshots, spreadsheets, a console they cannot export from</td>
+<td>Findings already named to NIST SP 800-53 Rev. 5 controls, a coverage record that distinguishes clean from unchecked, and OSCAL a tool can import</td>
+</tr>
 </tbody>
 </table></div>
 <h2 id="status">Status</h2>
+<p>Everything below is in the released code unless the row says otherwise. Dates are release dates.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -102,89 +118,29 @@ memory hit rate and tickets answered without escalation.</p>
 </thead>
 <tbody>
 <tr>
-<td>Offline lock, <code>doctor</code>, web GET-only and text-only</td>
+<td>Offline lock, <code>doctor</code>, web GET-only and text-only; diagnose-first playbooks; redacted bundle</td>
 <td>Done</td>
 <td>0.2.0</td>
 </tr>
 <tr>
-<td>Diagnose-first playbooks, redacted bundle, paste-safe commands</td>
-<td>Done</td>
-<td>0.2.0</td>
-</tr>
-<tr>
-<td>Upgrade-safe learning file; your own runbooks via <code>corpus add-docs</code></td>
-<td>Done</td>
-<td>0.2.0</td>
-</tr>
-<tr>
-<td><code>selftest</code> (61 questions), demos, use cases, guidance traceability</td>
-<td>Done</td>
-<td>0.2.0</td>
-</tr>
-<tr>
-<td>"No AI inside" stated and enforced by a test; no model configured by default</td>
+<td>"No AI inside" stated and enforced by a test; plugin runs bundled source from a hash-pinned <code>uv.lock</code>; PRIVACY.md</td>
 <td>Done</td>
 <td>0.2.1</td>
 </tr>
 <tr>
-<td>Claude plugin runs bundled source with a hash-pinned <code>uv.lock</code></td>
+<td>CI on Kubernetes 1.33-1.37 (OpenShift 4.20, 4.21, 4.22, next); sidecar under Pod Security restricted</td>
 <td>Done</td>
 <td>0.2.1</td>
 </tr>
 <tr>
-<td>PRIVACY.md with every destination; retention, egress and sizing documented</td>
+<td>Chart: generated token, namespace-scoped RBAC, optional EgressFirewall, signed OCI chart; Homebrew</td>
 <td>Done</td>
-<td>0.2.1</td>
+<td>0.2.1-0.2.3</td>
 </tr>
 <tr>
-<td>Two independent red-team reviews, all findings fixed with regression tests</td>
-<td>Done</td>
-<td>0.2.1</td>
-</tr>
-<tr>
-<td>CI on Kubernetes 1.33 to 1.37 (OpenShift 4.20, 4.21, 4.22, next); sidecar under Pod Security restricted</td>
-<td>Done</td>
-<td>0.2.1</td>
-</tr>
-<tr>
-<td>Chart: generated token, namespace-scoped RBAC, optional EgressFirewall, signed OCI chart</td>
-<td>Done</td>
-<td>0.2.1</td>
-</tr>
-<tr>
-<td>Homebrew (Apple silicon, Linux); <code>diagnose</code> takes pasted text</td>
-<td>Done</td>
-<td>0.2.1</td>
-</tr>
-<tr>
-<td>Claude plugin passes the plugin directory's checks (one policy hold: dependencies download at install)</td>
-<td>Done</td>
-<td>0.2.2</td>
-</tr>
-<tr>
-<td>Release writes the Homebrew formula; CI installs it the way users do (tap, <code>brew install kube-noob</code>)</td>
-<td>Done</td>
-<td>0.2.3</td>
-</tr>
-<tr>
-<td>Reported issues: errors matched to the OpenShift 4.20 to 4.22 release notes with link, fix version and workaround</td>
+<td>Reported issues matched to the OpenShift release notes with link, fix version and workaround</td>
 <td>Done</td>
 <td>0.3.0</td>
-</tr>
-<tr>
-<td>Every answer states the knowledge date; live checks read the cluster version; web results marked external</td>
-<td>Done</td>
-<td>0.3.0</td>
-</tr>
-<tr>
-<td>Red Hat Jira copy: every ticket (any status) of the OpenShift, ROSA, ACM and RHACS projects, synced through the REST API at one request per second; known-issue answers say what became of the ticket (fixed in which release, open, not a bug, won't fix, duplicate) with the workaround from the comments</td>
-<td>Done</td>
-<td>0.5.0</td>
-</tr>
-<tr>
-<td>Incident watch: always-on, read-only detection in the service or terminal; each incident explained once, with what changed before it and the fix the team confirmed for earlier occurrences</td>
-<td>Done</td>
-<td>0.4.0</td>
 </tr>
 <tr>
 <td>Audit findings name their NIST SP 800-53 Rev. 5 controls; <code>doctor</code> reports FIPS mode; FedRAMP High deployment guide</td>
@@ -192,131 +148,290 @@ memory hit rate and tickets answered without escalation.</p>
 <td>0.3.1</td>
 </tr>
 <tr>
-<td>Policy debugging: Kyverno, Gatekeeper, ValidatingAdmissionPolicy, Pod Security, SCC, RHACS, quota, LimitRange and RBAC denials explained with the fix; NetworkPolicy reachability (offline or live, read-only) with the smallest allow policy</td>
+<td>Policy debugging: six admission systems explained from a denial, with the smallest fix; NetworkPolicy reachability</td>
 <td>Done</td>
 <td>0.3.1</td>
 </tr>
 <tr>
+<td>Incident watch: always-on read-only detection, each incident explained once with what changed before it</td>
+<td>Done</td>
+<td>0.4.0</td>
+</tr>
+<tr>
+<td>Red Hat Jira copy and known-issue answers that say what became of the ticket</td>
+<td>Done</td>
+<td>0.5.0</td>
+</tr>
+<tr>
+<td>Playbooks for the weakest technologies; triage tuned on a training set and checked on real posts</td>
+<td>Done</td>
+<td>0.6.0</td>
+</tr>
+<tr>
+<td><code>policy migrate-check</code> for legacy Kyverno; generated safety contract and scorecard; Ceph health codes</td>
+<td>Done</td>
+<td>0.7.0</td>
+</tr>
+<tr>
+<td>HTTP server hardening: connection-burst 503, per-caller state, health-endpoint abuse, body limit, nesting guard</td>
+<td>Done</td>
+<td>0.7.1</td>
+</tr>
+<tr>
+<td>ANP -&gt; NetworkPolicy -&gt; BANP precedence evaluated offline, naming the deciding tier, policy and rule</td>
+<td>Done</td>
+<td>0.7.1</td>
+</tr>
+<tr>
+<td>An unread cluster-scoped policy is <code>undetermined</code> and exit 1, for a pasted file and for <code>policy reach</code> against the cluster. That covers <code>ClusterNetworkPolicy</code>, <code>CiliumClusterwideNetworkPolicy</code> (<code>cilium.io/v2</code>) and Calico <code>GlobalNetworkPolicy</code> (<code>crd.projectcalico.org/v1</code>). None of those is parsed. A namespace <code>CiliumNetworkPolicy</code> still does not flip pod-to-pod traffic</td>
+<td>Done</td>
+<td>Unreleased</td>
+</tr>
+<tr>
+<td>Zero-install path proven: <code>kubectl apply 2&gt;&amp;1 \| uvx --from kube-noob kube-noob policy explain</code>, 9 s cold</td>
+<td>Done</td>
+<td>Unreleased</td>
+</tr>
+<tr>
 <td>OpenShift Helm catalog (community) submission</td>
-<td>Not started: needs the owner's fork and pull requests (<a href="/docs/openshift-catalog/">openshift-catalog.md</a>)</td>
-<td>after 0.2.2</td>
+<td><strong>Not started.</strong> The <code>OWNERS</code> pull request has never merged; nothing is in <code>charts.openshift.io</code>. Blocks the chart PR behind it</td>
+<td>after 0.8.0</td>
+</tr>
+<tr>
+<td>Claude plugin directory listing</td>
+<td><strong>Held, not actionable.</strong> Ten versions, all "In review". The hold is <code>Runs a pinned npx or uvx package</code>, which the directory's own checklist lists as held by design for any launcher. Escalated</td>
+<td>-</td>
 </tr>
 <tr>
 <td>Admission under a real <code>restricted-v2</code> SCC in CI</td>
 <td>At risk: needs an OpenShift cluster for CI</td>
 <td>Next</td>
 </tr>
+<tr>
+<td><code>corpus-refresh</code>, <code>db-image</code> scheduled workflows</td>
+<td><strong>Failing.</strong> Scrubber misses bare Atlassian account ids; the bundler packs a VEX shard its own checker rejects</td>
+<td>0.8.0</td>
+</tr>
 </tbody>
 </table></div>
-<h2 id="the-program-milestones-in-build-order">The program (milestones in build order)</h2>
+<h2 id="the-program">The program</h2>
+<p>Reordered 2026-11-03 after four independent reviews. The order is: <strong>correctness before capability, capability
+before reach, reach before breadth.</strong> A verdict that can be wrong costs more than a feature that is missing.</p>
+<h3 id="now-080">Now: 0.8.0</h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
-<th>Milestone</th>
-<th>What ships</th>
+<th>#</th>
+<th>Item</th>
+<th>State</th>
+<th>Why it is first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0</td>
+<td><strong>Same-priority <code>AdminNetworkPolicy</code> ties are "not determined"</strong></td>
+<td>Shipped</td>
+<td>Two policies at one priority were decided by document order, silently. Upstream says the choice is implementation-defined and OVN-Kubernetes raises <code>ANPWithDuplicatePriority</code>. The README promises both policy commands "say what they could not determine"; this is the one place they do not</td>
+</tr>
+<tr>
+<td>P1</td>
+<td><strong>Coverage record: which rules ran over which objects</strong></td>
+<td>Not started</td>
+<td><code>controlSummary</code> lists only controls that have findings, so "clean" and "never evaluated" are indistinguishable. Every compliance output built on top of that would claim satisfaction from silence, which is the exact failure FedRAMP's own guidance names. Nothing else in the compliance arc is honest until this exists</td>
+</tr>
+<tr>
+<td>P2</td>
+<td><strong><code>kubectl krew</code> plugin</strong></td>
+<td>Not started</td>
+<td>Both <code>noob</code> and <code>kube-noob</code> are unclaimed in krew-index. A shell script that execs the installed CLI or falls back to <code>uvx</code>, mapping kubectl-shaped verbs onto commands that already take stdin. No new binary, no new Python, and it is the index platform engineers actually browse</td>
+</tr>
+<tr>
+<td>P3</td>
+<td><strong>OSCAL assessment-results emitter</strong></td>
+<td>Not started</td>
+<td><code>audit --oscal</code>, <code>gate --oscal</code>. Pure serialisation of data already computed, once P1 makes it honest. Deterministic v5 UUIDs so CI can diff it; <code>oscal-version: 1.2.1</code> for trestle interop; validated in CI against the pinned NIST schema with ajv, because Python's <code>jsonschema</code> cannot read the token pattern</td>
+</tr>
+<tr>
+<td>P4</td>
+<td><strong><code>ClusterNetworkPolicy</code> v1alpha2 evaluated, not just named</strong></td>
+<td>Not started</td>
+<td><strong>The wrong verdict is fixed; the capability is not.</strong> G172 stopped the lie: a v1alpha2 CNP in the input now makes <code>policy reach</code> answer <code>UNDETERMINED</code> and exit 1, where it used to answer <code>ALLOWED</code> and exit 0 with the kind named only under <code>notEvaluated</code>. What remains is reading the policy so the answer can be allowed or denied rather than unknown. It is not "mostly a kind and tier mapping": v1alpha2 renamed the action <code>Allow</code> to <strong><code>Accept</code></strong> and replaced the port field with <strong><code>protocols</code></strong> (<code>tcp</code>/<code>udp</code>/<code>sctp</code>, each with <code>destinationPort</code>), so the existing evaluator would read every rule wrong. Budget a week. Calico 3.32 <strong>removed</strong> ANP/BANP enforcement -- "You must migrate to ClusterNetworkPolicy before upgrading to v3.32" (Tigera, 13 May 2026) -- so on a Calico 3.32 cluster the policies kube-noob does evaluate are the ones that no longer apply</td>
+</tr>
+<tr>
+<td>P5</td>
+<td><strong>Fix the two failing scheduled workflows</strong></td>
+<td>Diagnosed, not fixed</td>
+<td>A red schedule that has been red for days trains everyone to ignore schedules. Both causes are now known, and neither is a bug in the workflow. <strong>The scheduled <code>db-image.yml</code></strong> fails its own member-size gate: <code>redhat-vex.jsonl</code> has grown past <code>db_bundle.MAX_MEMBER</code> (300 MB), so the upstream VEX feed outgrew a limit this project set. The similarly named <code>db-image</code> job in <code>ci.yml</code> is green and always was -- it bundles a small public corpus and never downloads the VEX feed, so a green check there says nothing about this. Raising the number is the lazy answer and buys one quarter; the real choice is between sharding the file, filtering the feed to the products kube-noob answers about, and compressing the member. That is a decision, not a fix. <strong>corpus-refresh</strong> fails its privacy audit with 123 person-shaped findings. The gate is right to refuse, and as of G179 its report says which field and what shape matched, so the next run can be triaged from the log. A passphrase mismatch used to start a new copy; as of G182 the run fails and the previous artifact stays the main copy. The privacy findings and the VEX member size are still open</td>
+</tr>
+<tr>
+<td>P6</td>
+<td><strong>A version ceiling on the API tables</strong></td>
+<td>Shipped</td>
+<td><code>REMOVED_APIS</code> is stated "as of Kubernetes 1.37" and its highest removal is 1.32, and nothing anywhere says what the table has not checked. A question about a later minor is therefore answered "no removals", which is a verdict earned by absence (G163) -- and it stops being hypothetical on <strong>16 December 2026</strong>, when Kubernetes 1.38 is released (kubernetes.dev schedule; cycle began 31 August 2026). A <code>CHECKED_THROUGH</code> constant and a <code>beyondCheckedVersions</code> note on <code>validate</code> and <code>api_history</code> when the target minor exceeds it. Hours, and dated</td>
+</tr>
+<tr>
+<td>P7</td>
+<td><strong>Calico 3.32 no longer enforces what kube-noob evaluates</strong></td>
+<td>Live read shipped; the inert-ANP case is not</td>
+<td><strong>Reading the object is not the same as knowing the CNI ignores it.</strong> A <code>GlobalNetworkPolicy</code> or <code>CiliumClusterwideNetworkPolicy</code> on the cluster is now <code>undetermined</code>, the same as a pasted one. What is still open is the opposite shape: the input carries an <code>AdminNetworkPolicy</code> that kube-noob evaluates, while Calico 3.32 does not enforce it. That takes knowing the CNI and its version. <code>policy migrate-check</code> is the right home</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="next-090">Next: 0.9.0</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Item</th>
 <th>Why</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>M1 Signal-keyed matching</td>
-<td>Signal extraction (alerts, event and condition reasons, error templates), a verified signal catalogue, known-issue matching on signals with a recall gate</td>
-<td>Plain words miss bugs the release notes describe differently (an etcd leader-change question misses OCPBUGS-73881)</td>
+<td>N1</td>
+<td><strong>Compliance Operator results reader</strong></td>
+<td><code>compliancecheckresults</code> and <code>rules.compliance.openshift.io</code> are namespaced, non-secret, get/list. Their <code>Rule</code> CRs carry NIST, CIS, SRG and PCI annotations and <code>checkType: Node\|Platform</code>. Reading them gives node-level CIS, STIG and PCI results kube-noob can never produce itself, already licensed to the customer, attributed to the operator and never to kube-noob</td>
 </tr>
 <tr>
-<td>M2 Fixes-as-code memory</td>
-<td>Reviewed YAML entries in the team's Git, <code>kube-noob memory</code> (validate as the poisoning guard, match, outcomes, stats), memory in every answer</td>
-<td>The team's own confirmed fixes are the moat no model can copy</td>
+<td>N2</td>
+<td><strong>Must-gather node configuration</strong></td>
+<td>A standard must-gather carries every rendered <code>MachineConfig</code>, including <code>kubelet.conf</code>, kernel arguments, <code>fips</code>, CRI-O config and the container signature policy. kube-noob opens that bundle and routes eight analyser buckets; this is parsing an artifact already in hand, not a new privilege</td>
 </tr>
 <tr>
-<td>M3 Ticket seeding and replay</td>
-<td>Offline ServiceNow and Jira importers, <code>memory replay</code> with a 30% useful-match gate</td>
-<td>Tests the riskiest assumption on real tickets before more is built on it</td>
+<td>N3</td>
+<td><strong>Curated FedRAMP 20x KSI evidence</strong></td>
+<td>FedRAMP's machine-readable crosswalk maps 25 of kube-noob's 27 controls to KSIs, but several of the 27 reachable indicators are absurd as config evidence. Ship a hand-curated allowlist of about ten, each with a sentence on what the finding does and does not show, carrying FedRAMP's own "do not claim compliance from a mapping alone". <strong>Pin the release and exclude the retired indicators.</strong> <code>FRMR.KSI.key-security-indicators.json</code> is at release <strong>25.11C</strong> (published 2025-12-01) with 20x at <code>current_status: Phase 2 Pilot</code>; the eleven families (AFR, CED, CMT, CNA, IAM, INR, MLA, PIY, RPL, SVC, TPR) are intact, but seven individual indicators now carry <code>retired: true</code> -- KSI-CMT-05, KSI-MLA-03, KSI-MLA-04, KSI-MLA-06, KSI-SVC-03, KSI-TPR-01, KSI-TPR-02. An allowlist built without that list would claim evidence for an indicator FedRAMP has withdrawn, which is worse than claiming none; the mapped release string has to ship with the allowlist and be asserted, because this file moves on its own schedule</td>
 </tr>
 <tr>
-<td>M4 Must-gather pre-flight</td>
-<td>Safe ingest, analysers, report and case draft, a custom must-gather image</td>
-<td>The fastest path to evidence on a disconnected cluster</td>
+<td>N4</td>
+<td><strong>Per-namespace standing posture</strong></td>
+<td><code>drift diff</code> already groups open findings <code>byNamespace</code>, <code>byOwner</code>, <code>byRule</code>. With P1 this becomes per-control standing rather than a count</td>
 </tr>
 <tr>
-<td>M5 Evidence breadth</td>
-<td>Operator release notes, installed-operator inventory, Kubernetes and RHACS known issues, Jira matches filtered by what the cluster runs</td>
-<td>Most escalations are about operators, not the core</td>
+<td>N5</td>
+<td><strong>Rules in the under-served set</strong></td>
+<td>Namespace with no Pod Security <code>enforce</code> label; webhook <code>failurePolicy: Ignore</code>; workloads with no ResourceQuota or LimitRange; <code>MachineConfigPool</code> paused as an SI-2 finding; <code>Subscription</code> on automatic approval. Each is something no other tool checks on OpenShift</td>
 </tr>
 <tr>
-<td>M6 Network truth</td>
-<td>Flow readers (OVN ACL log, Hubble, Network Observability), a pcap analyser, probe and capture plans, <code>net verify</code></td>
-<td>"Policy says allowed, packets say dropped"</td>
+<td>N6</td>
+<td><strong>Decision chain in the terminal</strong></td>
+<td>A text rendering of what <code>policy reach</code> already computes, and of an attack path. Formatting over existing data; makes the wedge visible without a canvas</td>
 </tr>
 <tr>
-<td>M7 Verifier hardening</td>
-<td>Prompt-injection sanitiser, server-side dry-run (tier D), blast radius</td>
-<td>Text from clusters and tickets reaches models; checks must hold under attack</td>
+<td>N7</td>
+<td><strong>Numeric <code>targetPort</code> with no declared <code>containerPort</code></strong></td>
+<td>KN-V012 catches the named case. The numeric case is unflagged, and can only be advisory because Kubernetes does not require the declaration</td>
 </tr>
 <tr>
-<td>M8 Integrations without AI</td>
-<td>Alertmanager receiver, SARIF and CI surfaces, Argo CD, chat commands, console plugin, REST API, <code>oc kube-noob</code>, runbook links, <code>report</code> and <code>/metrics</code></td>
-<td>Reach people where they already work</td>
+<td>N8</td>
+<td><strong>API-server configuration from a must-gather</strong></td>
+<td>TLS profile, audit policy and effective arguments from <code>kubeapiservers.operator.openshift.io/cluster</code>. Field stability across 4.x needs a real bundle first</td>
 </tr>
 <tr>
-<td>M9 Proactive</td>
-<td>Upgrade pre-mortem, offline what-if</td>
-<td>Prevent the ticket instead of answering it</td>
-</tr>
-<tr>
-<td>M10 Optional AI layer</td>
-<td>Egress log, pre-send preview, admin model controls, provider docs, bench with and without tools</td>
-<td>For teams that bring their own key: see exactly what leaves</td>
-</tr>
-<tr>
-<td>M11 kube-noob gate</td>
-<td>An MCP proxy: kube-noob gate checks agent tool calls, holds writes for approval and keeps a tamper-evident log</td>
-<td>The verifier position, without ever acting itself</td>
-</tr>
-<tr>
-<td>M12 Governance</td>
-<td>Identity in audit records, OSCAL, read as caller, a signed air-gap corpus pack</td>
-<td>What regulated buyers need; candidates for an enterprise edition (<a href="/docs/editions/">editions.md</a>)</td>
+<td>N9</td>
+<td>Generate the rule table in <code>docs/compliance.md</code> from code</td>
+<td>It is hand-kept and guarded by a test; generation is the same pattern as the safety contract</td>
 </tr>
 </tbody>
 </table></div>
-<p>Frozen (kept and tested, no new features): learner tracks and credits, brand videos. The grader and
-<code>kube-noob train bench</code> stay as an evaluation product: they score any model or MCP client against the same tasks.
-The trained-model track is cut: kube-noob stays model-free and makes every model better through its tools.</p>
-<p>Set aside: embeddings (unless an evaluation shows signals plus BM25 fail), a hosted SaaS (conflicts with the
-no-egress promise), Backstage beyond a design doc, and live outage signals from social or status feeds (conflicts with
-the offline default).</p>
+<h3 id="later-unchanged-in-intent">Later, unchanged in intent</h3>
+<p>M6 network truth (<code>net verify</code>: policy says allowed, packets say dropped) stays the insurance on the policy wedge,
+and needs an OVN cluster to validate. M7 verifier hardening, M8 integrations, M9 proactive, M10 the optional AI
+layer, M11 <code>kube-noob gate</code> and M12 governance keep their meaning; identity in audit records and the signed air-gap
+pack remain enterprise candidates in <a href="/docs/editions/">editions.md</a>.</p>
+<h2 id="what-this-refuses-to-be">What this refuses to be</h2>
+<p>Encompassing more means reading more artifacts, emitting more formats and reaching more places. It does not mean
+taking privileges the tool has promised not to take, and it does not mean competing on rule count.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Refused</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A node agent, DaemonSet, or any <code>nodes/proxy</code> or exec read</td>
+<td>Breaks the contract every other surface rests on. The Compliance Operator path gives the same evidence read-only</td>
+</tr>
+<tr>
+<td>Embedding CIS Benchmark text, or claiming "CIS compliance"</td>
+<td>The benchmarks are non-commercial-use and not redistributable. Section numbers reach us free through ComplianceAsCode and the Compliance Operator's own annotations</td>
+</tr>
+<tr>
+<td>A single compliance score, or a percentage of 800-53</td>
+<td>27 of about 1,189 controls. A percentage invites exactly the misreading FedRAMP warns against</td>
+</tr>
+<tr>
+<td>Image registry scanning</td>
+<td>Network, and Trivy and RHACS own it. Keep ingesting their output</td>
+</tr>
+<tr>
+<td>Hosted compute, hosted cluster state, or shareable server-side links</td>
+<td>"Nothing leaves your device" is the product. The browser playground already delivers zero-install without a backend</td>
+</tr>
+<tr>
+<td>Any model inside the tool</td>
+<td>The positioning, and a test enforces it</td>
+</tr>
+<tr>
+<td>ISO 27001 mapping, certificate expiry from Secrets, a generic RBAC viewer</td>
+<td>No free machine-readable crosswalk; forbidden; already answered by attack paths</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="the-honest-ceiling-on-compliance">The honest ceiling on compliance</h2>
+<p>kube-noob names 27 of NIST SP 800-53 Rev. 5's controls across its 78 rules. The right sentence is <strong>"machine-readable
+evidence bearing on these 27 controls, from these object kinds, over this scope, with these rules not applicable and
+these inputs unreadable"</strong> — never "compliance coverage", never a percentage. It does not assess the other controls,
+it does not scan nodes itself, and it is not a substitute for a continuous posture platform. A GRC team will not
+switch to it; they will run it beside what they already have, for the evidence those tools cannot export from a
+disconnected cluster.</p>
 <h2 id="riskiest-assumptions-and-the-cheapest-test">Riskiest assumptions and the cheapest test</h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Assumption</th>
 <th>Cheapest test</th>
+<th>State</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Team memory gets reused often enough to matter</td>
 <td><code>kube-noob memory replay</code> on one team's last 50 resolved tickets and the 4 weeks after: at least 30% useful matches</td>
+<td><strong>Blocked on a design partner, not on code.</strong> The harness, the gate and the no-hindsight controls exist; "useful" is a human label, so it needs one team's export and a grader</td>
 </tr>
 <tr>
 <td>Platform teams will let an OSS tool server into the cluster</td>
-<td>Show <code>doctor</code>, PRIVACY.md and SECURITY.md to two OpenShift admins; ask what blocks approval and whether they would enable probes and dry-runs</td>
+<td>Show <code>doctor</code>, PRIVACY.md and SECURITY.md to two OpenShift admins; ask what blocks approval</td>
+<td>Not run</td>
 </tr>
 <tr>
 <td>Developers will ask it before opening a ticket</td>
 <td>Turn on the Lightspeed integration for one team; compare ticket counts for the top 5 categories over 4 weeks</td>
+<td>Not run</td>
 </tr>
 <tr>
 <td>Read-as-caller is possible without new infrastructure</td>
 <td>Prototype with oauth-proxy's <code>--pass-access-token</code> on a test cluster</td>
+<td>Not run</td>
 </tr>
 <tr>
 <td>"No AI inside" reads as a strength, not a gap</td>
 <td>Post two headlines a week apart ("No AI inside. Works with yours." and "The ground truth your AI SRE checks against") and compare click-through to the repository</td>
+<td>Not run</td>
+</tr>
+<tr>
+<td>The two policy questions are ones people actually hit</td>
+<td>Publish the counterexample where a NetworkPolicy-only answer is wrong, and watch whether anyone brings their own manifests</td>
+<td>Counterexample published (<code>examples/netpol-admin-tiers.yaml</code>, README); no external user yet</td>
 </tr>
 </tbody>
-</table></div><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/roadmap.md">docs/roadmap.md</a></p></article></div>
+</table></div>
+<p>The first row is the one that decides whether the ledger is a moat or a feature. Until that number exists and is
+written down as pass or fail, kube-noob is a careful linter with two answers no other tool gives.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/roadmap.md">docs/roadmap.md</a></p></article></div>
 </main>
 <footer class="bottom"><div class="inner">
   <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>

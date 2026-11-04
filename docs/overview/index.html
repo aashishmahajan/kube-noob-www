@@ -43,19 +43,22 @@
 <a href="https://github.com/aashishmahajan/kube-noob/blob/main/LICENSE"><span class="badge">License</span></a></p>
 <p><strong>No AI inside. Works with yours.</strong> kube-noob is a Kubernetes, OpenShift, ROSA HCP, Helm and RHACS/StackRox expert
 in a box: audit rules, read-only-first playbooks, cited docs and graded exercises. Claude, OpenShift Lightspeed or any
-MCP client calls it as tools; the CLI runs it with no AI at all. No network calls unless enabled.</p>
-<ul>
-<li><strong>Audit</strong>: 77 rules plus strict schemas (Kubernetes 1.35, Routes, SCCs, EgressFirewall, Gateway API, StackRox),
-  removed-API checks, safe auto-fixes, attack paths, 9 red-team scenarios, RHACS policy comparison, Containerfiles;
-  scanner and SAST findings ranked by reachability (VEX, KEV); STRIDE threat models.</li>
-<li><strong>Generate</strong>: hardened manifests and Helm charts, re-audited; admission policies (VAP, Kyverno) and webhook; CI gate.</li>
-<li><strong>Debug</strong>: 67 offline playbooks, read-only steps first; must-gathers triaged into a case draft; OpenShift bugs
-  with fix versions; policy denials explained (Kyverno, Gatekeeper, Pod Security, SCC, RBAC); NetworkPolicy
-  reachability; cluster evidence (never Secrets); CI build failures.</li>
-<li><strong>Learn</strong>: 5 tracks, 16 lessons, graded exercises; your team's fixes as code.</li>
-<li><strong>Cite</strong>: answers cite local knowledge as <code>[kn:&lt;doc&gt;#&lt;n&gt;]</code>.</li>
-</ul>
-<p>Design requests run a 7-step protocol: Clarify, Validate, Research, Audit, Calibrate, Generate, Red Team.</p>
+MCP client calls it as tools; the CLI runs it with no AI at all. No network calls unless enabled.
+Browse the rules, the demos and the recordings at <strong><a href="https://kube-noob.com">kube-noob.com</a></strong>.</p>
+<p>Two questions it answers that other tools do not, offline, from files you already have:</p>
+<pre><code class="language-bash">kube-noob policy reach --from web/frontend --to shop/payments --port 9090 -f examples/netpol-admin-tiers.yaml
+kube-noob policy explain -f examples/denial-multi.txt
+</code></pre>
+<p><strong>Which policy governs this traffic?</strong> <code>AdminNetworkPolicy</code> → <code>NetworkPolicy</code> → <code>BaselineAdminNetworkPolicy</code>, in
+cluster order, naming the tier, policy and rule that decided. A checker reading NetworkPolicy alone gives a
+<strong>wrong</strong> answer wherever a platform team set cluster-wide guardrails, not a narrower one.
+<strong>Which system denied this pod?</strong> One pass across Pod Security, SCC, Kyverno, Gatekeeper, VAP and RHACS, with the
+smallest fix. <code>reach</code> exits 1 when denied; both say what they could not determine.</p>
+<p>Also: 78 rules with strict schemas and 9 red-team scenarios; 67 offline playbooks, read-only steps first;
+must-gathers triaged into a case draft that says what could not be read; OpenShift bugs with fix versions; hardened
+manifests and admission policies; 5 tracks, 16 lessons. <code>kube-noob gate</code> puts any of it in CI with SARIF and one
+exception list, and a design request runs the 7-step protocol (Clarify, Validate, Research, Audit, Calibrate,
+Generate, Red Team). Answers cite local knowledge as <code>[kn:&lt;doc&gt;#&lt;n&gt;]</code>. All of it: <a href="/docs/use-cases/">use-cases.md</a>.</p>
 <h2 id="who-does-the-thinking">Who does the thinking</h2>
 <div class="table-wrap"><table>
 <thead>
@@ -67,14 +70,9 @@ MCP client calls it as tools; the CLI runs it with no AI at all. No network call
 </thead>
 <tbody>
 <tr>
-<td>The Claude plugin (Claude Code, Cowork)</td>
-<td>Claude, calling kube-noob's tools</td>
-<td>What you share with Claude, as in any chat; kube-noob sends nothing</td>
-</tr>
-<tr>
-<td>OpenShift Lightspeed or another MCP client</td>
-<td>That client's model</td>
-<td>What that client sends; kube-noob sends nothing</td>
+<td>The Claude plugin, or any MCP client</td>
+<td>That client's model, calling kube-noob's tools</td>
+<td>What you send that client; kube-noob sends nothing</td>
 </tr>
 <tr>
 <td>The CLI</td>
@@ -83,7 +81,7 @@ MCP client calls it as tools; the CLI runs it with no AI at all. No network call
 </tr>
 <tr>
 <td><code>kube-noob ask</code> (optional)</td>
-<td>A model you configure: Anthropic or a local one</td>
+<td>A model you configure</td>
 <td>Your question, to that model only</td>
 </tr>
 </tbody>
@@ -93,20 +91,17 @@ MCP client calls it as tools; the CLI runs it with no AI at all. No network call
 brew trust --formula aashishmahajan/kube-noob/kube-noob
 brew install kube-noob
 kube-noob demo --list
-kube-noob audit -f k8s/ --platform openshift --version 4.22
+kube-noob audit -f your-manifests/ --platform openshift --version 4.22
 kube-noob insight 'paste anything'
 kube-noob doctor
-kube-noob selftest
 </code></pre>
-<p>No Homebrew: <code>uv tool install kube-noob</code> (Python 3.11+); <a href="/docs/install/">install help</a>.</p>
+<p>No Homebrew: <code>uv tool install kube-noob</code> (Python 3.11.4+); <a href="/docs/install/">install help</a>.</p>
 <h2 id="use-with-claude-or-any-mcp-client">Use with Claude or any MCP client</h2>
 <p>Claude plugin, in Claude Code (needs <a href="https://docs.astral.sh/uv/">uv</a>):</p>
 <pre><code>/plugin marketplace add aashishmahajan/kube-noob
 /plugin install kube-noob@kube-noob
 </code></pre>
-<p>Desktop app: <strong>Customize &gt; Plugins &gt; Add &gt; Add marketplace</strong>, <code>aashishmahajan/kube-noob</code>. claude.ai chat: upload the
-<a href="/docs/install/#agent-skill">Agent Skill</a> under <strong>Customize &gt; Skills</strong>.</p>
-<p>Any MCP client:</p>
+<p>Desktop app, claude.ai chat and the Agent Skill: <a href="/docs/install/">install.md</a>. Any MCP client:</p>
 <pre><code class="language-json">{&quot;mcpServers&quot;: {&quot;kube-noob&quot;: {&quot;command&quot;: &quot;uvx&quot;, &quot;args&quot;: [&quot;--from&quot;, &quot;kube-noob==0.7.1&quot;, &quot;kube-noob&quot;, &quot;mcp&quot;]}}}
 </code></pre>
 <h2 id="run-on-openshift">Run on OpenShift</h2>
@@ -114,58 +109,20 @@ kube-noob selftest
 <a href="/docs/openshift/">docs/openshift.md</a>. The chart ships
 NetworkPolicies and runs under <code>restricted-v2</code>.</p>
 <h2 id="safe-by-default">Safe by default</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Setting</th>
-<th>Default</th>
-<th>Change with</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Web lookups (allowlisted HTTPS docs, text only)</td>
-<td>off</td>
-<td><code>webEnabled: true</code> / <code>KUBE_NOOB_WEB_ENABLED=true</code></td>
-</tr>
-<tr>
-<td>Admin offline lock (overrides web)</td>
-<td>off</td>
-<td><code>offline: true</code> / <code>KUBE_NOOB_OFFLINE=1</code> / chart <code>config.offline</code></td>
-</tr>
-<tr>
-<td>Live cluster (read-only, no Secrets)</td>
-<td>off</td>
-<td><code>cluster.enabled: true</code> / <code>--cluster-enabled</code></td>
-</tr>
-<tr>
-<td>Local learning file (confirmed notes)</td>
-<td>on</td>
-<td><code>learningEnabled: false</code></td>
-</tr>
-<tr>
-<td>Model for <code>kube-noob ask</code> only</td>
-<td>none</td>
-<td><code>llm.provider: anthropic</code> (<code>kube-noob[ask]</code>) or <code>openai-compatible</code></td>
-</tr>
-</tbody>
-</table></div>
-<p><code>kube-noob doctor</code> shows what it can reach. Config never comes from the current directory. All keys: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/kube-noob.example.yaml">kube-noob.example.yaml</a>.</p>
+<p>Off until you turn it on: web lookups, live cluster access (read-only, never Secrets), and any model at all. An
+admin <code>offline: true</code> lock overrides every one of them and nothing later in the config chain can lift it. Config
+never comes from the current directory. <code>kube-noob doctor</code> shows what the process can reach and exits 1 if the
+configuration contradicts the lock; every key is in <a href="https://github.com/aashishmahajan/kube-noob/blob/main/kube-noob.example.yaml">kube-noob.example.yaml</a>, and the
+generated <a href="/docs/safety-contract/">safety contract</a> lists what each capability tier can do.</p>
 <h2 id="docs">Docs</h2>
-<ul>
-<li><a href="/docs/use-cases/">Use cases</a> and <a href="/docs/learning/">learning</a></li>
-<li><a href="/docs/roadmap/">Enterprise roadmap</a></li>
-<li><a href="/docs/architecture/">Architecture</a></li>
-<li><a href="/docs/training/">Training</a> and <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/evals/supported-technologies.md">measured accuracy</a></li>
-<li><a href="/docs/operations/">Operations</a></li>
-<li><a href="/docs/guidance/">Guidance traceability</a> and <a href="/docs/release-readiness/">release readiness</a></li>
-<li><a href="/docs/privacy/">Privacy</a>, <a href="/docs/security/">security policy</a> and <a href="/docs/contributing/">contributing</a></li>
-</ul>
+<p>Everything is at <strong><a href="https://kube-noob.com">kube-noob.com</a></strong>, and in <a href="https://github.com/aashishmahajan/kube-noob/tree/main/docs/">docs/</a>: <a href="/docs/use-cases/">use cases</a>,
+<a href="/docs/architecture/">architecture</a>, <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/evals/supported-technologies.md">measured accuracy</a>,
+<a href="/docs/guidance/">guidance</a>, <a href="/docs/learning/">learning</a>, <a href="/docs/privacy/">privacy</a>, <a href="/docs/security/">security</a>,
+<a href="/docs/contributing/">contributing</a>.</p>
 <h2 id="credits">Credits</h2>
-<p>Notices: <a href="/docs/third-party-notices/">THIRD_PARTY_NOTICES.md</a>.
-Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS are
-trademarks of their respective owners; kube-noob is independent and not endorsed by them.
-License: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/LICENSE">Apache-2.0</a>.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/README.md">README.md</a></p></article></div>
+<p>Notices: <a href="/docs/third-party-notices/">THIRD_PARTY_NOTICES.md</a>. Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox,
+OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS are trademarks of their respective owners; kube-noob is
+independent and not endorsed by them. License: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/LICENSE">Apache-2.0</a>.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/README.md">README.md</a></p></article></div>
 </main>
 <footer class="bottom"><div class="inner">
   <span>kube-noob 0.7.1 · Apache-2.0 · No AI inside. Works with yours.</span>

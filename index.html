@@ -41,7 +41,7 @@
   <div class="hero2-in">
     <div class="hero2-copy">
       <span class="pill"><span class="pulse-dot"></span>kube-noob 0.7.1 ·
-      77 rules · offline by default</span>
+      78 rules · offline by default</span>
       <h1>No AI inside.<br><span class="grad">Works with yours.</span></h1>
       <p class="lead">The Kubernetes, OpenShift, ROSA HCP, Helm and RHACS rulebook your AI calls as tools. Claude,
       OpenShift Lightspeed or any MCP client does the talking; kube-noob supplies the rules, the read-only steps and the
@@ -69,7 +69,7 @@
   </div>
 </section>
 <script type="application/json" id="kn-hero-data">{"platform": "openshift", "version": "4.22", "prompt": "Is deployment.yaml ready for OpenShift 4.22?", "yaml": [{"n": 3, "text": "apiVersion: apps/v1"}, {"n": 4, "text": "kind: Deployment"}, {"n": 5, "text": "metadata:"}, {"n": 6, "text": "  name: orders-api"}, {"n": 7, "text": "  namespace: shop"}, {"n": 8, "text": "spec:"}, {"n": 9, "text": "  replicas: 1"}, {"n": 10, "text": "  selector:"}, {"n": 11, "text": "    matchLabels: {app: orders-api}"}, {"n": 12, "text": "  template:"}, {"n": 13, "text": "    metadata:"}, {"n": 14, "text": "      labels: {app: orders-api}"}, {"n": 15, "text": "    spec:"}, {"n": 16, "text": "      containers:"}, {"n": 17, "text": "        - name: api"}, {"n": 18, "text": "          image: quay.io/example/orders-api:latest"}, {"n": 19, "text": "          ports:"}, {"n": 20, "text": "            - containerPort: 80"}, {"n": 21, "text": "          env:"}, {"n": 22, "text": "            - name: DB_PASSWORD"}, {"n": 23, "text": "              value: changeme"}, {"n": 24, "text": "          securityContext:"}, {"n": 25, "text": "            runAsUser: 1000"}, {"n": 26, "text": "            allowPrivilegeEscalation: true"}, {"n": 27, "text": "---"}, {"n": 28, "text": "apiVersion: v1"}, {"n": 29, "text": "kind: Service"}, {"n": 30, "text": "metadata:"}, {"n": 31, "text": "  name: orders-api"}, {"n": 32, "text": "  namespace: shop"}, {"n": 33, "text": "spec:"}, {"n": 34, "text": "  selector: {app: orders}"}, {"n": 35, "text": "  ports:"}, {"n": 36, "text": "    - port: 80"}, {"n": 37, "text": "      targetPort: 80"}], "score": 37, "fixed": 59, "findings": [{"rule": "KN-S013", "severity": "high", "line": 23, "title": "Secret value hard-coded in environment"}, {"rule": "KN-S004", "severity": "high", "line": 25, "title": "Fixed UID/fsGroup conflicts with OpenShift restricted-v2 SCC"}, {"rule": "KN-S002", "severity": "high", "line": 26, "title": "Privilege escalation not disabled"}, {"rule": "KN-N001", "severity": "medium", "line": 5, "title": "Namespace has workloads but no NetworkPolicy"}, {"rule": "KN-C007", "severity": "medium", "line": 9, "title": "Single replica"}], "fixedLines": [25, 26], "changes": [{"op": "+", "text": "seccompProfile: {type: RuntimeDefault}"}, {"op": "+", "text": "runAsNonRoot: true"}, {"op": "-", "text": "runAsUser: 1000"}, {"op": "-", "text": "allowPrivilegeEscalation: true"}, {"op": "+", "text": "allowPrivilegeEscalation: false"}, {"op": "+", "text": "drop: [ALL]"}], "answer": "3 high findings: Secret value hard-coded in environment (KN-S013, line 23); Fixed UID/fsGroup conflicts with OpenShift restricted-v2 SCC (KN-S004, line 25); Privilege escalation not disabled (KN-S002, line 26). kube-noob applied 5 safe fixes, so the score goes from 37 to 59; 4 need a person, and it says which."}</script>
-<section class="band statsband"><div class="stats"><div class="stat"><div class="n" data-count="77">77</div><div class="l">Audit rules</div></div><div class="stat"><div class="n" data-count="67">67</div><div class="l">Offline playbooks</div></div><div class="stat"><div class="n" data-count="957">957</div><div class="l">Release-note issues</div></div><div class="stat"><div class="n" data-count="47">47</div><div class="l">MCP tools (default)</div></div><div class="stat"><div class="n" data-count="9">9</div><div class="l">Red-team scenarios</div></div><div class="stat"><div class="n">63/63</div><div class="l">Self-test</div></div></div></section>
+<section class="band statsband"><div class="stats"><div class="stat"><div class="n" data-count="78">78</div><div class="l">Audit rules</div></div><div class="stat"><div class="n" data-count="67">67</div><div class="l">Offline playbooks</div></div><div class="stat"><div class="n" data-count="957">957</div><div class="l">Release-note issues</div></div><div class="stat"><div class="n" data-count="47">47</div><div class="l">MCP tools (default)</div></div><div class="stat"><div class="n" data-count="9">9</div><div class="l">Red-team scenarios</div></div><div class="stat"><div class="n">63/63</div><div class="l">Self-test</div></div></div></section>
 <section class="band flow">
   <h2>Your AI does the talking. kube-noob supplies the facts.</h2>
   <p class="sub">No model inside, no guessing: the same input gives the same result, with rule ids, playbook ids and
@@ -78,7 +78,7 @@
     <div class="node ai"><svg class="ico" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6zM18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg><h3>Your AI</h3><p>Claude, OpenShift Lightspeed or any MCP client</p></div>
     <div class="wire" aria-hidden="true"><span class="label">MCP tool calls</span><span class="beam"></span></div>
     <div class="node kn"><img src="/brand/kube-noob-icon.svg" alt="" width="52" height="52"><h3>kube-noob</h3>
-      <p>77 rules · 67 playbooks ·
+      <p>78 rules · 67 playbooks ·
       957 known issues · cited docs</p></div>
     <div class="wire" aria-hidden="true"><span class="label">read-only</span><span class="beam"></span></div>
     <div class="node you"><svg class="ico" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12L4 7.5M12 12v9"/></svg><h3>Your YAML, errors and cluster</h3><p>Read-only first; offline unless you
@@ -91,10 +91,9 @@
 brew trust --formula aashishmahajan/kube-noob/kube-noob
 brew install kube-noob
 kube-noob demo --list
-kube-noob audit -f k8s/ --platform openshift --version 4.22
+kube-noob audit -f your-manifests/ --platform openshift --version 4.22
 kube-noob insight &#x27;paste anything&#x27;
-kube-noob doctor
-kube-noob selftest</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-uv" aria-labelledby="tab-uv" hidden><pre><code>uv tool install kube-noob
+kube-noob doctor</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-uv" aria-labelledby="tab-uv" hidden><pre><code>uv tool install kube-noob
 kube-noob demo --list
 kube-noob audit -f k8s/ --platform openshift</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" hidden><pre><code>/plugin marketplace add aashishmahajan/kube-noob
 /plugin install kube-noob@kube-noob</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-mcp" aria-labelledby="tab-mcp" hidden><pre><code>{&quot;mcpServers&quot;: {&quot;kube-noob&quot;: {&quot;command&quot;: &quot;uvx&quot;, &quot;args&quot;: [&quot;--from&quot;, &quot;kube-noob==0.7.1&quot;, &quot;kube-noob&quot;, &quot;mcp&quot;]}}}</code></pre><button class="copy" type="button">Copy</button></div></div></section>
@@ -108,14 +107,9 @@ kube-noob audit -f k8s/ --platform openshift</code></pre><button class="copy" ty
 </thead>
 <tbody>
 <tr>
-<td>The Claude plugin (Claude Code, Cowork)</td>
-<td>Claude, calling kube-noob's tools</td>
-<td>What you share with Claude, as in any chat; kube-noob sends nothing</td>
-</tr>
-<tr>
-<td>OpenShift Lightspeed or another MCP client</td>
-<td>That client's model</td>
-<td>What that client sends; kube-noob sends nothing</td>
+<td>The Claude plugin, or any MCP client</td>
+<td>That client's model, calling kube-noob's tools</td>
+<td>What you send that client; kube-noob sends nothing</td>
 </tr>
 <tr>
 <td>The CLI</td>
@@ -124,7 +118,7 @@ kube-noob audit -f k8s/ --platform openshift</code></pre><button class="copy" ty
 </tr>
 <tr>
 <td><code>kube-noob ask</code> (optional)</td>
-<td>A model you configure: Anthropic or a local one</td>
+<td>A model you configure</td>
 <td>Your question, to that model only</td>
 </tr>
 </tbody>

@@ -108,7 +108,7 @@ options:
 </pre><h2 id="audit">kube-noob audit</h2><pre>usage: kube-noob audit [-h] [--config CONFIG] [--web-enabled] [--cluster-enabled]
                        [--format {text,json,yaml}] -f FILE
                        [--platform {kubernetes,openshift,rosa-classic,rosa-hcp}] [--version PVERSION]
-                       [--min-severity {info,low,medium,high,critical}] [--skip-unreadable]
+                       [--min-severity {info,low,medium,high,critical}] [--skip-unreadable] [--compact]
                        [--fail-on {info,low,medium,high,critical,never}] [--exceptions EXCEPTIONS]
 
 options:
@@ -125,6 +125,11 @@ options:
                         report; without it a directory holding a file that is not UTF-8 or not YAML exits 5,
                         so a gate never reads a partial audit as a clean one (exit 1 stays findings at or
                         above --fail-on)
+  --compact             in json/yaml output, collect each rule&#x27;s constant fields (title, severity,
+                        remediation, citations, controls and the rest) once into a &#x27;ruleInfo&#x27; map keyed by
+                        rule id instead of repeating them on every finding: the same report, losslessly,
+                        about a third smaller where a rule fires more than once. The exit code is unchanged,
+                        so a gate reads the same verdict either way
   --fail-on {info,low,medium,high,critical,never}
   --exceptions EXCEPTIONS
                         exception list (kube-noob.io/v1 ExceptionList): active entries hide the findings

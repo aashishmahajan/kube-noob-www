@@ -69,6 +69,25 @@ kube-noob protocol &quot;deploy orders-api&quot; --blueprint examples/blueprint.
 kube-noob helm-chart --name orders-api --namespace shop --image quay.io/acme/orders:1.4.2 --platform rosa-hcp -o charts
 </code></pre>
 <p>To gate pull requests, run <code>kube-noob audit -f k8s/ --fail-on high</code> in CI. It exits 1 on any HIGH or CRITICAL finding.</p>
+<p>If you target a Kubernetes or OpenShift minor newer than the one kube-noob's removed-API data was read at, the
+report says so rather than reporting nothing:</p>
+<pre><code class="language-console">$ kube-noob validate -f k8s/ --platform openshift --version 4.25
+kube-noob audit | platform=openshift k8s=1.38 | score=100.0 |
+  not checked: The Kubernetes deprecated-API migration guide was read at 1.37, so no removed or deprecated API
+  finding here means none through 1.37 -- not none in 1.38. Check the guide for 1.38 before reading this as clean.
+</code></pre>
+<p>In JSON the same thing arrives as a <code>notCheckedBeyond</code> block, and <code>api_history</code> carries <code>checkedThrough</code> and
+<code>beyondCheckedVersions</code>. A target at or below the ceiling says nothing extra, because for those the answer is
+complete.</p>
+<p>When the report is going into a model's context rather than a terminal, add <code>--compact</code>:</p>
+<pre><code class="language-bash">kube-noob --format json audit -f k8s/ --platform openshift --compact
+</code></pre>
+<p>Each rule's constant fields -- title, severity, remediation, citations, controls and the rest -- are collected
+once into a <code>ruleInfo</code> map keyed by rule id instead of being repeated on every finding that rule produced. On
+this repository's <code>examples/</code> directory that is 105 findings over 19 rules, and the JSON goes from 118 631 to
+54 694 bytes with nothing dropped: <code>kube_noob.audit.compact.expand_report</code> turns it back into the flat report
+exactly. The MCP and HTTP tool takes the same thing as <code>compact: true</code>, off by default so the flat shape stays
+what it was. The exit code is the audit's either way, so a gate reads the same verdict with the flag as without.</p>
 <h2 id="sre-or-on-call-diagnose-before-you-change-anything">SRE or on-call: diagnose before you change anything</h2>
 <p>Not sure what you have? <code>insight</code> names it first (events, logs, a denial, manifests, a ticket, a build log, a
 question; several at once), runs every analyser that applies and merges the answer: findings with their source,
@@ -202,7 +221,7 @@ kube-noob corpus seal jira-snapshot.tgz -o jira-snapshot.tgz.enc --key-file seed
 kubectl create secret generic kn-seed-key --from-file=key=seed.key
 helm upgrade --install kube-noob deploy/helm/kube-noob --set jira.seed.source=image --set jira.seed.image.repository=quay.io/acme/kube-noob-db-jira --set jira.seed.image.digest=sha256:&lt;digest&gt; --set jira.seed.path=/seed/jira-snapshot.tgz.enc --set jira.seed.keySecret.name=kn-seed-key --set config.offline=true
 </code></pre>
-<p>Nobody should wait hours for a first sync. Keep one main copy, refresh it daily (or every two days), and start every
+<p>Nobody should wait hours for a first sync. Keep one main copy, refresh it every other day (or daily), and start every
 other install from it:</p>
 <pre><code class="language-bash">kube-noob corpus jira --online
 kube-noob corpus jira-snapshot -o jira-snapshot.tgz
@@ -220,11 +239,12 @@ version or opened, each with its link, and the open tickets per project and verd
 verdict, comments kept against what Jira reported, tickets cut at the size cap or still in the older format, key
 coverage, size, sync state, what the anonymiser replaced, and a self-check that no email, account id or profile link
 is left (the daily workflow fails if one is).</p>
-<p>The <code>corpus-refresh</code> workflow keeps the main copy in GitHub Actions: daily at 05:17 UTC (set the repository variable
-<code>JIRA_EVERY_DAYS</code> to <code>2</code> for every two days), continuing the previous run's copy, with the changes and open tickets in
-the run summary, and the new copy uploaded only encrypted with your <code>CORPUS_PASSPHRASE</code>. In OpenShift, put the
-snapshot in a private image and set <code>jira.seed</code> so every new pod starts from it (an init container copies it; the
-image needs <code>cp</code> and must run as non-root):</p>
+<p>The <code>corpus-refresh</code> workflow keeps the main copy in GitHub Actions: every other day at 05:17 UTC (set the repository
+variable <code>JIRA_EVERY_DAYS</code> to <code>1</code> for every day), newest updates first, continuing the previous run's copy. A run that
+cannot decrypt that copy fails and leaves it in place. The changes and open tickets are in the run summary, and the
+new copy is uploaded only encrypted with your <code>CORPUS_PASSPHRASE</code>. Ticket text is not published on the website. In
+OpenShift, put the snapshot in a private image and set <code>jira.seed</code> so every new pod starts from it (an init container
+copies it; the image needs <code>cp</code> and must run as non-root):</p>
 <pre><code class="language-bash">gh run download &quot;$(gh run list --repo aashishmahajan/kube-noob --workflow corpus-refresh.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')&quot; --repo aashishmahajan/kube-noob -n jira-main-copy-encrypted -D seed
 openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in seed/jira-snapshot.tgz.enc -out seed/jira-snapshot.tgz -pass env:CORPUS_PASSPHRASE
 printf 'FROM registry.access.redhat.com/ubi9/ubi-micro:latest\nCOPY --chmod=0444 jira-snapshot.tgz /seed/jira-snapshot.tgz\nUSER 1001\n' &gt; seed/Containerfile
@@ -292,7 +312,11 @@ namespace's NetworkPolicies, then <code>BaselineAdminNetworkPolicy</code>. The t
 needs them: an ANP <code>Deny</code> blocks traffic every NetworkPolicy in the namespace allows, and a BANP decides the traffic
 no NetworkPolicy selects. Each verdict names the tier, the policy and the rule that decided it, says for every other
 rule whether the peer or the port did not match, and proposes the smallest NetworkPolicy that would allow the
-traffic. It exits 1 when the traffic is denied, so CI can assert the paths an application needs. <code>--live</code> reads the
+traffic. There is a third verdict: two <code>AdminNetworkPolicy</code> objects at one priority whose rules disagree have no
+defined winner in the API, so the answer is <code>undetermined</code> (<code>UNKNOWN</code> in the text output), it names both policies,
+and it proposes nothing -- a NetworkPolicy cannot override the admin tier whichever way the tie lands. A duplicate
+priority is reported as a note even where the tied policies agree. It exits 1 when the traffic is denied or
+undetermined, so CI can assert the paths an application needs. <code>--live</code> reads the
 policies, both admin tiers, namespace labels and workloads from the cluster (read-only); a cluster without the
 <code>network-policy-api</code> CRDs is a note, not a failure. EgressFirewall and CNI-specific policies are listed as not
 evaluated.</p>
@@ -363,11 +387,15 @@ kube-noob doctor
 <li>nothing later in the config chain can lift it;</li>
 <li>the chart refuses to render if web access is also requested.</li>
 </ul>
-<p>Start answering from day one without any egress: the public <code>kube-noob-db</code> image carries the documentation corpus
-(with its licenses), release history and known issues, rebuilt daily and checked to hold no Jira data. Pin it by
-digest; pods import it on start when it is newer than what they have.</p>
-<pre><code class="language-bash">cosign verify ghcr.io/aashishmahajan/kube-noob-db@sha256:&lt;digest&gt; --certificate-identity-regexp https://github.com/aashishmahajan/kube-noob/ --certificate-oidc-issuer https://token.actions.githubusercontent.com
-helm upgrade --install kube-noob deploy/helm/kube-noob --set db.enabled=true --set db.image.digest=sha256:&lt;digest&gt; --set config.offline=true
+<p>Start answering from day one without any egress: build the corpus image yourself and pin it by digest. Pods import
+it on start when it is newer than what they have.</p>
+<blockquote>
+<p><strong>Not published yet.</strong> The <code>db-image</code> workflow that would publish a public <code>kube-noob-db</code> image has failed on
+every scheduled run since it was added and has never published one, so there is no image to pull. Pack your own
+bundle with <code>kube-noob corpus db-bundle</code>, check it with <code>kube-noob corpus db-check</code>, put it in an image and push
+that to a registry you control, then pin its digest below. This note goes when the workflow publishes.</p>
+</blockquote>
+<pre><code class="language-bash">helm upgrade --install kube-noob deploy/helm/kube-noob --set db.enabled=true --set db.image.repository=&lt;your-registry&gt;/kube-noob-db --set db.image.digest=sha256:&lt;digest&gt; --set config.offline=true
 kube-noob corpus db-check kube-noob-db.tgz
 </code></pre>
 <p><code>doctor</code> prints what the process can reach and exits 1 if the configuration contradicts the lock. To add kube-noob
@@ -569,8 +597,14 @@ values are kept. <code>posture diff</code> compares two snapshots: objects added
 changed, findings new and fixed, and open findings by namespace, owner and rule. Scaling, status, server-set
 metadata and the ReplicaSets and pods a controller makes are not drift. <code>posture report</code> does both in one step and
 keeps the newest snapshots and reports (JSON and Markdown) in a folder; <code>serve</code> with <code>posture.reportEnabled</code> (chart:
-<code>posture.report.enabled</code>) writes one a day at a random time, and the MCP tool <code>posture_report</code> returns the newest.
+<code>posture.report.enabled</code>) writes one a day at a random time, and the MCP tool <code>posture_report</code> returns the newest
+with an <code>ageSeconds</code>, since a failed daily run leaves the previous report as the latest one.
 Excepted findings (<code>--exceptions</code>) are not counted open.</p>
+<p>A live snapshot records what it could not read, and the diff uses it. An object that was in yesterday's snapshot
+and is missing from today's is only <code>removed</code> if today's run could read its kind; if the backend refused that
+resource -- RBAC narrowed, a CRD uninstalled -- the object is <code>undetermined</code> and its findings are
+<code>undetermined</code> rather than <code>fixed</code>, and the report says so above every count. Losing permission to look is not a
+finding being fixed, and a report that conflated the two would call an RBAC regression an improvement.</p>
 <pre><code class="language-bash">kube-noob posture snapshot -f k8s/ -o monday.json
 kube-noob posture diff monday.json tuesday.json --markdown drift.md
 kube-noob --cluster-enabled posture report --live -n shop --exceptions kube-noob-exceptions.yaml
@@ -609,6 +643,15 @@ oc apply -f kube-noob-policies.yaml
 kube-noob policy generate --rule KN-S001 --rule KN-S009 --mode enforce --engine vap -o enforce.yaml
 kube-noob policy generate --engine kyverno --exclude-namespace legacy-apps -o kyverno.yaml
 </code></pre>
+<p>Through the MCP or HTTP tool there is no <code>-o</code>, so the inline YAML is capped at 128 KiB: every rule on every
+engine renders about 380 KB (~95,000 tokens), which is more than most callers can hold. Over the limit the result
+is the counts, <code>skipped</code>, <code>yamlOmitted: true</code>, the byte count and how to ask for less -- 14,168 bytes instead of
+380,670, with nothing truncated. Narrow it with <code>rules</code> or a single <code>engines</code> entry, or pass <code>allow_large: true</code>
+if you can hold the whole set.</p>
+<p>With <code>-o</code>, the JSON or YAML result is the path, the file's size and the counts -- not the policy set as well.
+The whole generated set is about 358 KB of YAML, so returning it inline <em>and</em> writing it made the result larger
+with <code>-o</code> than without; a caller that names a file has already said where it wants the bytes. Without <code>-o</code> the
+rendered YAML is still returned inline, because there is nowhere else for it to go.</p>
 <h3 id="every-finding-as-a-kubectl-warning-the-admission-webhook">Every finding as a kubectl warning: the admission webhook</h3>
 <p>The generated policies cover the rules CEL can decide. <code>kube-noob-admission</code> runs the audit itself: every finding of
 a created or updated object comes back to <code>kubectl</code> and <code>oc</code> as an admission warning (<code>Warning: [KN-S001] Privileged

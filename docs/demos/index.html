@@ -58,7 +58,7 @@ match the shipped version. The demos are offline and use a throwaway data direct
 <td><code>kube-noob demo</code> and <code>selftest</code></td>
 </tr>
 <tr>
-<td>kube-noob as tools for Claude (MCP), 70 s</td>
+<td>kube-noob as tools for Claude (MCP), 67 s</td>
 <td><code>demos/video/render.sh &lt;out-dir&gt; mcp &lt;session.jsonl&gt;</code></td>
 <td>a <code>claude -p --plugin-dir plugin/kube-noob --output-format stream-json --verbose</code> session, with its prompt in <code>&lt;session&gt;.prompt.txt</code></td>
 </tr>
@@ -73,35 +73,45 @@ match the shipped version. The demos are offline and use a throwaway data direct
 AI-generated teaser, sidecar and MCP explainer are in <a href="https://github.com/aashishmahajan/kube-noob/blob/main/demos/ai-video-prompts.md">ai-video-prompts.md</a>.</p>
 <h3 id="animated-videos-no-video-model">Animated videos, no video model</h3>
 <p>The same three scripts, rendered locally in the look of the Grok teaser (navy server room, glass terminal, rocket
-mascot) with a Kokoro voice-over and the kube-noob brand music. Every terminal line in them is copied from a real run:
-the 0.2.2 CLI, the CI sidecar transcript and the recorded Claude session.</p>
+mascot) with a Kokoro voice-over and the kube-noob brand music. Every terminal line in them comes from a real run,
+recorded when the video is built rather than typed: <code>demos/video/facts.py</code> recomputes each number and re-records
+each <code>@name</code> line against the code being built, takes the sidecar lines from the CI transcript and the Claude lines
+from the recorded session. A release that changes a count changes the video, and <code>tests/test_video_facts.py</code> fails a
+script that hard-codes one.</p>
+<p>Lengths below are the released v0.7.1 renders, measured from the attached 1080p copies. A local build of the
+same script can differ by a second or two, because the voice-over is synthesised at build time.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Video</th>
 <th>Length</th>
+<th>Attached to releases</th>
 <th>Command</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Teaser: no AI inside</td>
-<td>30 s</td>
+<td>32 s</td>
+<td>yes</td>
 <td><code>demos/video/stage/build.sh &lt;out-dir&gt; teaser</code></td>
 </tr>
 <tr>
 <td>kube-noob as a sidecar</td>
-<td>56 s</td>
+<td>57 s</td>
+<td>yes</td>
 <td><code>demos/video/stage/build.sh &lt;out-dir&gt; sidecar</code></td>
 </tr>
 <tr>
 <td>kube-noob as tools for Claude (MCP)</td>
-<td>57 s</td>
+<td>67 s</td>
+<td>yes</td>
 <td><code>demos/video/stage/build.sh &lt;out-dir&gt; mcp</code></td>
 </tr>
 <tr>
 <td>Compliance regimes: FedRAMP, EU AI Act, GDPR</td>
 <td>71 s</td>
+<td><strong>no, local render only</strong></td>
 <td><code>python3 demos/video/stage/compliance.py &lt;out-dir&gt;</code> then <code>node demos/video/stage/capture.js &lt;out-dir&gt;</code></td>
 </tr>
 </tbody>

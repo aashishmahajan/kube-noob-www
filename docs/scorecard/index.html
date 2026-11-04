@@ -80,7 +80,7 @@
 </tr>
 <tr>
 <td>Audit rules</td>
-<td>77</td>
+<td>78</td>
 <td><code>python -c "from kube_noob.audit.engine import RULES; print(len(RULES))"</code></td>
 </tr>
 <tr>
@@ -90,12 +90,12 @@
 </tr>
 <tr>
 <td>Knowledge documents</td>
-<td>64</td>
+<td>65</td>
 <td><code>python -c "from kube_noob.knowledge.store import builtin_chunks; print(len({c.doc_id for c in builtin_chunks()}))"</code></td>
 </tr>
 <tr>
 <td>Knowledge sections</td>
-<td>283</td>
+<td>288</td>
 <td><code>python -c "from kube_noob.knowledge.store import builtin_chunks; print(len(builtin_chunks()))"</code></td>
 </tr>
 <tr>
@@ -122,9 +122,9 @@
 </ul>
 <h2 id="what-it-carries">What it carries</h2>
 <ul>
-<li>77 audit rules (45 audit, 12 calibrate, 20 validate).</li>
+<li>78 audit rules (46 audit, 12 calibrate, 20 validate).</li>
 <li>67 diagnosis playbooks with 170 root causes.</li>
-<li>283 knowledge sections in 64 documents.</li>
+<li>288 knowledge sections in 65 documents.</li>
 <li>921 reported issues from the bundled OpenShift release notes.</li>
 <li>63 self-test cases, 151 golden questions, 114 held-out and 171 training triage questions.</li>
 </ul>
@@ -319,7 +319,7 @@
 <td>RHACS</td>
 <td>How do I stop one RHACS deploy-time policy from firing in every namespace whose name starts with test-?</td>
 <td>rank: kn:rhacs-policy-rules-scope#3 exclusion doc should outrank the roxctl deployment check doc</td>
-<td><code>kn:rhacs-roxctl-ci#3</code>, <code>kn:rhacs-enforcement#0</code>, <code>kn:rhacs-policy-rules-scope#4</code></td>
+<td><code>kn:rhacs-roxctl-ci#3</code>, <code>kn:rhacs-policy-rules-scope#4</code>, <code>kn:rhacs-enforcement#0</code></td>
 </tr>
 <tr>
 <td><code>pcel-001</code></td>
@@ -382,7 +382,7 @@
 <td>Admission policy engines</td>
 <td>Creating a namespace fails with: Error from server ([ns-needs-owner] you must provide labels: {"owner"}): a...</td>
 <td>doc: Gatekeeper constraint spec.enforcementAction dryrun or warn instead of deny</td>
-<td><code>gatekeeper/ns-needs-owner</code>, <code>DBG-WEBHOOK</code>, <code>kn:gatekeeper-constraints-usage#4</code></td>
+<td><code>gatekeeper/ns-needs-owner</code>, <code>DBG-WEBHOOK</code>, <code>kn:gatekeeper-enforcement#4</code></td>
 </tr>
 <tr>
 <td><code>pol-012</code></td>

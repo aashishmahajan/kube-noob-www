@@ -615,7 +615,7 @@
 <li>Flags it can pass: <code>--all-namespaces</code>, <code>--container</code>, <code>--context</code>, <code>--field-selector</code>, <code>--namespace</code>, <code>--output</code>, <code>--previous</code>, <code>--request-timeout</code>, <code>--selector</code>, <code>--tail</code></li>
 <li>API paths it builds: <code>/api/v1</code>, <code>/api/v1/namespaces/</code>, <code>/api/v1/namespaces/{namespace}/pods/{pod}/log</code>, <code>/apis/</code>, <code>/apis/{self.group_version}</code>, <code>/version</code></li>
 <li>Names, namespaces, selectors and containers taken from a caller must match strict patterns (<code>_NAME</code>, <code>_SELECTOR</code>, <code>_FIELD_SELECTOR</code>, <code>_CONTAINER</code> in <code>debug/cluster.py</code>), none of which admits <code>/</code>, <code>?</code>, <code>#</code> or a newline, so a name cannot add a path segment such as <code>/exec</code> or <code>/proxy</code>.</li>
-<li><code>resolve_resource</code> refuses <code>secrets</code> by name and any resource outside the allowlist below (37 resources, 53 short names); subresources such as <code>pods/exec</code> are not in it.</li>
+<li><code>resolve_resource</code> refuses <code>secrets</code> by name and any resource outside the allowlist below (40 resources, 58 short names); subresources such as <code>pods/exec</code> are not in it.</li>
 <li>Output is redacted before it leaves the backend: 10 credential patterns for logs and text (markers <code>***JWT***</code>, <code>***PRIVATE KEY***</code>, <code>***aws-key-id***</code>, <code>***github-token***</code>, <code>***slack-token***</code>, <code>***vault-token***</code> and <code>***</code> for values), ConfigMap <code>data</code> and <code>binaryData</code> replaced by byte counts, sensitive <code>env</code> values, <code>last-applied-configuration</code> and sensitive annotations masked, <code>managedFields</code> dropped.</li>
 </ul>
 <p>Resources the backend can read (all <code>get</code> and <code>list</code>; <code>pods/log</code> through <code>logs</code>):</p>
@@ -659,8 +659,18 @@
 <td>namespaced</td>
 </tr>
 <tr>
+<td>cilium.io/v2</td>
+<td><code>ciliumclusterwidenetworkpolicies</code></td>
+<td>cluster</td>
+</tr>
+<tr>
 <td>config.openshift.io/v1</td>
 <td><code>clusteroperators</code>, <code>clusterversions</code></td>
+<td>cluster</td>
+</tr>
+<tr>
+<td>crd.projectcalico.org/v1</td>
+<td><code>globalnetworkpolicies</code></td>
 <td>cluster</td>
 </tr>
 <tr>
@@ -681,6 +691,11 @@
 <tr>
 <td>policy.networking.k8s.io/v1alpha1</td>
 <td><code>adminnetworkpolicies</code>, <code>baselineadminnetworkpolicies</code></td>
+<td>cluster</td>
+</tr>
+<tr>
+<td>policy.networking.k8s.io/v1alpha2</td>
+<td><code>clusternetworkpolicies</code></td>
 <td>cluster</td>
 </tr>
 <tr>
@@ -859,8 +874,26 @@
 <tr>
 <td><code>rbac.yaml</code></td>
 <td><code>ClusterRole &lt;fullname&gt;-read</code></td>
+<td><code>cilium.io</code></td>
+<td><code>ciliumclusterwidenetworkpolicies</code></td>
+<td><code>get</code>, <code>list</code></td>
+<td><code>config.clusterEnabled</code> and <code>rbac.scope = "cluster"</code></td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>rbac.yaml</code></td>
+<td><code>ClusterRole &lt;fullname&gt;-read</code></td>
 <td><code>config.openshift.io</code></td>
 <td><code>clusteroperators</code>, <code>clusterversions</code></td>
+<td><code>get</code>, <code>list</code></td>
+<td><code>config.clusterEnabled</code> and <code>rbac.scope = "cluster"</code></td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>rbac.yaml</code></td>
+<td><code>ClusterRole &lt;fullname&gt;-read</code></td>
+<td><code>crd.projectcalico.org</code></td>
+<td><code>globalnetworkpolicies</code></td>
 <td><code>get</code>, <code>list</code></td>
 <td><code>config.clusterEnabled</code> and <code>rbac.scope = "cluster"</code></td>
 <td>no</td>
@@ -905,7 +938,7 @@
 <td><code>rbac.yaml</code></td>
 <td><code>ClusterRole &lt;fullname&gt;-read</code></td>
 <td><code>policy.networking.k8s.io</code></td>
-<td><code>adminnetworkpolicies</code>, <code>baselineadminnetworkpolicies</code></td>
+<td><code>clusternetworkpolicies</code>, <code>adminnetworkpolicies</code>, <code>baselineadminnetworkpolicies</code></td>
 <td><code>get</code>, <code>list</code></td>
 <td><code>config.clusterEnabled</code> and <code>rbac.scope = "cluster"</code></td>
 <td>no</td>
@@ -1321,7 +1354,7 @@
 <td><code>kube_noob/generate/helm_render.py</code></td>
 <td><code>render_chart</code></td>
 <td><code>subprocess.run</code></td>
-<td><code>[helm, 'template', release, str(chart), '--namespace', namespace] + ['--values', vf]</code></td>
+<td><code>[helm, 'template', release, str(chart), '--namespace', namespace] + ['--kube-version', kube_version] + ['--values', vf]</code></td>
 </tr>
 <tr>
 <td><code>kube_noob/sources/advisories.py</code></td>
@@ -1347,13 +1380,39 @@
 <p>kube-noob calls no model, but the model that calls kube-noob reads its results, so text that came from outside (events, logs, tickets, memory entries, pages) is cleaned before a result leaves the server. The sanitiser is <code>kube_noob.sanitize</code>; it is defence in depth, not a guarantee.</p>
 <p>Where it is applied (found in the code):</p>
 <ul>
+<li><code>kube_noob/admission.py</code> <code>review_bytes</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/audit/exceptions.py</code> <code>review</code> calls <code>sanitize.safe_load_bounded</code></li>
+<li><code>kube_noob/build/analytics.py</code> <code>load_history</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/build/containerfile.py</code> <code>audit</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/build/oci.py</code> <code>_json</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/code/sarif.py</code> <code>parse</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/code/ship.py</code> <code>_args</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/debug/diagnose.py</code> <code>_selector</code> calls <code>sanitize.loads_bounded</code></li>
 <li><code>kube_noob/evals/problems.py</code> <code>parse</code> calls <code>sanitize.json_nesting_ok</code></li>
+<li><code>kube_noob/gate.py</code> <code>_classify</code> calls <code>sanitize.safe_load_all_bounded</code></li>
+<li><code>kube_noob/gate.py</code> <code>unreadable_reason</code> calls <code>sanitize.safe_load_all_bounded</code></li>
 <li><code>kube_noob/insight.py</code> <code>_json</code> calls <code>sanitize.json_nesting_ok</code></li>
+<li><code>kube_noob/knowledge_status.py</code> <code>_corpus_as_of</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/known_issues.py</code> <code>_read_parts</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/memory/importers.py</code> <code>parse</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/rhacs.py</code> <code>load</code> calls <code>sanitize.loads_bounded</code></li>
 <li><code>kube_noob/server/mcp_app.py</code> <code>CallFailed.__init__</code> calls <code>sanitize.clean</code></li>
 <li><code>kube_noob/server/mcp_app.py</code> <code>build_server.knowledge_doc</code> calls <code>sanitize.clean</code></li>
 <li><code>kube_noob/server/rest.py</code> <code>register.endpoint.handle</code> calls <code>sanitize.json_nesting_ok</code></li>
 <li><code>kube_noob/signals/alertmanager.py</code> <code>_load</code> calls <code>sanitize.json_nesting_ok</code></li>
+<li><code>kube_noob/signals/core.py</code> <code>_parse</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/sources/db_bundle.py</code> <code>_known_problems</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/sources/db_bundle.py</code> <code>build</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/sources/jira.py</code> <code>load_state</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/ticket_changes.py</code> <code>sync_state</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/tickets.py</code> <code>_ticket_shards</code> calls <code>sanitize.loads_bounded</code></li>
 <li><code>kube_noob/tool_runner.py</code> <code>call</code> calls <code>sanitize.result</code></li>
+<li><code>kube_noob/upgrade_risks.py</code> <code>bundled</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/vuln/kev.py</code> <code>parse</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/vuln/reports.py</code> <code>parse</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/vuln/vex.py</code> <code>_corpus_records</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/vuln/vex.py</code> <code>_documents</code> calls <code>sanitize.loads_bounded</code></li>
+<li><code>kube_noob/vuln/vex.py</code> <code>load</code> calls <code>sanitize.loads_bounded</code></li>
 </ul>
 <p>Finding kinds it reports (read from its source): <code>bidi-override</code>, <code>instruction</code>, <code>instruction-hint</code>, <code>markdown-image</code>, <code>markdown-link</code>, <code>role-marker</code>, <code>tool-call</code>, <code>unicode-tags</code>, <code>zero-width</code>.</p>
 <p>What each does, shown by running the sanitiser on a probe built for the purpose (the document does not quote attack text):</p>

@@ -72,27 +72,30 @@ installing the dependencies at the exact versions and SHA-256 hashes in the <cod
 throwaway environment in uv's cache. <code>-I</code> keeps your working directory and <code>PYTHONPATH</code> off <code>sys.path</code>, and <code>-B</code>
 writes no <code>.pyc</code> into the plugin. If no Python 3.11 or later is present, uv downloads its managed CPython once.
 Nothing else is downloaded and no LLM SDK is installed.</p>
-<p>A pinned package launcher — <code>uvx kube-noob==&lt;version&gt; mcp</code> — is what the plugin directory clears automatically,
-where <code>uv run --frozen</code> is held for a human reviewer. It becomes the default from 0.7.1, not before: the published
-0.7.0 has no switch to withhold <code>analyze_must_gather</code>, the one tool that opens a path on your machine rather than
-reading text it was handed, so installing the published package would hand the plugin a capability the vendored copy
-has never had. 0.7.1 adds <code>mustGather.enabled</code>, this file already sets <code>KUBE_NOOB_MUST_GATHER_ENABLED=false</code>, and the
-two launchers then offer exactly the same tools.</p>
+<p>Running the published package from an index instead would be cleared by the directory's automatic checks, where
+this launcher is held for a human reviewer. kube-noob does not do it, and the reason is worth stating plainly: a
+launcher that names a package and a version fixes that package, and leaves the rest of the tree to be resolved when
+the user first runs it. This one resolves nothing. The source is the readable copy in <code>server/</code>, every dependency is
+fixed to an exact version and SHA-256 hash in the <code>uv.lock</code> beside this file, and <code>--frozen</code> refuses to re-resolve
+any of it. The trade is a slower listing for an install that is identical on every machine and auditable before it
+runs, and that is the right way round for a tool people point at production clusters.</p>
 <h3 id="what-the-vendored-copy-is">What the vendored copy is</h3>
 <p>The server source in <code>server/</code> is the modules of the
 <a href="https://github.com/aashishmahajan/kube-noob">kube-noob repository</a>'s <code>src/kube_noob</code> that the stdio MCP server
 imports, copied unchanged. The CLI, the optional model agent, the HTTP service and REST routes, the web client, Helm
 rendering and the cluster backends are not included, so nothing in that copy reads a credential, opens a connection or
 starts another program. Beside it is a <code>uv.lock</code> pinning every dependency to an exact version and SHA-256 hash.</p>
-<p>From 0.7.1 the default becomes the pinned package launcher. To keep running this vendored copy instead — on an
-air-gapped machine, or when you want every dependency fixed by hash rather than resolved at install time — keep the
-<code>mcpServers</code> entry as:</p>
-<pre><code class="language-json">{&quot;command&quot;: &quot;uv&quot;, &quot;args&quot;: [&quot;run&quot;, &quot;--frozen&quot;, &quot;--exact&quot;, &quot;--isolated&quot;, &quot;--quiet&quot;, &quot;--project&quot;,
-  &quot;${CLAUDE_PLUGIN_ROOT}&quot;, &quot;python&quot;, &quot;-I&quot;, &quot;-B&quot;, &quot;${CLAUDE_PLUGIN_ROOT}/server/kube_noob_plugin.py&quot;]}
-</code></pre>
-<p>That form reads only the source in this directory and the hashes in <code>uv.lock</code>, and resolves nothing at install time.
-It stays the stronger of the two. Vendoring <code>mcp</code>, <code>pydantic</code>, <code>starlette</code> and <code>uvicorn</code> as well — which would let
-the plugin run a plain file with no resolver at all — does not fit the directory's file-count and file-size limits.</p>
+<p>The <code>uv.lock</code> beside this file names 32 packages. Eight are what the bundled server imports directly: <code>mcp</code>,
+<code>pydantic</code>, <code>pydantic-core</code>, <code>mcp-types</code>, <code>anyio</code>, <code>starlette</code>, <code>PyYAML</code> and <code>jsonschema</code>. The rest arrive through
+<code>mcp</code>, which declares its HTTP transports as dependencies whether or not you use them, so the installed tree does
+contain HTTP clients and a web server — <code>httpx2</code>, <code>httpcore2</code>, <code>h11</code>, <code>uvicorn</code>, <code>sse-starlette</code> — along with
+<code>cryptography</code>, <code>truststore</code>, <code>pyjwt</code> and their own dependencies. A reviewer reading <code>uv.lock</code> will see all of them,
+and this file should not say otherwise.</p>
+<p>What is true is narrower and checkable: this plugin serves stdio only, the bundled modules under <code>server/</code> never
+import those packages and never start a server or open a connection, and the CLI, the optional model agent, the HTTP
+service and the web client are not part of the copy at all. All 31 dependencies are pinned to an exact version and SHA-256 hash -- the 32nd entry is this plugin itself,
+which is a virtual project with no artifact to hash -- and <code>--frozen</code> refuses to re-resolve any of it. Vendoring them instead, which would let the plugin run
+a plain file with no resolver at all, does not fit the directory's file-count and file-size limits.</p>
 <h2 id="what-it-accesses">What it accesses</h2>
 <ul>
 <li>Network: none of its own. The plugin has no web client and no cluster access, and the server never calls a model;
